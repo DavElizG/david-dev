@@ -1,0 +1,22 @@
+[
+  {
+    "id_project": 1,
+    "title": "Sistema de Gestión para CTP La Mansión",
+    "description": "Aplicación web para la gestión de solicitudes de salas y laboratorios, con características de reserva, aprobación y notificaciones.",
+    "image": "/src/assets/images/projects/ctp-system.webp",
+    "technologies": ["React", "Tailwind CSS", ".NET C#", "SQL Server"],
+    "liveUrl": "https://ctp-system-demo.vercel.app",
+    "repoUrl": "https://github.com/DavElizG/ctp-system",
+    "featured": true
+  },
+  {
+    "id_project": 2,
+    "title": "Portal de Noticias Universitarias",
+    "description": "Aplicación web para mostrar noticias y eventos de la Universidad Nacional, desarrollada con React y Tailwind CSS como proyecto académico.",
+    "image": "/src/assets/images/projects/news-portal.webp",
+    "technologies": ["React", "Tailwind CSS", "JavaScript"],
+    "liveUrl": "https://news-portal-demo.vercel.app",
+    "repoUrl": "https://github.com/DavElizG/news-portal",
+    "featured": true
+  }
+]

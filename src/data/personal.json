@@ -1,0 +1,22 @@
+{
+  "id_personal": 1,
+  "name": "David Guadamuz Elizondo",
+  "title": "Desarrollador Frontend Junior",
+  "email": "jose.guadamuz.elizondo@est.una.ac.cr",
+  "location": "Nicoya, Costa Rica",
+  "bio": "Desarrollador frontend con experiencia en React y .NET C#. Estudiante de Ingeniería en Sistemas de Información comprometido con crear experiencias de usuario atractivas y funcionales.",
+  "socialLinks": [
+    {
+      "id_social": 1,
+      "platform": "GitHub",
+      "url": "https://github.com/DavElizG",
+      "icon": "github"
+    },
+    {
+      "id_social": 2,
+      "platform": "LinkedIn",
+      "url": "https://www.linkedin.com/in/jose-guadamuz-elizondo-8288a5354/",
+      "icon": "linkedin"
+    }
+  ]
+}
