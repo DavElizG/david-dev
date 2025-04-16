@@ -54,7 +54,7 @@
       {
         "id_tech": 8,
         "name": "SQL Server",
-        "icon": "microsoftsqlserver",
+        "icon": "sqlserver",
         "url": "https://learn.microsoft.com/es-es/sql/sql-server/"
       },
       {
