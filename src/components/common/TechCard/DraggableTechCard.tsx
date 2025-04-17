@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { getTechIcon } from '../../../utils/iconUtils';
 import { TechCardProps } from '../../../types/techCard.types';
