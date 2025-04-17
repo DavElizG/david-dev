@@ -1,13 +1,13 @@
 [
   {
     "id_experience": 1,
-    "role": "Desarrollador de Aplicaciones",
-    "company": "CTP de La Mansión",
+    "role": "Desarrollador de Software",
+    "company": "Desarrollador Independiente",
     "location": "Guanacaste, Costa Rica",
     "startDate": "Enero 2024",
     "endDate": "Presente",
-    "description": "Desarrollo de un sistema de gestión para solicitudes de salas y laboratorios. Implementación de metodología Scrum, trabajo en sprints y participación en reuniones de planificación. Integración de frontend en React con backend en .NET C#.",
-    "technologies": ["React", "Tailwind CSS", "TypeScript", ".NET C#", "SQL Server", "Scrum"]
+    "description": "Desarrollo de aplicaciones y sistemas web personalizados. Implementación de metodologías ágiles para gestión de proyectos. Creación de soluciones integrales con tecnologías tanto de frontend como backend para diversos clientes.",
+    "technologies": ["React", "Tailwind CSS", "TypeScript", ".NET C#", "Node.js", "SQL Server", "MongoDB", "Scrum"]
   },
   {
     "id_experience": 2,

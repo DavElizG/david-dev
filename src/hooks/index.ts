@@ -5,3 +5,4 @@ export * from './useExperience';
 export * from './useSkills';
 export * from './useLanguages';
 export * from './useProjects';
+export * from './useAboutInfo';

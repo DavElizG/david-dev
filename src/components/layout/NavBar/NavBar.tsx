@@ -1,63 +1,50 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTheme } from '../../../context';
+import { Link, useLocation } from 'react-router-dom';
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('hero');
   const { darkMode } = useTheme();
-
-  // Menú de navegación
+  const location = useLocation();
+  
+  // Estructura de navegación actualizada (quitando Contacto)
   const navItems = [
-    { name: 'Inicio', href: '#hero' },
-    { name: 'Sobre mí', href: '#about' },
-    { name: 'Habilidades', href: '#skills' },
-    { name: 'Proyectos', href: '#projects' },
-    { name: 'Contacto', href: '#contact' }
+    { name: 'Inicio', href: '/' },
+    { name: 'Sobre mí', href: '/about' },
+    { name: 'CV', href: '/resume' }
   ];
 
-  // Detectar sección activa en el scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = document.querySelectorAll('section[id]');
-      // Ajustamos el scrollPosition para tener en cuenta la altura de la barra de navegación fija (aprox. 64px)
-      const scrollPosition = window.scrollY + 100;
-
-      sections.forEach((section) => {
-        const sectionTop = (section as HTMLElement).offsetTop;
-        const sectionHeight = (section as HTMLElement).offsetHeight;
-        const sectionId = section.getAttribute('id') || '';
-
-        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-          setActiveSection(sectionId);
-        }
-      });
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    // Llamamos a handleScroll al inicio para establecer la sección activa inicial
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Función para manejar la navegación suave
+  // Función para manejar la navegación
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    setIsOpen(false);
-    
-    const targetId = href.substring(1);
-    const targetElement = document.getElementById(targetId);
-    
-    if (targetElement) {
-      // Ajustamos el desplazamiento para tener en cuenta la barra de navegación fija
-      const targetPosition = targetElement.offsetTop - 64; // 64px es aproximadamente la altura del header
-      
-      window.scrollTo({
-        top: targetPosition,
-        behavior: 'smooth'
-      });
-      
-      setActiveSection(targetId);
+    // Si el enlace es un ancla dentro de la página home, realizamos scroll suave
+    if (href.includes('#')) {
+      // Solo hacemos scroll si estamos en la página de inicio
+      if (location.pathname === '/') {
+        e.preventDefault();
+        const targetId = href.substring(href.indexOf('#') + 1);
+        const targetElement = document.getElementById(targetId);
+        
+        if (targetElement) {
+          // Ajustamos el desplazamiento para tener en cuenta la barra de navegación fija
+          const targetPosition = targetElement.offsetTop - 64;
+          
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }
     }
+    
+    setIsOpen(false);
+  };
+
+  // Función para determinar si un enlace está activo
+  const isActive = (href: string) => {
+    if (href === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(href);
   };
 
   return (
@@ -104,18 +91,18 @@ const NavBar = () => {
             } ring-1 ring-black ring-opacity-5 z-50`}
           >
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
+                to={item.href}
                 className={`block px-4 py-2 text-sm ${
-                  activeSection === item.href.substring(1)
+                  isActive(item.href)
                     ? `${darkMode ? 'bg-gray-800 text-blue-300' : 'bg-gray-100 text-blue-600'}`
                     : `${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-50'}`
                 }`}
                 onClick={(e) => handleNavClick(e, item.href)}
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
           </div>
         )}
@@ -124,18 +111,18 @@ const NavBar = () => {
       {/* Menú para escritorio */}
       <div className="hidden md:flex space-x-8">
         {navItems.map((item) => (
-          <a
+          <Link
             key={item.name}
-            href={item.href}
+            to={item.href}
             className={`text-sm font-medium ${
-              activeSection === item.href.substring(1)
+              isActive(item.href)
                 ? `${darkMode ? 'text-blue-300' : 'text-blue-600'}`
                 : `${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900'}`
             } transition-colors`}
             onClick={(e) => handleNavClick(e, item.href)}
           >
             {item.name}
-          </a>
+          </Link>
         ))}
       </div>
     </nav>

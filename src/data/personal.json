@@ -1,10 +1,10 @@
 {
   "id_personal": 1,
   "name": "David Guadamuz Elizondo",
-  "title": "Desarrollador Frontend Junior",
+  "title": "Desarrollador Full Stack",
   "email": "jose.guadamuz.elizondo@est.una.ac.cr",
   "location": "Nicoya, Costa Rica",
-  "bio": "Desarrollador frontend con experiencia en React y .NET C#. Estudiante de Ingeniería en Sistemas de Información comprometido con crear experiencias de usuario atractivas y funcionales.",
+  "bio": "Desarrollador Full Stack con experiencia en tecnologías modernas como React, Node.js y .NET C#. Estudiante de Ingeniería en Sistemas de Información con enfoque en el desarrollo de soluciones web completas y escalables, con habilidades balanceadas en backend y frontend.",
   "socialLinks": [
     {
       "id_social": 1,

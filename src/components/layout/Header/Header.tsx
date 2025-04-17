@@ -1,12 +1,16 @@
+import { useState } from 'react'; // Añadido el import de useState
 import NavBar from '../NavBar';
 import ThemeToggle from '../../common/ThemeToggle';
 import { usePersonalInfo } from '../../../hooks';
 import { useTheme } from '../../../context';
-import { ThreeDHeader } from '../../common/3DModel';
+import logo from '../../../assets/images/logo/JDSnoppyLogo.webp';
+import logoHandsUp from '../../../assets/images/logo/JDSnoppyLogoHandsUp.webp'; // Importación del logo con manos levantadas
+//import { ThreeDHeader } from '../../common/3DModel';
 
 const Header = () => {
     const { personalInfo, loading } = usePersonalInfo();
     const { darkMode } = useTheme();
+    const [isHovered, setIsHovered] = useState(false); // Estado para controlar el hover
     
     return (
         <>
@@ -14,8 +18,17 @@ const Header = () => {
             <header className={`fixed top-0 left-0 right-0 z-50 shadow-md ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
                 <div className="container mx-auto px-6 py-4 flex justify-between items-center">
                     {/* Logo/Nombre */}
-                    <div className="text-xl font-bold">
-                        {loading ? 'Cargando...' : personalInfo?.name.split(' ').slice(0, 2).join(' ')}
+                    <div className="flex items-center">
+                        <img 
+                            src={isHovered ? logoHandsUp : logo} 
+                            alt="Logo JD" 
+                            className="h-8 w-auto mr-2 transition-all duration-200" 
+                            onMouseEnter={() => setIsHovered(true)}
+                            onMouseLeave={() => setIsHovered(false)}
+                        />
+                        <span className="text-xl font-bold">
+                            {loading ? 'Cargando...' : personalInfo?.name.split(' ').slice(0, 2).join(' ')}
+                        </span>
                     </div>
 
                     {/* Componente de navegación separado */}
@@ -33,10 +46,10 @@ const Header = () => {
             {/* Espacio para compensar la barra fija */}
             <div className="h-16"></div>
             
-            {/* Componente 3D interactivo */}
-            <div className={`w-full ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} relative`}>
+            {/* Componente 3D interactivo - temporalmente comentado */}
+            {/* <div className={`w-full ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} relative`}>
                 <ThreeDHeader />
-            </div>
+            </div> */}
         </>
     );
 };

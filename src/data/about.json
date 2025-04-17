@@ -1,0 +1,10 @@
+{
+  "id": 1,
+  "whoAmI": "Soy un desarrollador full stack con mayor afinidad por el desarrollo backend, pero con sólidas habilidades en ambos campos. Me apasiona crear soluciones digitales completas y escalables. Actualmente estudio Ingeniería en Sistemas de Información y me especializo en el desarrollo de aplicaciones web modernas y arquitecturas de sistemas.",
+  "currentStudy": "Estudiante de Ingeniería en Sistemas de Información",
+  "objectives": [
+    "Mi objetivo es desarrollar soluciones tecnológicas integrales que impacten positivamente a los usuarios, con especial atención en la robustez y escalabilidad del backend junto a interfaces intuitivas.",
+    "Me apasiona profundizar en arquitecturas de sistemas y bases de datos, así como aprender nuevas tecnologías que me permitan evolucionar constantemente como desarrollador full stack.",
+    "Busco colaborar en proyectos desafiantes donde pueda aplicar mis conocimientos en tecnologías como .NET C#, Node.js, bases de datos, React y otras herramientas para crear productos digitales de alta calidad."
+  ]
+}
