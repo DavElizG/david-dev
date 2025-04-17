@@ -8,3 +8,17 @@ export interface Project {
   repoUrl: string;
   featured: boolean;
 }
+
+/**
+ * Props para el componente ProjectCard 
+ */
+export interface ProjectCardProps {
+  id: number;
+  title: string;
+  description: string;
+  technologies: string[];
+  repoUrl: string;
+  liveUrl: string;
+  darkMode: boolean;
+  image?: string;
+}

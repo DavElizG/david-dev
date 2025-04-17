@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Trabajo en equipo",
+    "description": "Capacidad para colaborar efectivamente en equipos diversos, contribuyendo al éxito colectivo y fomentando un ambiente de cooperación."
+  },
+  {
+    "id": 2,
+    "name": "Comunicación efectiva",
+    "description": "Habilidad para transmitir ideas de forma clara y concisa, tanto verbalmente como por escrito, adaptando el mensaje a diferentes audiencias."
+  },
+  {
+    "id": 3,
+    "name": "Resolución de problemas",
+    "description": "Capacidad para identificar obstáculos, analizar situaciones complejas y proponer soluciones creativas y efectivas."
+  },
+  {
+    "id": 4,
+    "name": "Adaptabilidad",
+    "description": "Flexibilidad para ajustarme a nuevos entornos, tecnologías y metodologías de trabajo, manteniendo la productividad ante los cambios."
+  },
+  {
+    "id": 5,
+    "name": "Gestión del tiempo",
+    "description": "Organización eficiente de tareas y prioridades para cumplir con plazos y objetivos, optimizando recursos disponibles."
+  },
+  {
+    "id": 6,
+    "name": "Pensamiento crítico",
+    "description": "Capacidad de análisis y evaluación de información para tomar decisiones fundamentadas y resolver problemas de manera lógica."
+  }
+]

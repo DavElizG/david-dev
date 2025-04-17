@@ -1,7 +1,6 @@
 import { About } from '../../components/sections';
 import { useEducation, useExperience, useLanguages, usePersonalInfo, useSkills } from '../../hooks';
 import { useTheme } from '../../context';
-import profileImage from '../../assets/images/profile/FB_IMG_1731451105768.webp';
 import { getTechIcon, getTechDocUrl } from '../../utils/iconUtils';
 
 const AboutPage = () => {
@@ -17,28 +16,9 @@ const AboutPage = () => {
   return (
     <div className={`min-h-screen py-16 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
       <div className="container mx-auto px-6">
-        {/* Banner de presentación con nuevo diseño vertical */}
+        {/* Contenedor principal para el componente About - eliminado el marco */}
         <div className="mb-20">
-          <div className={`rounded-xl overflow-hidden shadow-2xl ${darkMode ? 'bg-gray-800' : 'bg-white'} p-8`}>
-            {/* Imagen centrada circular y más pequeña en la parte superior */}
-            <div className="mb-10 flex justify-center">
-              <div className={`relative overflow-hidden rounded-full ${darkMode ? 'ring-4 ring-blue-500/40' : 'ring-4 ring-blue-600/40'} shadow-xl w-48 h-48`}>
-                <img 
-                  src={profileImage} 
-                  alt="Foto de perfil" 
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-            </div>
-            
-            {/* Título principal */}
-            <h1 className="text-4xl font-bold mb-8 text-center">Sobre mí</h1>
-            
-            {/* Contenido informativo */}
-            <div className="prose prose-lg max-w-none">
-              <About />
-            </div>
-          </div>
+          <About />
         </div>
         
         {/* Sección de Skills */}
@@ -85,6 +65,7 @@ const AboutPage = () => {
                 <div key={index} className={`p-6 rounded-lg shadow-md ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                   <h3 className="text-xl font-semibold mb-2">{lang.name}</h3>
                   <p>Nivel: {lang.level}</p>
+                  
                 </div>
               ))}
             </div>

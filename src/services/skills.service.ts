@@ -5,7 +5,7 @@ import { SkillCategory, Technology } from '../types/skills.types';
  * Obtiene todas las categorías de habilidades
  */
 export async function getAllSkills(): Promise<SkillCategory[]> {
-  return fetchData<SkillCategory[]>('skills');
+  return fetchData<SkillCategory[]>('techskills');
 }
 
 /**
