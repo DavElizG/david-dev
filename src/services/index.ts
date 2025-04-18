@@ -7,3 +7,5 @@ export * from './skills.service';
 export * from './languages.service';
 export * from './projects.service';
 export * from './about.service';
+export * from './softskills.service';
+export * from './techskills.service';

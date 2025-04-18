@@ -1,4 +1,5 @@
 import { About } from '../../components/sections';
+import SoftSkills from '../../components/sections/SoftSkills/SoftSkills';
 import { useEducation, useExperience, useLanguages, usePersonalInfo, useSkills } from '../../hooks';
 import { useTheme } from '../../context';
 import { getTechIcon, getTechDocUrl } from '../../utils/iconUtils';
@@ -16,16 +17,19 @@ const AboutPage = () => {
   return (
     <div className={`min-h-screen py-16 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
       <div className="container mx-auto px-6">
-        {/* Contenedor principal para el componente About - eliminado el marco */}
+        {/* Contenedor principal para el componente About */}
         <div className="mb-20">
           <About />
         </div>
         
-        {/* Sección de Skills */}
+        {/* Sección de Soft Skills */}
+        <SoftSkills />
+        
+        {/* Sección de Skills Técnicas */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-6">Habilidades</h2>
+          <h2 className="text-3xl font-bold mb-6">Habilidades Técnicas</h2>
           {isLoading ? (
-            <p>Cargando habilidades...</p>
+            <p>Cargando habilidades técnicas...</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {skills?.map((skill, index) => (
@@ -54,7 +58,7 @@ const AboutPage = () => {
           )}
         </section>
 
-        {/* Sección de Idiomas - movida después de las habilidades */}
+        {/* Sección de Idiomas */}
         <section className="mb-16">
           <h2 className="text-3xl font-bold mb-6">Idiomas</h2>
           {isLoading ? (
@@ -65,7 +69,6 @@ const AboutPage = () => {
                 <div key={index} className={`p-6 rounded-lg shadow-md ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                   <h3 className="text-xl font-semibold mb-2">{lang.name}</h3>
                   <p>Nivel: {lang.level}</p>
-                  
                 </div>
               ))}
             </div>

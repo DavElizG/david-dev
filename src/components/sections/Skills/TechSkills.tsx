@@ -1,17 +1,17 @@
-import { useSkills } from '../../../hooks';
+import { useTechSkills } from '../../../hooks';
 import { useTheme } from '../../../context';
 import { DraggableTechCard } from '../../common/TechCard';
 import { motion } from 'framer-motion';
 
-const Skills = () => {
-  const { skills, loading: techSkillsLoading } = useSkills();
+const TechSkills = () => {
+  const { techSkills, loading: techSkillsLoading } = useTechSkills();
   const { darkMode } = useTheme();
   
-  // Combinar todas las tecnologías en un solo array
-  const allTechItems = skills?.flatMap(category => category.items) || [];
+  // Combinar todas las tecnologías en un solo array con verificación null/undefined
+  const allTechItems = techSkills?.flatMap(category => category?.items || []) || [];
 
   return (
-    <section id="skills" className={`py-16 ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-50 text-gray-900'}`}>
+    <section id="tech-skills" className={`py-16 ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-50 text-gray-900'}`}>
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -30,18 +30,24 @@ const Skills = () => {
         ) : (
           <div className="relative">
             {/* Grid directo de tecnologías (sin fondos animados) */}
-            <div className="flex flex-wrap justify-center gap-3 py-8 relative z-10">
-              {allTechItems.map((tech) => (
-                <DraggableTechCard
-                  key={tech.id_tech}
-                  id={tech.id_tech}
-                  name={tech.name}
-                  icon={tech.icon}
-                  url={tech.url}
-                  darkMode={darkMode}
-                />
-              ))}
-            </div>
+            {allTechItems.length > 0 ? (
+              <div className="flex flex-wrap justify-center gap-3 py-8 relative z-10">
+                {allTechItems.map((tech) => (
+                  <DraggableTechCard
+                    key={tech?.id_tech || `tech-${Math.random()}`}
+                    id={tech?.id_tech || 0}
+                    name={tech?.name || 'Sin nombre'}
+                    icon={tech?.icon || ''}
+                    url={tech?.url || ''}
+                    darkMode={darkMode}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p>No hay tecnologías disponibles</p>
+              </div>
+            )}
             
             {/* Mensaje instructivo */}
             <motion.div 
@@ -61,4 +67,4 @@ const Skills = () => {
   );
 };
 
-export default Skills;
+export default TechSkills;
