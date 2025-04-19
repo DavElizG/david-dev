@@ -1,21 +1,46 @@
-# React + TypeScript + Vite
+# Portafolio Personal
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este es mi portafolio personal, desarrollado para mostrar mi información profesional, proyectos y habilidades de manera atractiva y comprensible. El proyecto está construido con **React** y desplegado en **Vercel**.
 
-While this project uses React, Vite supports many popular JS frameworks. [See all the supported frameworks](https://vitejs.dev/guide/#scaffolding-your-first-vite-project).
+## 🚀 Funcionalidades
 
-## Deploy Your Own
+- **Home**: Presenta una vista general de algunos de mis proyectos y tecnologías en las que tengo experiencia.
+- **About Me**: Detalla mi educación, habilidades técnicas, habilidades blandas y experiencia profesional.
+- **Currículum**: Una sección para ver y descargar mi currículum actualizado.
 
-Deploy your own Vite project with Vercel.
+## 🌟 Próximas Mejoras
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/examples/tree/main/framework-boilerplates/vite-react&template=vite-react)
+Aunque el portafolio sigue un diseño genérico, planeo añadir elementos únicos como:
+- **Uso de la librería Lenis** para mejorar la experiencia de desplazamiento.
+- **Integración de un marco 3D** para enriquecer la interacción visual.
 
-_Live Example: https://vite-react-example.vercel.app_
+## 🛠️ Tecnologías
 
-### Deploying From Your Terminal
+- **React**: Biblioteca de JavaScript para interfaces de usuario.
+- **Vercel**: Plataforma de despliegue para aplicaciones web.
 
-You can deploy your new Vite project with a single command from your terminal using [Vercel CLI](https://vercel.com/download):
+## 📥 Instalación
 
-```shell
-$ vercel
-```
+Este repositorio es público, pero se recomienda realizar un fork antes de clonar el proyecto. Sigue los pasos a continuación:
+
+1. Realiza un fork de este repositorio.
+2. Clona tu fork localmente:
+   ```bash
+   git clone https://github.com/TU-USUARIO/david-dev.git
+   ```
+3. Instala las dependencias:
+   ```bash
+   npm install
+   ```
+4. Inicia el servidor de desarrollo:
+   ```bash
+   npm start
+   ```
+
+## 📧 Contribuciones
+
+¡Se aceptan sugerencias y mejoras! Si deseas contribuir, realiza un pull request desde tu fork o contacta conmigo por correo electrónico.
+
+## ⚠️ Nota
+
+Este proyecto no cuenta con una licencia específica, por lo que todos los derechos están reservados.
