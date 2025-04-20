@@ -1,4 +1,4 @@
-import React, { useEffect, ReactNode } from 'react';
+import React, { useEffect, useRef, ReactNode } from 'react';
 import Lenis from 'lenis';
 import { useLocation } from 'react-router-dom';
 
@@ -21,8 +21,10 @@ interface SmoothScrollProps {
  */
 const SmoothScroll: React.FC<SmoothScrollProps> = ({ children, options = {} }) => {
   const location = useLocation();
+  const lenisRef = useRef<Lenis | null>(null);
+  const prevPathRef = useRef<string>(location.pathname);
   
-  // Inicialización de Lenis
+  // Inicialización de Lenis (solo se ejecuta una vez al montar el componente)
   useEffect(() => {
     // Configuración predeterminada para Lenis
     const defaultOptions = {
@@ -38,6 +40,7 @@ const SmoothScroll: React.FC<SmoothScrollProps> = ({ children, options = {} }) =
 
     // Crear instancia de Lenis
     const lenis = new Lenis(lenisOptions);
+    lenisRef.current = lenis;
     
     // Función para actualizar Lenis en cada frame
     function raf(time: number) {
@@ -48,9 +51,24 @@ const SmoothScroll: React.FC<SmoothScrollProps> = ({ children, options = {} }) =
     // Iniciar el loop de animación
     requestAnimationFrame(raf);
 
-    // Resetear el scroll cuando cambia la ruta principal
-    if (!location.hash) {
-      lenis.scrollTo(0, { immediate: true });
+    return () => {
+      // Limpiar Lenis al desmontar el componente
+      window.cancelAnimationFrame(0); // Cancelar cualquier animación pendiente
+      lenis.destroy();
+      lenisRef.current = null;
+    };
+  }, []); // Solo se ejecuta una vez al montar el componente
+  
+  // Manejo de cambio de ruta
+  useEffect(() => {
+    if (!lenisRef.current) return;
+    
+    // Si ha cambiado la ruta (no solo el hash), scroll al inicio
+    if (location.pathname !== prevPathRef.current) {
+      console.log('Cambio de ruta detectado:', prevPathRef.current, '->', location.pathname);
+      lenisRef.current.scrollTo(0, { immediate: true });
+      prevPathRef.current = location.pathname;
+      return;
     }
 
     // Manejar scroll a secciones con hash
@@ -61,11 +79,13 @@ const SmoothScroll: React.FC<SmoothScrollProps> = ({ children, options = {} }) =
       if (element) {
         // Dar tiempo para que se renderice el DOM
         setTimeout(() => {
-          // Scroll a la sección con animación suave
-          lenis.scrollTo(element, {
-            offset: -64, // Ajuste para header fijo
-            duration: 1.2
-          });
+          if (lenisRef.current) {
+            // Scroll a la sección con animación suave
+            lenisRef.current.scrollTo(element, {
+              offset: -64, // Ajuste para header fijo
+              duration: 1.2
+            });
+          }
         }, 100);
       }
     }
@@ -77,20 +97,21 @@ const SmoothScroll: React.FC<SmoothScrollProps> = ({ children, options = {} }) =
       if (element) {
         // Dar tiempo para que se renderice el DOM
         setTimeout(() => {
-          lenis.scrollTo(element, {
-            offset: -64, // Ajuste para header fijo
-            duration: 1.2
-          });
-          sessionStorage.removeItem('scrollToId');
+          if (lenisRef.current) {
+            lenisRef.current.scrollTo(element, {
+              offset: -64, // Ajuste para header fijo
+              duration: 1.2
+            });
+            sessionStorage.removeItem('scrollToId');
+          }
         }, 100);
+      } else {
+        sessionStorage.removeItem('scrollToId');
       }
     }
-
-    return () => {
-      // Limpiar Lenis al desmontar el componente
-      lenis.destroy();
-    };
-  }, [location.pathname, location.hash, options]);
+    
+    prevPathRef.current = location.pathname;
+  }, [location.pathname, location.hash]); // Se ejecuta cuando cambia la ruta o el hash
   
   return <>{children}</>;
 };
