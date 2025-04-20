@@ -11,14 +11,17 @@ const Skills = () => {
   const allTechItems = skills?.flatMap(category => category?.items || []) || [];
 
   return (
-    <section id="skills" className={`py-16 ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-50 text-gray-900'}`}>
+    <section id="skills" className="py-16 relative">
+      {/* Separador visual superior */}
+      <div className={`absolute top-0 left-0 w-full h-px ${darkMode ? 'bg-gradient-to-r from-transparent via-gray-700 to-transparent' : 'bg-gradient-to-r from-transparent via-gray-300 to-transparent'}`}></div>
+      
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className={`text-3xl font-bold text-center mb-12 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          <h2 className="text-3xl font-bold text-center mb-12">
             Tecnologías
           </h2>
         </motion.div>
@@ -29,7 +32,7 @@ const Skills = () => {
           </div>
         ) : (
           <div className="relative">
-            {/* Grid directo de tecnologías (sin fondos animados) */}
+            {/* Grid directo de tecnologías */}
             {allTechItems.length > 0 ? (
               <div className="flex flex-wrap justify-center gap-3 py-8 relative z-10">
                 {allTechItems.map((tech) => (
@@ -48,21 +51,12 @@ const Skills = () => {
                 <p>No hay tecnologías disponibles</p>
               </div>
             )}
-            
-            {/* Mensaje instructivo */}
-            <motion.div 
-              className="text-center mt-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-            >
-              <p className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                Haz clic en cualquier tecnología para visitar su documentación oficial
-              </p>
-            </motion.div>
           </div>
         )}
       </div>
+      
+      {/* Separador visual inferior */}
+      <div className={`absolute bottom-0 left-0 w-full h-px ${darkMode ? 'bg-gradient-to-r from-transparent via-gray-700 to-transparent' : 'bg-gradient-to-r from-transparent via-gray-300 to-transparent'}`}></div>
     </section>
   );
 };

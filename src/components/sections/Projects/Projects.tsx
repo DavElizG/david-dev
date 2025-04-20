@@ -1,6 +1,5 @@
 import { useProjects } from '../../../hooks';
 import { useTheme } from '../../../context';
-import { Link } from 'react-router-dom';
 import ProjectCard from '../../../components/common/ProjectCard';
 import { motion } from 'framer-motion';
 
@@ -40,22 +39,19 @@ const Projects: React.FC<ProjectsProps> = ({ featured = false }) => {
   };
 
   return (
-    <section id="projects" className={`py-16 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+    <section id="projects" className="py-16 relative">
+      {/* Separador visual superior */}
+      <div className={`absolute top-0 left-0 w-full h-px ${darkMode ? 'bg-gradient-to-r from-transparent via-gray-700 to-transparent' : 'bg-gradient-to-r from-transparent via-gray-300 to-transparent'}`}></div>
+      
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className={`text-3xl font-bold text-center mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          <h2 className="text-3xl font-bold text-center mb-8">
             {featured ? 'Proyectos Destacados' : 'Mis Proyectos'}
           </h2>
-
-          {featured && (
-            <p className={`text-center mb-12 max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              Estos son algunos de mis proyectos más relevantes. Puedes ver todos mis proyectos haciendo click en el botón de abajo.
-            </p>
-          )}
         </motion.div>
 
         {loading ? (
@@ -90,30 +86,12 @@ const Projects: React.FC<ProjectsProps> = ({ featured = false }) => {
                 </motion.div>
               ))}
             </motion.div>
-            
-            {/* Botón para ver todos los proyectos (solo en modo featured) */}
-            {featured && (
-              <motion.div 
-                className="mt-10 text-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-              >
-                <Link
-                  to="/projects"
-                  className={`inline-block px-6 py-3 rounded-lg font-semibold transition-all ${
-                    darkMode 
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                      : 'bg-blue-500 hover:bg-blue-600 text-white'
-                  }`}
-                >
-                  Ver todos los proyectos
-                </Link>
-              </motion.div>
-            )}
           </>
         )}
       </div>
+      
+      {/* Separador visual inferior */}
+      <div className={`absolute bottom-0 left-0 w-full h-px ${darkMode ? 'bg-gradient-to-r from-transparent via-gray-700 to-transparent' : 'bg-gradient-to-r from-transparent via-gray-300 to-transparent'}`}></div>
     </section>
   );
 };
