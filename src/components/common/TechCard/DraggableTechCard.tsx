@@ -1,8 +1,9 @@
-import { motion } from 'framer-motion';
+import { memo } from 'react';
 import { getTechIcon } from '../../../utils/iconUtils';
 import { TechCardProps } from '../../../types/techCard.types';
 
-const DraggableTechCard = ({ id, name, icon, url, darkMode }: TechCardProps) => {
+// Usando memo para prevenir re-renderizados innecesarios
+const DraggableTechCard = memo(({ id, name, icon, url, darkMode }: TechCardProps) => {
   // Colores aleatorios para las tarjetas
   const colors = [
     'from-blue-500 to-cyan-500',
@@ -17,62 +18,32 @@ const DraggableTechCard = ({ id, name, icon, url, darkMode }: TechCardProps) => 
   
   const randomColor = colors[id % colors.length];
 
-  // Genera una animación de flotación ligeramente diferente para cada tarjeta
-  const floatDuration = 2 + Math.random() * 2;
-  const floatDelay = Math.random() * 1.5;
-  const floatDistance = -3 - Math.random() * 5;
-  
-  // Sombra adaptativa según el tema
-  const hoverShadow = darkMode 
-    ? '0px 15px 30px rgba(255, 255, 255, 0.15)' // Sombra clara en modo oscuro
-    : '0px 15px 30px rgba(0, 0, 0, 0.25)';      // Sombra oscura en modo claro
+  // Simplificamos las animaciones usando CSS en lugar de framer-motion
+  // para las animaciones básicas, reduciendo el tamaño del bundle
     
-  const defaultShadow = darkMode
-    ? '0 4px 12px rgba(255, 255, 255, 0.08)'    // Sombra clara sutil en modo oscuro
-    : '0 4px 12px rgba(0, 0, 0, 0.15)';         // Sombra oscura sutil en modo claro
+  // Sombra adaptativa según el tema
+  const shadowClass = darkMode 
+    ? 'hover:shadow-light' 
+    : 'hover:shadow-dark';
+  
+  // El efecto de flotación ahora se hace con CSS nativo
+  const animationDelay = `${Math.random() * 2}s`;
+  const animationDuration = `${3 + Math.random() * 2}s`;
 
   return (
-    <motion.a
+    <a
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      whileHover={{ 
-        scale: 1.12,
-        boxShadow: hoverShadow,
-        rotateZ: Math.random() > 0.5 ? 3 : -3,
-        zIndex: 10,
-        transition: {
-          duration: 0.1, // Transición más rápida (reducida de 0.2 a 0.1)
-          ease: "easeOut"
-        }
-      }}
-      initial={{ 
-        opacity: 0, 
-        scale: 0.8, 
-        y: 20 
-      }}
-      animate={{ 
-        opacity: 1, 
-        scale: 1,
-        y: [0, floatDistance, 0],
-        transition: {
-          opacity: { duration: 0.5 },
-          scale: { duration: 0.5 },
-          y: {
-            delay: floatDelay,
-            duration: floatDuration,
-            repeat: Infinity,
-            repeatType: "reverse",
-            ease: "easeInOut"
-          }
-        }
-      }}
       className={`flex items-center gap-2 px-4 py-3 rounded-xl border-2 m-2
         bg-gradient-to-br ${randomColor} ${darkMode ? 'border-gray-600' : 'border-gray-200'}
-        transition-all duration-200 relative
+        hover:scale-110 hover:-rotate-1 hover:z-10
+        ${shadowClass} transition-all duration-150 relative
+        animate-float
       `}
       style={{ 
-        boxShadow: defaultShadow,
+        animationDelay,
+        animationDuration
       }}
     >
       {/* Efecto de resplandor al hacer hover */}
@@ -90,8 +61,11 @@ const DraggableTechCard = ({ id, name, icon, url, darkMode }: TechCardProps) => 
         )}
       </div>
       <span className="font-medium text-white drop-shadow-md">{name}</span>
-    </motion.a>
+    </a>
   );
-};
+});
+
+// Añadir displayName para herramientas de desarrollo
+DraggableTechCard.displayName = 'DraggableTechCard';
 
 export default DraggableTechCard;
