@@ -25,6 +25,8 @@ const Header = () => {
                             className="h-8 w-auto mr-2 transition-all duration-200" 
                             onMouseEnter={() => setIsHovered(true)}
                             onMouseLeave={() => setIsHovered(false)}
+                            width="32"
+                            height="32"
                         />
                         <span className="text-xl font-bold">
                             {loading ? 'Cargando...' : personalInfo?.name.split(' ').slice(0, 2).join(' ')}
