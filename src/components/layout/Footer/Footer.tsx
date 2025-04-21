@@ -1,10 +1,18 @@
 import { usePersonalInfo } from "../../../hooks";
 import { useTheme } from "../../../context";
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
+import { useState, useEffect } from "react";
 
 const Footer = () => {
   const { personalInfo, loading } = usePersonalInfo();
   const { darkMode } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const currentYear = new Date().getFullYear();
+  
+  // Establecer el estado de montado después del renderizado inicial
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Función helper para obtener el enlace social específico
   const getSocialLink = (platform: string) => {
@@ -16,64 +24,62 @@ const Footer = () => {
   const githubLink = getSocialLink('github');
   const linkedinLink = getSocialLink('linkedin');
 
+  // Contenido placeholder para mantener el layout estable durante la carga
+  const placeholderName = "David Guadamuz";
+  const placeholderTitle = "Desarrollador Full Stack";
+  
   return (
     <footer className={`${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-800'} py-8`}>
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          {/* Logo/Nombre */}
-          <div className="mb-4 md:mb-0">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+          {/* Logo/Nombre - Ancho fijo en contenedor */}
+          <div className="text-center md:text-left min-h-[60px] flex flex-col justify-center">
             <h3 className="text-lg font-bold">
-              {loading ? "Cargando..." : personalInfo?.name}
+              {(!mounted || loading) ? placeholderName : personalInfo?.name}
             </h3>
             <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              {personalInfo?.title}
+              {(!mounted || loading) ? placeholderTitle : personalInfo?.title}
             </p>
           </div>
 
-          {/* Redes sociales */}
-          <div className="flex space-x-4 mb-4 md:mb-0">
-            {githubLink && (
-              <a
-                href={githubLink.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`text-xl hover:scale-110 transition-transform ${
-                  darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
-                }`}
-                aria-label="GitHub"
-              >
-                <FaGithub />
-              </a>
-            )}
-            {linkedinLink && (
-              <a
-                href={linkedinLink.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`text-xl hover:scale-110 transition-transform ${
-                  darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
-                }`}
-                aria-label="LinkedIn"
-              >
-                <FaLinkedin />
-              </a>
-            )}
-            {personalInfo?.email && (
-              <a
-                href={`mailto:${personalInfo.email}`}
-                className={`text-xl hover:scale-110 transition-transform ${
-                  darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
-                }`}
-                aria-label="Email"
-              >
-                <FaEnvelope />
-              </a>
-            )}
+          {/* Redes sociales - Centrado con altura fija */}
+          <div className="flex justify-center space-x-4 min-h-[24px]">
+            <a
+              href={githubLink?.url || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`text-xl hover:scale-110 transition-transform ${
+                darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+              }`}
+              aria-label="GitHub"
+            >
+              <FaGithub />
+            </a>
+            <a
+              href={linkedinLink?.url || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`text-xl hover:scale-110 transition-transform ${
+                darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+              }`}
+              aria-label="LinkedIn"
+            >
+              <FaLinkedin />
+            </a>
+            <a
+              href={`mailto:${personalInfo?.email || "correo@ejemplo.com"}`}
+              className={`text-xl hover:scale-110 transition-transform ${
+                darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+              }`}
+              aria-label="Email"
+            >
+              <FaEnvelope />
+            </a>
           </div>
 
-          {/* Copyright */}
-          <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            © {new Date().getFullYear()} {personalInfo?.name}. Todos los derechos reservados.
+          {/* Copyright - Derecha con altura fija */}
+          <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} text-center md:text-right min-h-[24px]`}>
+            © {currentYear} {(!mounted || loading) ? placeholderName : personalInfo?.name}
           </div>
         </div>
       </div>

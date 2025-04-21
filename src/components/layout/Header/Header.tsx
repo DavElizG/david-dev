@@ -3,8 +3,8 @@ import NavBar from '../NavBar';
 import ThemeToggle from '../../common/ThemeToggle';
 import { usePersonalInfo } from '../../../hooks';
 import { useTheme } from '../../../context';
-import logo from '../../../assets/images/logo/JDSnoppyLogo.webp';
-import logoHandsUp from '../../../assets/images/logo/JDSnoppyLogoHandsUp.webp'; // Importación del logo con manos levantadas
+import logo from '../../../assets/images/logo/optimized/JDSnoppyLogo-small.webp';
+import logoHandsUp from '../../../assets/images/logo/optimized/JDSnoppyLogoHandsUp-small.webp'; // Importación del logo con manos levantadas
 //import { ThreeDHeader } from '../../common/3DModel';
 
 const Header = () => {
@@ -22,7 +22,7 @@ const Header = () => {
                         <img 
                             src={isHovered ? logoHandsUp : logo} 
                             alt="Logo JD" 
-                            className="h-8 w-auto mr-2 transition-all duration-200" 
+                            className="h-8 w-8 mr-2 transition-all duration-200" 
                             onMouseEnter={() => setIsHovered(true)}
                             onMouseLeave={() => setIsHovered(false)}
                             width="32"
