@@ -3,9 +3,19 @@ import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import SmoothScroll from './components/common/SmoothScroll'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import HomePage from './pages/Home/HomePage'
-import AboutPage from './pages/About/AboutPage'
-import ResumePage from './pages/Resume/ResumePage'
+import { lazy, Suspense } from 'react'
+
+// Lazy load page components
+const HomePage = lazy(() => import('./pages/Home/HomePage'))
+const AboutPage = lazy(() => import('./pages/About/AboutPage'))
+const ResumePage = lazy(() => import('./pages/Resume/ResumePage'))
+
+// Loading component
+const PageLoader = () => (
+  <div className="flex justify-center items-center h-64">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+)
 
 // Componente principal de la aplicación
 function AppContent() {
@@ -26,11 +36,13 @@ function AppContent() {
       <Header />
       <SmoothScroll options={smoothScrollOptions}>
         <main className="flex-grow w-full">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/resume" element={<ResumePage />} />
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/resume" element={<ResumePage />} />
+            </Routes>
+          </Suspense>
         </main>
       </SmoothScroll>
       <Footer />

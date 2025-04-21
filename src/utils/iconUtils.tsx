@@ -1,16 +1,27 @@
 import React from 'react';
-import * as SiIcons from 'react-icons/si';
 import { FaDatabase, FaLaptopCode } from 'react-icons/fa';
 import { DiDotnet } from 'react-icons/di';
 import { VscCode } from 'react-icons/vsc';
 
-// Tipo para el objeto de iconos dinámicos
-type IconsType = {
-  [key: string]: React.ElementType;
-};
+// Import only the most commonly used icons individually
+import { 
+  SiReact, SiTypescript, SiJavascript, SiHtml5, SiCss3, 
+  SiTailwindcss, SiMysql, SiGit, SiGithub, SiFigma 
+} from 'react-icons/si';
 
-// Todas las propiedades de SiIcons convertidas a un objeto con tipos
-const Icons = SiIcons as unknown as IconsType;
+// Map of commonly used icons - only import what you actually use
+const commonIcons: Record<string, React.ComponentType<any>> = {
+  react: SiReact,
+  typescript: SiTypescript,
+  javascript: SiJavascript,
+  html5: SiHtml5,
+  css3: SiCss3,
+  tailwindcss: SiTailwindcss,
+  mysql: SiMysql,
+  git: SiGit,
+  github: SiGithub,
+  figma: SiFigma,
+};
 
 // Iconos específicos para casos especiales
 const specificIcons: Record<string, React.FC<{ size?: number; color?: string }>> = {
@@ -98,19 +109,15 @@ export const getTechIcon = (techName: string, darkMode: boolean, size: number = 
     return specificIcons[iconKey]({ size, color });
   }
 
-  // Formar el nombre del componente para la biblioteca de iconos Si
-  const formattedName = `Si${iconKey.charAt(0).toUpperCase()}${iconKey.slice(1)}`;
-
-  // Verificar si el icono existe en la biblioteca SiIcons
-  if (Icons[formattedName]) {
-    const IconComponent = Icons[formattedName];
+  // Check if we have the icon in our common icons map
+  if (commonIcons[iconKey]) {
+    const IconComponent = commonIcons[iconKey];
     const color = iconColors[iconKey] || (darkMode ? '#60A5FA' : '#2563EB');
     return <IconComponent size={size} color={color} />;
   }
 
-  // Fallback para iconos no encontrados
+  // Fallback for icons not pre-imported
   const sizeClass = `w-[${Math.round(size / 1.5)}px] h-[${Math.round(size / 1.5)}px] text-[${Math.round(size / 2.5)}px]`;
-  console.log(`No se encontró el icono: ${formattedName} para tech: ${techName}`);
   return (
     <div
       className={`flex items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 ${sizeClass}`}

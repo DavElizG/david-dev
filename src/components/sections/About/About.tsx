@@ -45,6 +45,10 @@ const About = () => {
                     src={profileImage} 
                     alt="Foto de perfil" 
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                    width="400"
+                    height="400"
+                    loading="eager"
+                    fetchPriority="high"
                   />
                   
                   {/* Efecto de gradiente en la parte inferior de la imagen */}
