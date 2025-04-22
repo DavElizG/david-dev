@@ -82,6 +82,8 @@ const Projects: React.FC<ProjectsProps> = ({ featured = false }) => {
                     liveUrl={project.liveUrl}
                     darkMode={darkMode}
                     image={project.image}
+                    backendRepo={project.backendRepo}
+                    isPrivate={project.isPrivate}
                   />
                 </motion.div>
               ))}

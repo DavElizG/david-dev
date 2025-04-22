@@ -21,6 +21,7 @@ const commonIcons: Record<string, React.ComponentType<any>> = {
   git: SiGit,
   github: SiGithub,
   figma: SiFigma,
+  swagger: () => <img src="https://swagger.io/swagger/media/assets/images/swagger_logo.svg" alt="Swagger" style={{ width: '36px', height: '36px' }} />,
 };
 
 // Iconos específicos para casos especiales
@@ -31,6 +32,7 @@ const specificIcons: Record<string, React.FC<{ size?: number; color?: string }>>
   'visual studio code': (props) => <VscCode {...props} />,
   'visualstudio': (props) => <FaLaptopCode {...props} />,
   'visual studio': (props) => <FaLaptopCode {...props} />,
+  'rest api': (props) => <img src="https://swagger.io/swagger/media/assets/images/swagger_logo.svg" alt="Swagger" style={{ width: props.size || 36, height: props.size || 36 }} />,
 };
 
 // Mapa de colores originales para los iconos
@@ -51,6 +53,8 @@ export const iconColors: Record<string, string> = {
   vscode: '#007ACC',
   visualstudio: '#5C2D91',
   figma: '#F24E1E',
+  swagger: '#85EA2D',
+  'rest api': '#85EA2D',
 };
 
 // Mapa de nombres alternativos para iconos que podrían no encontrarse con su nombre original
@@ -67,6 +71,9 @@ export const iconAlternatives: Record<string, string> = {
   'vs code': 'vscode',
   'visual studio code': 'vscode',
   'visual studio': 'visualstudio',
+  'rest api': 'swagger',
+  'restapi': 'swagger',
+  'api': 'swagger',
 };
 
 /**
@@ -116,15 +123,8 @@ export const getTechIcon = (techName: string, darkMode: boolean, size: number = 
     return <IconComponent size={size} color={color} />;
   }
 
-  // Fallback for icons not pre-imported
-  const sizeClass = `w-[${Math.round(size / 1.5)}px] h-[${Math.round(size / 1.5)}px] text-[${Math.round(size / 2.5)}px]`;
-  return (
-    <div
-      className={`flex items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 ${sizeClass}`}
-    >
-      {techName.charAt(0).toUpperCase()}
-    </div>
-  );
+  // Fallback: No icon displayed for technologies without a predefined icon
+  return null;
 };
 
 /**
@@ -142,6 +142,9 @@ export const getTechDocUrl = (techName: string): string => {
     '.net c#': 'https://learn.microsoft.com/es-es/dotnet/csharp/',
     'sql server': 'https://learn.microsoft.com/es-es/sql/sql-server/',
     mysql: 'https://dev.mysql.com/doc/',
+    signalr: 'https://learn.microsoft.com/en-us/aspnet/signalr/',
+    swagger: 'https://swagger.io/',
+    'rest api': 'https://swagger.io/'
   };
 
   for (const [key, url] of Object.entries(techDocsUrls)) {

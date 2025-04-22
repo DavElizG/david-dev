@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaGithub, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaGithub, FaExternalLinkAlt, FaServer, FaLock } from 'react-icons/fa';
 import { getTechIcon, getTechDocUrl } from '../../../utils/iconUtils';
 import { ProjectCardProps } from '../../../types/projects.types';
 
@@ -12,7 +12,9 @@ const ProjectCard = ({
   repoUrl,
   liveUrl,
   darkMode,
-  image
+  image,
+  backendRepo,
+  isPrivate
 }: ProjectCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -27,15 +29,15 @@ const ProjectCard = ({
   ];
 
   const selectedGradient = gradients[id % gradients.length];
-  
-  // Sombras adaptativas según el tema (similares a las de las tarjetas de tecnologías)
+
+  // Sombras adaptativas según el tema
   const hoverShadow = darkMode 
-    ? '0px 20px 40px rgba(255, 255, 255, 0.1), 0px 5px 20px rgba(120, 120, 255, 0.1)' // Sombra clara en modo oscuro
-    : '0px 20px 40px rgba(0, 0, 0, 0.15), 0px 5px 20px rgba(0, 0, 150, 0.07)';        // Sombra oscura en modo claro
+    ? '0px 20px 40px rgba(255, 255, 255, 0.1), 0px 5px 20px rgba(120, 120, 255, 0.1)'
+    : '0px 20px 40px rgba(0, 0, 0, 0.15), 0px 5px 20px rgba(0, 0, 150, 0.07)';
     
   const defaultShadow = darkMode
-    ? '0 8px 20px rgba(255, 255, 255, 0.05), 0px 2px 10px rgba(30, 30, 255, 0.05)'    // Sombra clara sutil en modo oscuro
-    : '0 8px 20px rgba(0, 0, 0, 0.1), 0px 2px 10px rgba(0, 0, 150, 0.03)';            // Sombra oscura sutil en modo claro
+    ? '0 8px 20px rgba(255, 255, 255, 0.05), 0px 2px 10px rgba(30, 30, 255, 0.05)'
+    : '0 8px 20px rgba(0, 0, 0, 0.1), 0px 2px 10px rgba(0, 0, 150, 0.03)';
 
   // Verificar si es el proyecto de CTP La Mansión
   const isCtpProject = title.toLowerCase().includes('ctp la mansión') || 
@@ -59,24 +61,21 @@ const ProjectCard = ({
       <div className={`relative h-48 overflow-hidden ${!image ? `bg-gradient-to-br ${selectedGradient}` : ''}`}>
         {image || isCtpProject ? (
           <>
-            {/* Imagen de previsualización */}
+            {/* Imagen de previsualización - Sin superposiciones de color */}
             <img 
               src={image || '/assets/images/projects/ctp-preview.webp'} 
               alt={`Previsualización de ${title}`}
               className="w-full h-full object-cover object-center"
             />
             
-            {/* Capa de gradiente sobre la imagen */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${selectedGradient} opacity-70`}></div>
-            
-            {/* Título del proyecto en la cabecera */}
-            <div className="absolute inset-0 flex items-center justify-center text-center p-4 z-10">
-              <h3 className="text-2xl font-bold text-white drop-shadow-lg">{title}</h3>
+            {/* Título en la parte inferior, con fondo muy transparente */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+              <h3 className="text-lg font-medium text-white drop-shadow-md">{title}</h3>
             </div>
           </>
         ) : (
           <>
-            {/* Título del proyecto en la cabecera */}
+            {/* Para proyectos sin imagen, mantener el gradiente y título centrado */}
             <div className="absolute inset-0 flex items-center justify-center text-center p-4">
               <h3 className="text-2xl font-bold text-white drop-shadow-lg">{title}</h3>
             </div>
@@ -93,7 +92,7 @@ const ProjectCard = ({
           </>
         )}
         
-        {/* Efecto de iluminación */}
+        {/* Efecto de iluminación al hacer hover */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-tr from-transparent via-white to-transparent opacity-0"
           initial={{ opacity: 0 }}
@@ -139,7 +138,8 @@ const ProjectCard = ({
         <div className="flex-grow"></div>
         
         {/* Enlaces - Siempre al final de la tarjeta */}
-        <div className="flex justify-between mt-4 pt-4 border-t border-gray-700/30">
+        <div className="flex flex-wrap gap-y-3 justify-between mt-4 pt-4 border-t border-gray-700/30">
+          {/* Frontend Repository */}
           <motion.a 
             href={repoUrl} 
             target="_blank" 
@@ -157,27 +157,59 @@ const ProjectCard = ({
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
             <FaGithub className="mr-2" /> 
-            <span>Repositorio</span>
+            <span>{backendRepo ? "Frontend" : "Repositorio"}</span>
           </motion.a>
-          <motion.a 
-            href={liveUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className={`flex items-center transition-colors
-              ${darkMode 
-                ? 'text-gray-300 hover:text-blue-400' 
-                : 'text-gray-700 hover:text-blue-600'}`}
-            whileHover={{ 
-              scale: 1.05,
-              textShadow: darkMode 
-                ? '0 0 8px rgba(120, 160, 255, 0.5)' 
-                : '0 0 8px rgba(0, 90, 255, 0.3)'
-            }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
-            <span>Demo</span>
-            <FaExternalLinkAlt className="ml-2" />
-          </motion.a>
+          
+          {/* Backend Repository (if available) */}
+          {backendRepo && (
+            <motion.a 
+              href={backendRepo} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className={`flex items-center transition-colors
+                ${darkMode 
+                  ? 'text-gray-300 hover:text-green-400' 
+                  : 'text-gray-700 hover:text-green-600'}`}
+              whileHover={{ 
+                scale: 1.05,
+                textShadow: darkMode 
+                  ? '0 0 8px rgba(120, 255, 160, 0.5)' 
+                  : '0 0 8px rgba(0, 255, 90, 0.3)'
+              }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <FaServer className="mr-2" /> 
+              <span>Backend</span>
+            </motion.a>
+          )}
+          
+          {/* Demo link (if not private) */}
+          {!isPrivate ? (
+            <motion.a 
+              href={liveUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className={`flex items-center transition-colors
+                ${darkMode 
+                  ? 'text-gray-300 hover:text-blue-400' 
+                  : 'text-gray-700 hover:text-blue-600'}`}
+              whileHover={{ 
+                scale: 1.05,
+                textShadow: darkMode 
+                  ? '0 0 8px rgba(120, 160, 255, 0.5)' 
+                  : '0 0 8px rgba(0, 90, 255, 0.3)'
+              }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <span>Demo</span>
+              <FaExternalLinkAlt className="ml-2" />
+            </motion.a>
+          ) : (
+            <div className={`flex items-center ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+              <FaLock className="mr-2" /> 
+              <span>Acceso privado</span>
+            </div>
+          )}
         </div>
       </div>
     </motion.div>
