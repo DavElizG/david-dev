@@ -1,0 +1,6 @@
+# Robots.txt for daveliz.me
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://daveliz.me/sitemap.xml
