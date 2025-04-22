@@ -2,8 +2,10 @@ import { useTheme } from './context'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import SmoothScroll from './components/common/SmoothScroll'
+import { SEO } from './components/common'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
+import { HelmetProvider } from 'react-helmet-async'
 
 // Lazy load page components
 const HomePage = lazy(() => import('./pages/Home/HomePage'))
@@ -33,6 +35,7 @@ function AppContent() {
 
   return (
     <div className={`flex flex-col min-h-screen w-full overflow-x-hidden ${darkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+      <SEO />
       <Header />
       <SmoothScroll options={smoothScrollOptions}>
         <main className="flex-grow w-full">
@@ -52,9 +55,11 @@ function AppContent() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </HelmetProvider>
   );
 }
 

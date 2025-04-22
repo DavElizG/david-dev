@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import { SEO } from '../../components/common';
 
 // Lazy load section components
 const Hero = lazy(() => import('../../components/sections/Hero/Hero'));
@@ -15,26 +16,34 @@ const SectionLoader = () => (
 
 const HomePage = () => {
   return (
-    <main>
-      <Suspense fallback={<SectionLoader />}>
-        <Hero />
-      </Suspense>
+    <>
+      <SEO 
+        title="Jose Guadamuz | Desarrollador Web Full Stack"
+        description="Portafolio profesional de Jose Guadamuz, especializado en desarrollo web con React, TypeScript, .NET y otras tecnologías modernas. Conoce mis proyectos y habilidades."
+        keywords="desarrollador web, full stack, React, TypeScript, .NET, JavaScript, frontend, backend, Jose Guadamuz"
+      />
       
-      {/* Sección de tecnologías */}
-      <Suspense fallback={<SectionLoader />}>
-        <Skills />
-      </Suspense>
-      
-      {/* Sección de proyectos destacados */}
-      <Suspense fallback={<SectionLoader />}>
-        <Projects featured={true} />
-      </Suspense>
-      
-      {/* Sección de contacto */}
-      <Suspense fallback={<SectionLoader />}>
-        <Contact />
-      </Suspense>
-    </main>
+      <main>
+        <Suspense fallback={<SectionLoader />}>
+          <Hero />
+        </Suspense>
+        
+        {/* Sección de tecnologías */}
+        <Suspense fallback={<SectionLoader />}>
+          <Skills />
+        </Suspense>
+        
+        {/* Sección de proyectos destacados */}
+        <Suspense fallback={<SectionLoader />}>
+          <Projects featured={true} />
+        </Suspense>
+        
+        {/* Sección de contacto */}
+        <Suspense fallback={<SectionLoader />}>
+          <Contact />
+        </Suspense>
+      </main>
+    </>
   );
 };
 
