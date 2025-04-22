@@ -5,7 +5,7 @@ import { SEO } from '../../components/common';
 const Hero = lazy(() => import('../../components/sections/Hero/Hero'));
 const Skills = lazy(() => import('../../components/sections/Skills/Skills'));
 const Projects = lazy(() => import('../../components/sections/Projects/Projects'));
-const Contact = lazy(() => import('../../components/sections/Contact/Contact'));
+//const Contact = lazy(() => import('../../components/sections/Contact/Contact'));
 
 // Loading component for sections
 const SectionLoader = () => (
@@ -38,10 +38,10 @@ const HomePage = () => {
           <Projects featured={true} />
         </Suspense>
         
-        {/* Sección de contacto */}
+        {/* Sección de contacto 
         <Suspense fallback={<SectionLoader />}>
           <Contact />
-        </Suspense>
+        </Suspense>*/}
       </main>
     </>
   );
