@@ -3,20 +3,49 @@
     "id_project": 1,
     "title": "Sistema de Gestión para CTP La Mansión",
     "description": "Aplicación web para la gestión de solicitudes de salas y laboratorios, con características de reserva, aprobación y notificaciones.",
-    "image": "/src/assets/images/projects/ctp-system.webp",
-    "technologies": ["React", "Tailwind CSS", ".NET C#", "SQL Server"],
+    "image": "https://i.ibb.co/8w56D2C/Home-Page-Admin.webp",
+    "technologies": [
+      "React",
+      "Tailwind CSS",
+      ".NET C#",
+      "MySQL"
+    ],
     "liveUrl": "https://ctp-system-demo.vercel.app",
     "repoUrl": "https://github.com/DavElizG/ctp-system",
-    "featured": true
+    "featured": true,
+    "isPrivate": true,
+    "backendRepo": null
   },
   {
     "id_project": 2,
-    "title": "Portal de Noticias Universitarias",
-    "description": "Aplicación web para mostrar noticias y eventos de la Universidad Nacional, desarrollada con React y Tailwind CSS como proyecto académico.",
-    "image": "/src/assets/images/projects/news-portal.webp",
-    "technologies": ["React", "Tailwind CSS", "JavaScript"],
-    "liveUrl": "https://news-portal-demo.vercel.app",
-    "repoUrl": "https://github.com/DavElizG/news-portal",
-    "featured": true
+    "title": "CTP La Mansión",
+    "description": "Sitio web institucional con información académica, galería y mapa interactivo. Desarrollado con React, TypeScript y TailwindCSS.",
+    "image": "https://i.ibb.co/RGJDR3Xn/0-C1-D2159-B9-AA-4-C63-816-C-C680-A9-F7-BF14.png",
+    "technologies": [
+      "React",
+      "Tailwind CSS",
+      ".NET C#",
+      "MySQL"
+    ],
+    "liveUrl": "https://ctplaman.netlify.app",
+    "repoUrl": "https://github.com/majifo99/CTPMansion_Front.git",
+    "featured": true,
+    "backendRepo": null
+  },
+  {
+    "id_project": 3,
+    "title": "SignalR Chat App",
+    "description": "Chat en tiempo real con autenticación, reconexión automática e historial de mensajes. Usa SignalR, React Hooks y API REST.",
+    "image": "https://i.ibb.co/bjk04HGr/imagen-2025-04-20-162017112.png",
+    "technologies": [
+      "SignalR",
+      "React",
+      "REST API",
+      ".NET"
+    ],
+    "liveUrl": "https://chat-hub-liard.vercel.app",
+    "repoUrl": "https://github.com/majifo99/ChatHub.git",
+    "featured": true,
+    "backendRepo": "https://github.com/DavElizG/SignalRExample.git"
   }
 ]

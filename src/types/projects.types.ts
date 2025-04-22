@@ -7,6 +7,8 @@ export interface Project {
   liveUrl: string;
   repoUrl: string;
   featured: boolean;
+  backendRepo?: string; // Optional backend repository URL
+  isPrivate?: boolean;  // Optional flag to indicate if demo link should be hidden
 }
 
 /**
@@ -21,4 +23,6 @@ export interface ProjectCardProps {
   liveUrl: string;
   darkMode: boolean;
   image?: string;
+  backendRepo?: string; // Optional backend repository URL
+  isPrivate?: boolean;  // Optional flag to indicate if demo link should be hidden
 }
