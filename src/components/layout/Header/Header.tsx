@@ -5,7 +5,7 @@ import { usePersonalInfo } from '../../../hooks';
 import { useTheme } from '../../../context';
 import logo from '../../../assets/images/logo/optimized/JDSnoppyLogo-small.webp';
 import logoHandsUp from '../../../assets/images/logo/optimized/JDSnoppyLogoHandsUp-small.webp'; // Importación del logo con manos levantadas
-//import { ThreeDHeader } from '../../common/3DModel';
+import { ThreeDHeader } from '../../common/3DModel';
 
 const Header = () => {
     const { personalInfo, loading } = usePersonalInfo();
@@ -49,9 +49,9 @@ const Header = () => {
             <div className="h-16"></div>
             
             {/* Componente 3D interactivo - temporalmente comentado */}
-            {/* <div className={`w-full ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} relative`}>
+             <div className={`w-full ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} relative`}>
                 <ThreeDHeader />
-            </div> */}
+            </div> 
         </>
     );
 };
