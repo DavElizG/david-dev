@@ -79,6 +79,7 @@ const JourneySection = () => {
   const entryRefs         = useRef<(HTMLDivElement | null)[]>([]);
   const dotRefs           = useRef<(HTMLDivElement | null)[]>([]);
   const scrollProgressRef = useRef<number>(0);
+  const atomContainerRef  = useRef<HTMLDivElement>(null);
 
   /* ── GSAP setup ───────────────────────────────────── */
   useEffect(() => {
@@ -229,251 +230,276 @@ const JourneySection = () => {
     if (!isLoading) ScrollTrigger.refresh();
   }, [isLoading]);
 
+  /* Fade fixed atom in/out as journey section enters/leaves the viewport */
+  useEffect(() => {
+    const container = atomContainerRef.current;
+    const section   = sectionRef.current;
+    if (!container) return;
+
+    gsap.set(container, { autoAlpha: 0 });
+    if (isLoading || !section) return;
+
+    const st = ScrollTrigger.create({
+      trigger:     section,
+      start:       'top 70%',
+      end:         'bottom 30%',
+      onEnter:     () => gsap.to(container, { autoAlpha: 1, duration: 0.5 }),
+      onLeave:     () => gsap.to(container, { autoAlpha: 0, duration: 0.5 }),
+      onEnterBack: () => gsap.to(container, { autoAlpha: 1, duration: 0.5 }),
+      onLeaveBack: () => gsap.to(container, { autoAlpha: 0, duration: 0.5 }),
+    });
+
+    return () => st.kill();
+  }, [isLoading]);
+
   /* ════════════════════════════════════════════════════
      RENDER — the <section> MUST always be in the DOM so
      React doesn't try to insert/remove siblings of the
      GSAP pin-spacer that wraps the pinned HeroSection.
      ═════════════════════════════════════════════════ */
   return (
-    <section
-      ref={sectionRef}
-      id="journey"
-      style={{ position: 'relative', background: 'var(--space-bg)', padding: isLoading ? 0 : '15vh 0 20vh' }}
-    >
-      {!isLoading && (
-        <>
-      {/* ── Sticky Atom — stays visible for entire section scroll ── */}
-      <div style={{
-        position:      'sticky',
-        top:           'calc(50vh - 170px)',
-        height:        '340px',
-        width:         '100%',
-        zIndex:        0,
-        pointerEvents: 'none',
-        marginBottom:  '-340px',
-      }}>
-        <Suspense fallback={null}>
-          <Atom scrollProgressRef={scrollProgressRef} />
-        </Suspense>
+    <>
+      {/* ── Fixed Atom — right side of viewport, shown only while section scrolls ── */}
+      <div
+        ref={atomContainerRef}
+        style={{
+          position:      'fixed',
+          top:           '50%',
+          right:         '1.5rem',
+          transform:     'translateY(-50%)',
+          width:         '42vw',
+          maxWidth:      '600px',
+          height:        '500px',
+          pointerEvents: 'none',
+          zIndex:        5,
+        }}
+      >
+        {!isLoading && (
+          <Suspense fallback={null}>
+            <Atom scrollProgressRef={scrollProgressRef} />
+          </Suspense>
+        )}
       </div>
 
-      {/* ── Section header text ── */}
-      <div style={{
-        position:     'relative',
-        zIndex:       1,
-        textAlign:    'center',
-        marginBottom: '12vh',
-        padding:      '8vh 1.5rem 0',
-      }}>
-        <span style={{
-          display:       'block',
-          fontSize:      '0.72rem',
-          textTransform: 'uppercase',
-          letterSpacing: '0.22em',
-          color:          ACCENT,
-          marginBottom:  '1rem',
-        }}>
-          Mi historia
-        </span>
-        <h2 style={{
-          fontSize:             'clamp(2.5rem, 6vw, 5rem)',
-          fontWeight:           700,
-          background:          'linear-gradient(135deg, var(--space-text) 0%, var(--space-accent) 60%, var(--space-accent-2) 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor:  'transparent',
-          backgroundClip:       'text',
-        }}>
-          Educación &amp; Experiencia
-        </h2>
-      </div>
+      {/* ── Section — always in DOM (GSAP pin-spacer safety) ── */}
+      <section
+        ref={sectionRef}
+        id="journey"
+        style={{ position: 'relative', background: 'var(--space-bg)' }}
+      >
+        {!isLoading && (
+          <div style={{ padding: '15vh 2rem 20vh', maxWidth: '55vw' }}>
 
-      {/* ── Timeline ── */}
-      <div style={{
-        position:     'relative',
-        maxWidth:     '900px',
-        margin:       '0 auto',
-        paddingLeft:  '4rem',   /* space for the gutter */
-        paddingRight: '1.5rem',
-      }}>
-        {/* Vertical line */}
-        <div style={{
-          position:   'absolute',
-          left:       '1.5rem',
-          top:        0,
-          bottom:     0,
-          width:      '2px',
-          background: `linear-gradient(to bottom, ${ACCENT}, ${ACCENT2})`,
-          opacity:    0.35,
-        }} />
+            {/* Section header */}
+            <div style={{ marginBottom: '12vh', paddingTop: '4vh' }}>
+              <span style={{
+                display:       'block',
+                fontSize:      '0.72rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.22em',
+                color:          ACCENT,
+                marginBottom:  '1rem',
+              }}>
+                Mi historia
+              </span>
+              <h2 style={{
+                fontSize:             'clamp(2.5rem, 6vw, 5rem)',
+                fontWeight:           700,
+                background:          'linear-gradient(135deg, var(--space-text) 0%, var(--space-accent) 60%, var(--space-accent-2) 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor:  'transparent',
+                backgroundClip:       'text',
+              }}>
+                Educación &amp; Experiencia
+              </h2>
+            </div>
 
-        {/* Flip cursor — the moving waypoint indicator */}
-        <div
-          ref={cursorRef}
-          style={{
-            position:     'absolute',
-            left:         'calc(1.5rem - 11px)',  /* center on the line */
-            top:          0,
-            width:        '22px',
-            height:       '22px',
-            borderRadius: '50%',
-            background:    ACCENT,
-            boxShadow:    `0 0 14px ${ACCENT}, 0 0 32px rgba(168,85,247,0.45)`,
-            zIndex:       10,
-          }}
-        />
+            {/* ── Timeline ── */}
+            <div style={{
+              position:     'relative',
+              paddingLeft:  '4rem',
+              paddingRight: '1.5rem',
+            }}>
+              {/* Vertical line */}
+              <div style={{
+                position:   'absolute',
+                left:       '1.5rem',
+                top:        0,
+                bottom:     0,
+                width:      '2px',
+                background: `linear-gradient(to bottom, ${ACCENT}, ${ACCENT2})`,
+                opacity:    0.35,
+              }} />
 
-        {/* ── Entries ── */}
-        {entries.map((entry, i) => {
-          const isEdu   = entry.type === 'education';
-          const dotColor = isEdu ? ACCENT : ACCENT2;
-
-          return (
-            <div
-              key={entry.id}
-              ref={el => { entryRefs.current[i] = el; }}
-              style={{
-                position:     'relative',
-                minHeight:    '70vh',
-                paddingTop:   '6vh',
-                paddingBottom: '10vh',
-                borderBottom: i < entries.length - 1
-                  ? `1px solid ${BORDER}`
-                  : 'none',
-              }}
-            >
-              {/* Dot waypoint marker */}
+              {/* Flip cursor */}
               <div
-                ref={el => { dotRefs.current[i] = el; }}
+                ref={cursorRef}
                 style={{
                   position:     'absolute',
-                  left:         'calc(-4rem + 1.5rem - 5px)', /* aligns w/ line center */
-                  top:          '6vh',
-                  width:        '10px',
-                  height:       '10px',
+                  left:         'calc(1.5rem - 11px)',
+                  top:          0,
+                  width:        '22px',
+                  height:       '22px',
                   borderRadius: '50%',
-                  background:    dotColor,
-                  border:       `2px solid ${isEdu ? 'rgba(168,85,247,0.4)' : 'rgba(6,182,212,0.4)'}`,
-                  opacity:      0.4,
-                  zIndex:       5,
+                  background:    ACCENT,
+                  boxShadow:    `0 0 14px ${ACCENT}, 0 0 32px rgba(168,85,247,0.45)`,
+                  zIndex:       10,
                 }}
               />
 
-              {/* Category tag + date */}
-              <div style={{
-                display:        'flex',
-                alignItems:     'center',
-                justifyContent: 'space-between',
-                flexWrap:       'wrap',
-                gap:            '0.5rem',
-                marginBottom:   '2rem',
-              }}>
-                <span style={{
-                  fontSize:      '0.72rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.18em',
-                  color:          dotColor,
-                  background:    isEdu ? 'rgba(168,85,247,0.1)' : 'rgba(6,182,212,0.1)',
-                  border:        `1px solid ${isEdu ? 'rgba(168,85,247,0.3)' : 'rgba(6,182,212,0.3)'}`,
-                  padding:       '4px 14px',
-                  borderRadius:  '999px',
-                }}>
-                  {isEdu ? 'Educación' : 'Experiencia'}
-                </span>
-                <span style={{
-                  fontSize:           '0.85rem',
-                  color:               TEXT_DIM,
-                  fontVariantNumeric: 'tabular-nums',
-                }}>
-                  {entry.period}
-                </span>
-              </div>
+              {/* ── Entries ── */}
+              {entries.map((entry, i) => {
+                const isEdu    = entry.type === 'education';
+                const dotColor = isEdu ? ACCENT : ACCENT2;
 
-              {/* Org — SplitText target (dangerouslySetInnerHTML prevents React/SplitText DOM conflict) */}
-              <p
-                className="jt-org"
-                style={{
-                  fontSize:     'clamp(0.9rem, 1.8vw, 1.1rem)',
-                  color:         TEXT_DIM,
-                  fontWeight:   500,
-                  marginBottom: '0.75rem',
-                }}
-                dangerouslySetInnerHTML={{ __html: entry.org }}
-              />
-
-              {/* Title — gradient, fades in (no SplitText) */}
-              <h3
-                className="jt-title"
-                style={{
-                  fontSize:             'clamp(1.8rem, 4vw, 3.5rem)',
-                  fontWeight:           700,
-                  lineHeight:           1.1,
-                  marginBottom:         '2rem',
-                  background:          'linear-gradient(135deg, var(--space-text) 0%, var(--space-accent) 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor:  'transparent',
-                  backgroundClip:       'text',
-                }}
-              >
-                {entry.title}
-              </h3>
-
-              {/* Location */}
-              <p style={{
-                fontSize:     '0.88rem',
-                color:         TEXT_DIM,
-                marginBottom: '1.5rem',
-                display:      'flex',
-                alignItems:   'center',
-                gap:          '0.4rem',
-              }}>
-                <span aria-hidden>📍</span>
-                <span>{entry.location}</span>
-              </p>
-
-              {/* Description — SplitText target */}
-              <p
-                className="jt-desc"
-                style={{
-                  fontSize:     'clamp(1rem, 1.8vw, 1.1rem)',
-                  lineHeight:   1.75,
-                  color:         TEXT,
-                  opacity:      0.82,
-                  maxWidth:     '65ch',
-                  marginBottom: '1.5rem',
-                }}
-                dangerouslySetInnerHTML={{ __html: entry.description }}
-              />
-
-              {/* Tech tags */}
-              {entry.tags.length > 0 && (
-                <div
-                  className="jt-tags"
-                  style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '1rem' }}
-                >
-                  {entry.tags.map((tag, idx) => (
-                    <span
-                      key={idx}
+                return (
+                  <div
+                    key={entry.id}
+                    ref={el => { entryRefs.current[i] = el; }}
+                    style={{
+                      position:      'relative',
+                      minHeight:     '70vh',
+                      paddingTop:    '6vh',
+                      paddingBottom: '10vh',
+                      borderBottom:  i < entries.length - 1
+                        ? `1px solid ${BORDER}`
+                        : 'none',
+                    }}
+                  >
+                    {/* Dot waypoint */}
+                    <div
+                      ref={el => { dotRefs.current[i] = el; }}
                       style={{
-                        fontSize:     '0.8rem',
-                        padding:      '4px 14px',
-                        borderRadius: '999px',
-                        background:   'rgba(168,85,247,0.08)',
-                        color:          ACCENT,
-                        border:       '1px solid rgba(168,85,247,0.25)',
+                        position:     'absolute',
+                        left:         'calc(-4rem + 1.5rem - 5px)',
+                        top:          '6vh',
+                        width:        '10px',
+                        height:       '10px',
+                        borderRadius: '50%',
+                        background:    dotColor,
+                        border:       `2px solid ${isEdu ? 'rgba(168,85,247,0.4)' : 'rgba(6,182,212,0.4)'}`,
+                        opacity:      0.4,
+                        zIndex:       5,
+                      }}
+                    />
+
+                    {/* Category tag + date */}
+                    <div style={{
+                      display:        'flex',
+                      alignItems:     'center',
+                      justifyContent: 'space-between',
+                      flexWrap:       'wrap',
+                      gap:            '0.5rem',
+                      marginBottom:   '2rem',
+                    }}>
+                      <span style={{
+                        fontSize:      '0.72rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.18em',
+                        color:          dotColor,
+                        background:    isEdu ? 'rgba(168,85,247,0.1)' : 'rgba(6,182,212,0.1)',
+                        border:        `1px solid ${isEdu ? 'rgba(168,85,247,0.3)' : 'rgba(6,182,212,0.3)'}`,
+                        padding:       '4px 14px',
+                        borderRadius:  '999px',
+                      }}>
+                        {isEdu ? 'Educación' : 'Experiencia'}
+                      </span>
+                      <span style={{
+                        fontSize:           '0.85rem',
+                        color:               TEXT_DIM,
+                        fontVariantNumeric: 'tabular-nums',
+                      }}>
+                        {entry.period}
+                      </span>
+                    </div>
+
+                    {/* Org */}
+                    <p
+                      className="jt-org"
+                      style={{
+                        fontSize:     'clamp(0.9rem, 1.8vw, 1.1rem)',
+                        color:         TEXT_DIM,
+                        fontWeight:   500,
+                        marginBottom: '0.75rem',
+                      }}
+                      dangerouslySetInnerHTML={{ __html: entry.org }}
+                    />
+
+                    {/* Title */}
+                    <h3
+                      className="jt-title"
+                      style={{
+                        fontSize:             'clamp(1.8rem, 4vw, 3.5rem)',
+                        fontWeight:           700,
+                        lineHeight:           1.1,
+                        marginBottom:         '2rem',
+                        background:          'linear-gradient(135deg, var(--space-text) 0%, var(--space-accent) 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor:  'transparent',
+                        backgroundClip:       'text',
                       }}
                     >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
+                      {entry.title}
+                    </h3>
+
+                    {/* Location */}
+                    <p style={{
+                      fontSize:     '0.88rem',
+                      color:         TEXT_DIM,
+                      marginBottom: '1.5rem',
+                      display:      'flex',
+                      alignItems:   'center',
+                      gap:          '0.4rem',
+                    }}>
+                      <span aria-hidden>📍</span>
+                      <span>{entry.location}</span>
+                    </p>
+
+                    {/* Description */}
+                    <p
+                      className="jt-desc"
+                      style={{
+                        fontSize:     'clamp(1rem, 1.8vw, 1.1rem)',
+                        lineHeight:   1.75,
+                        color:         TEXT,
+                        opacity:      0.82,
+                        maxWidth:     '65ch',
+                        marginBottom: '1.5rem',
+                      }}
+                      dangerouslySetInnerHTML={{ __html: entry.description }}
+                    />
+
+                    {/* Tech tags */}
+                    {entry.tags.length > 0 && (
+                      <div
+                        className="jt-tags"
+                        style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '1rem' }}
+                      >
+                        {entry.tags.map((tag, idx) => (
+                          <span
+                            key={idx}
+                            style={{
+                              fontSize:     '0.8rem',
+                              padding:      '4px 14px',
+                              borderRadius: '999px',
+                              background:   'rgba(168,85,247,0.08)',
+                              color:          ACCENT,
+                              border:       '1px solid rgba(168,85,247,0.25)',
+                            }}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          );
-        })}
-      </div>
-        </>
-      )}
-    </section>
+          </div>
+        )}
+      </section>
+    </>
   );
 };
 

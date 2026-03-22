@@ -1,9 +1,13 @@
 /**
- * Atom.tsx — Raw Three.js atom with scroll-driven ring rotation
+ * Atom.tsx — Three.js atom with proper 3D lighting and scroll-driven rotation.
  *
- * Lightweight 3D atom: glowing nucleus + 3 tilted orbit rings + electrons.
- * Ring rotation is driven by a mutable ref (written by GSAP ScrollTrigger).
- * Uses alpha:true so it composites over the dark background.
+ * Architecture:
+ *  - Each ring uses a TWO-GROUP hierarchy:
+ *      tiltGroup (permanent tilt rotation) → spinGroup (Z-rotation updated each frame)
+ *    This guarantees the ring spins correctly in its own tilted plane without
+ *    the per-frame rotation.set() → rotateZ() drift bug.
+ *  - MeshStandardMaterial + PointLights give real 3D shading (highlights / shadows).
+ *  - scrollProgressRef drives ring speed via GSAP ScrollTrigger (written externally).
  */
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
@@ -18,10 +22,15 @@ const CYAN   = 0x06b6d4;
 const LILAC  = 0xc084fc;
 
 const RING_CONFIGS = [
-  { radius: 2.5, color: PURPLE, tilt: [1.05, 0,    0.3 ] as const, speed: 1.0 },
-  { radius: 3.0, color: CYAN,   tilt: [-0.6, 0.78, 0   ] as const, speed: 1.4 },
-  { radius: 2.0, color: LILAC,  tilt: [0.5, -1.05, 0.4 ] as const, speed: 0.8 },
+  { radius: 2.8, color: PURPLE, tilt: [1.05, 0,     0.3 ] as const, speed: 1.0 },
+  { radius: 3.4, color: CYAN,   tilt: [-0.6, 0.78,  0   ] as const, speed: 1.4 },
+  { radius: 2.2, color: LILAC,  tilt: [0.5, -1.05,  0.4 ] as const, speed: 0.8 },
 ];
+
+interface RingEntry {
+  spinGroup: THREE.Group;
+  cfg: typeof RING_CONFIGS[0];
+}
 
 const Atom = ({ scrollProgressRef }: AtomProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -48,50 +57,81 @@ const Atom = ({ scrollProgressRef }: AtomProps) => {
       0.1,
       100,
     );
-    camera.position.z = 9;
+    /* Slight offset so the atom has visible depth/perspective */
+    camera.position.set(1.2, 0.6, 10);
+    camera.lookAt(0, 0, 0);
 
-    /* ── Nucleus ── */
-    const nucleusGeo = new THREE.SphereGeometry(0.35, 16, 16);
-    const nucleusMat = new THREE.MeshBasicMaterial({ color: PURPLE });
-    const nucleus    = new THREE.Mesh(nucleusGeo, nucleusMat);
+    /* ── Lighting ──────────────────────────────────────── */
+    scene.add(new THREE.AmbientLight(0x281840, 1.2));
+
+    const purpleLight = new THREE.PointLight(PURPLE, 4, 28);
+    purpleLight.position.set(4, 4, 6);
+    scene.add(purpleLight);
+
+    const cyanLight = new THREE.PointLight(CYAN, 2.5, 22);
+    cyanLight.position.set(-5, -3, 5);
+    scene.add(cyanLight);
+
+    /* ── Nucleus ────────────────────────────────────────── */
+    const nucleusMat = new THREE.MeshStandardMaterial({
+      color:              PURPLE,
+      emissive:           PURPLE,
+      emissiveIntensity:  0.55,
+      roughness:          0.15,
+      metalness:          0.75,
+    });
+    const nucleus = new THREE.Mesh(new THREE.SphereGeometry(0.42, 32, 32), nucleusMat);
     scene.add(nucleus);
 
-    /* Outer glow sphere (pulsing) */
-    const glowGeo = new THREE.SphereGeometry(0.55, 16, 16);
-    const glowMat = new THREE.MeshBasicMaterial({
-      color: PURPLE, transparent: true, opacity: 0.12,
-    });
-    const glow = new THREE.Mesh(glowGeo, glowMat);
+    /* Outer glow halo */
+    const glowMat = new THREE.MeshBasicMaterial({ color: PURPLE, transparent: true, opacity: 0.10 });
+    const glow    = new THREE.Mesh(new THREE.SphereGeometry(0.72, 16, 16), glowMat);
     scene.add(glow);
 
-    /* ── Orbit rings + electrons ── */
-    const ringGroups: THREE.Group[] = [];
-    const electronAngles: number[]  = [];   // base angle offsets
+    /* ── Rings + electrons ──────────────────────────────── */
+    const rings: RingEntry[] = [];
 
-    RING_CONFIGS.forEach((cfg, idx) => {
-      const group = new THREE.Group();
-      group.rotation.set(cfg.tilt[0], cfg.tilt[1], cfg.tilt[2]);
+    RING_CONFIGS.forEach(cfg => {
+      /* Outer group: permanent tilt — NEVER modified after creation */
+      const tiltGroup = new THREE.Group();
+      tiltGroup.rotation.set(cfg.tilt[0], cfg.tilt[1], cfg.tilt[2]);
+      scene.add(tiltGroup);
 
-      /* Ring (thin torus) */
-      const ringGeo = new THREE.TorusGeometry(cfg.radius, 0.02, 8, 128);
-      const ringMat = new THREE.MeshBasicMaterial({
-        color: cfg.color, transparent: true, opacity: 0.5,
+      /* Inner group: spins around local Z each frame */
+      const spinGroup = new THREE.Group();
+      tiltGroup.add(spinGroup);
+
+      /* Ring — thicker tube + more radial segments = rounder, 3D-looking tube */
+      const ringMat = new THREE.MeshStandardMaterial({
+        color:             cfg.color,
+        emissive:          cfg.color,
+        emissiveIntensity: 0.25,
+        roughness:         0.35,
+        metalness:         0.65,
+        transparent:       true,
+        opacity:           0.75,
       });
-      group.add(new THREE.Mesh(ringGeo, ringMat));
+      spinGroup.add(new THREE.Mesh(
+        new THREE.TorusGeometry(cfg.radius, 0.045, 20, 140),
+        ringMat,
+      ));
 
-      /* Electron */
-      const elGeo = new THREE.SphereGeometry(0.1, 8, 8);
-      const elMat = new THREE.MeshBasicMaterial({ color: cfg.color });
-      const el    = new THREE.Mesh(elGeo, elMat);
-      el.name     = 'electron';
-      group.add(el);
+      /* Electron — fixed at (radius, 0, 0) in spinGroup space; orbits via group rotation */
+      const elMat = new THREE.MeshStandardMaterial({
+        color:             cfg.color,
+        emissive:          cfg.color,
+        emissiveIntensity: 0.85,
+        roughness:         0.08,
+        metalness:         0.95,
+      });
+      const el = new THREE.Mesh(new THREE.SphereGeometry(0.13, 20, 20), elMat);
+      el.position.set(cfg.radius, 0, 0);
+      spinGroup.add(el);
 
-      scene.add(group);
-      ringGroups.push(group);
-      electronAngles.push((idx * Math.PI * 2) / 3);  // evenly spaced starts
+      rings.push({ spinGroup, cfg });
     });
 
-    /* ── Resize ── */
+    /* ── Resize observer ────────────────────────────────── */
     const ro = new ResizeObserver(() => {
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
@@ -101,37 +141,29 @@ const Atom = ({ scrollProgressRef }: AtomProps) => {
     });
     ro.observe(canvas);
 
-    /* ── Animation loop ── */
+    /* ── Animation loop ─────────────────────────────────── */
     const startMs = Date.now();
     let animId: number;
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
       const t = (Date.now() - startMs) / 1000;
-      const p = scrollProgressRef.current;   // 0 → 1
+      const p = scrollProgressRef.current; // 0 → 1
 
-      ringGroups.forEach((group, i) => {
-        const cfg   = RING_CONFIGS[i];
-        const angle = t * 0.4 * cfg.speed + p * Math.PI * 4 * cfg.speed;
-
-        /* Rotate entire group around its local Z → rings spin in their own plane */
-        group.rotation.set(cfg.tilt[0], cfg.tilt[1], cfg.tilt[2]);
-        group.rotateZ(angle);
-
-        /* Move electron along the ring */
-        const el = group.getObjectByName('electron') as THREE.Mesh;
-        if (el) {
-          const a = electronAngles[i] + angle * 1.8;
-          el.position.set(
-            cfg.radius * Math.cos(a),
-            cfg.radius * Math.sin(a),
-            0,
-          );
-        }
+      /* Spin each ring's inner group — tiltGroup never touched */
+      rings.forEach(({ spinGroup, cfg }) => {
+        spinGroup.rotation.z = t * 0.45 * cfg.speed + p * Math.PI * 6 * cfg.speed;
       });
 
+      /* Slowly orbit the primary light for dynamic highlights */
+      purpleLight.position.set(
+        4 * Math.cos(t * 0.28),
+        4 * Math.sin(t * 0.35),
+        6,
+      );
+
       /* Pulse nucleus glow */
-      glow.scale.setScalar(1 + Math.sin(t * 2) * 0.12);
+      glow.scale.setScalar(1 + Math.sin(t * 2.1) * 0.13);
 
       renderer.render(scene, camera);
     };
@@ -154,12 +186,12 @@ const Atom = ({ scrollProgressRef }: AtomProps) => {
     <canvas
       ref={canvasRef}
       style={{
-        position: 'absolute',
-        inset:    0,
-        width:    '100%',
-        height:   '100%',
+        position:      'absolute',
+        inset:         0,
+        width:         '100%',
+        height:        '100%',
         pointerEvents: 'none',
-        display:  'block',
+        display:       'block',
       }}
     />
   );
