@@ -8,26 +8,30 @@
  *  - Galaxy fixed and centered behind all content
  *  - Content blocks have a subtle gradient dark veil for readability
  *
- * Animations (GSAP):
- *  1. Flip waypoints  — cursor tracks down left gutter (scrubbed)
- *  2. SplitText chars — org names reveal letter-by-letter with rotationX
- *  3. SplitText lines — description lines scrub-masked in
- *  4. Gradient titles — gsap.from y + opacity (no SplitText — webkit-clip conflict)
- *  5. Meta row        — slides in from the correct side per entry alignment
- *  6. Tags            — scale + opacity pop with back easing
+ * Cursor animation (inspired by GSAP CodePen raerLaK):
+ *  - MotionPathPlugin animates a glowing orb along a curved zigzag path
+ *  - Path points are computed from each marker's getBoundingClientRect()
+ *  - Recreated on window resize (same pattern as the CodePen)
+ *
+ * Other animations (GSAP):
+ *  - SplitText chars — org names reveal letter-by-letter with rotationX
+ *  - SplitText lines — description lines scrub-masked in
+ *  - Gradient titles — gsap.from y + opacity (no SplitText — webkit-clip conflict)
+ *  - Meta row        — slides in from the correct side
+ *  - Tags            — scale + opacity pop with back easing
  */
 import { useEffect, useRef, lazy, Suspense } from 'react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SplitText } from 'gsap/SplitText';
-import { Flip } from 'gsap/Flip';
-import { useEducation } from '../../../hooks';
-import { useExperience } from '../../../hooks';
+import { ScrollTrigger }    from 'gsap/ScrollTrigger';
+import { SplitText }        from 'gsap/SplitText';
+import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
+import { useEducation }     from '../../../hooks';
+import { useExperience }    from '../../../hooks';
 
 const Galaxy    = lazy(() => import('../../3d/Galaxy'));
 const StarField = lazy(() => import('../../3d/StarField'));
 
-gsap.registerPlugin(ScrollTrigger, SplitText, Flip);
+gsap.registerPlugin(ScrollTrigger, SplitText, MotionPathPlugin);
 
 /* ── Merged entry type ─────────────────────────────── */
 interface JourneyEntry {
@@ -80,72 +84,103 @@ const JourneySection = () => {
   const sectionRef         = useRef<HTMLElement>(null);
   const cursorRef          = useRef<HTMLDivElement>(null);
   const entryRefs          = useRef<(HTMLDivElement | null)[]>([]);
-  const dotRefs            = useRef<(HTMLDivElement | null)[]>([]);
+  const markerRefs         = useRef<(HTMLDivElement | null)[]>([]);
   const scrollProgressRef  = useRef<number>(0);
   const galaxyContainerRef = useRef<HTMLDivElement>(null);
 
   /* ── GSAP setup ───────────────────────────────────── */
   useEffect(() => {
-    const n = entries.length;
-    if (!n || !sectionRef.current || !cursorRef.current) return;
+    if (!entries.length || !sectionRef.current || !cursorRef.current) return;
 
-    let cancelled = false;
+    let cancelled     = false;
     let ctx: gsap.Context | undefined;
+    let handleResize: (() => void) | undefined;
+    let resizeTimer:  ReturnType<typeof setTimeout>;
 
-    document.fonts.ready.then(() => {
-      if (cancelled || !sectionRef.current) return;
+    /* ─────────────────────────────────────────────────────
+       setup() — mirrors the CodePen pattern:
+       revert previous context, recompute BoundingClientRects,
+       rebuild MotionPath + all scroll animations fresh.
+       Called once on init and again on every resize.
+       ───────────────────────────────────────────────────── */
+    const setup = () => {
+      ctx?.revert();
+      if (cancelled || !sectionRef.current || !cursorRef.current) return;
+
+      const validMarkers = markerRefs.current.filter(Boolean) as HTMLDivElement[];
+      if (!validMarkers.length) return;
 
       ctx = gsap.context(() => {
+        const cursor = cursorRef.current!;
 
-        /* ────────────────────────────────────────────────
-           1. FLIP WAYPOINTS — cursor tracks gutter dots
-           ──────────────────────────────────────────────── */
-        const validDots = dotRefs.current.filter(Boolean) as HTMLDivElement[];
-        const dotStates = validDots.map(d => Flip.getState(d));
+        /* Reset cursor to origin before measuring */
+        gsap.set(cursor, { x: 0, y: 0, opacity: 0 });
+        const cursorRect = cursor.getBoundingClientRect();
 
-        if (dotStates[0]) {
-          Flip.fit(cursorRef.current!, dotStates[0], { duration: 0, scale: false });
+        /* Compute {x, y} offsets from cursor origin to each marker center
+           (identical to the CodePen getBoundingClientRect approach)       */
+        const points = validMarkers.map(marker => {
+          const r = marker.getBoundingClientRect();
+          return {
+            x: r.left + r.width  / 2 - (cursorRect.left + cursorRect.width  / 2),
+            y: r.top  + r.height / 2 - (cursorRect.top  + cursorRect.height / 2),
+          };
+        });
+
+        /* Snap cursor to first marker, make it visible */
+        gsap.set(cursor, { x: points[0].x, y: points[0].y, opacity: 1 });
+
+        /* Continuous pulse (independent of scroll) */
+        gsap.to(cursor, {
+          scale:    1.4,
+          duration: 1.1,
+          repeat:   -1,
+          yoyo:     true,
+          ease:     'sine.inOut',
+        });
+
+        /* ── MotionPath scroll timeline ─────────────────
+           Cursor travels along a curved zigzag path
+           scrubbed to the full section scroll (top → bottom).
+           curviness: 1.5 gives smooth S-curves between markers.
+           ─────────────────────────────────────────────── */
+        if (points.length > 1) {
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger:  sectionRef.current,
+              start:    'top top',
+              end:      'bottom bottom',
+              scrub:    1.5,
+              onUpdate: (self) => { scrollProgressRef.current = self.progress; },
+            },
+          });
+
+          tl.to(cursor, {
+            duration:   1,
+            ease:       'none',
+            motionPath: {
+              path:      points.slice(1), // skip first — cursor is already there
+              curviness: 1.5,
+            },
+          });
         }
 
-        const flipTl = gsap.timeline({
-          scrollTrigger: {
-            trigger:             sectionRef.current,
-            start:               'top top',
-            end:                 'bottom bottom',
-            scrub:               1.5,
-            invalidateOnRefresh: true,
-            onUpdate: (self) => { scrollProgressRef.current = self.progress; },
-          },
-        });
-
-        dotStates.forEach((state, i) => {
-          if (i === 0) return;
-          const fit = Flip.fit(cursorRef.current!, state, {
-            duration: 1,
-            ease:     'power1.inOut',
-            scale:    false,
-          });
-          if (fit) flipTl.add(fit as gsap.core.Tween);
-        });
-
-        /* Dot activation pulse */
-        validDots.forEach((dot, i) => {
+        /* ── Marker activation — pulse glow on active entry ── */
+        validMarkers.forEach((marker, i) => {
           const entry = entryRefs.current[i];
           if (!entry) return;
           ScrollTrigger.create({
             trigger:     entry,
             start:       'top 60%',
             end:         'bottom 40%',
-            onEnter:     () => gsap.to(dot, { scale: 1.6, opacity: 1,   duration: 0.35 }),
-            onLeave:     () => gsap.to(dot, { scale: 1,   opacity: 0.4, duration: 0.35 }),
-            onEnterBack: () => gsap.to(dot, { scale: 1.6, opacity: 1,   duration: 0.35 }),
-            onLeaveBack: () => gsap.to(dot, { scale: 1,   opacity: 0.4, duration: 0.35 }),
+            onEnter:     () => gsap.to(marker, { scale: 1.7, opacity: 1,    duration: 0.35 }),
+            onLeave:     () => gsap.to(marker, { scale: 1,   opacity: 0.35, duration: 0.35 }),
+            onEnterBack: () => gsap.to(marker, { scale: 1.7, opacity: 1,    duration: 0.35 }),
+            onLeaveBack: () => gsap.to(marker, { scale: 1,   opacity: 0.35, duration: 0.35 }),
           });
         });
 
-        /* ────────────────────────────────────────────────
-           2. TEXT ANIMATIONS per entry
-           ──────────────────────────────────────────────── */
+        /* ── Text animations per entry ──────────────────── */
         entryRefs.current.forEach((entry) => {
           if (!entry) return;
 
@@ -171,7 +206,7 @@ const JourneySection = () => {
             });
           }
 
-          /* Title — large gradient, plain y+opacity (no SplitText — webkit-clip conflict) */
+          /* Title — gradient, plain y+opacity (no SplitText — webkit-clip conflict) */
           if (titleEl) {
             gsap.from(titleEl, {
               y:        80,
@@ -238,10 +273,24 @@ const JourneySection = () => {
         });
 
       }, sectionRef);
+    };
+
+    /* ─── Init after fonts, attach resize handler (CodePen pattern) ─── */
+    document.fonts.ready.then(() => {
+      if (cancelled) return;
+      setup();
+
+      handleResize = () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(setup, 200);
+      };
+      window.addEventListener('resize', handleResize);
     });
 
     return () => {
       cancelled = true;
+      clearTimeout(resizeTimer);
+      if (handleResize) window.removeEventListener('resize', handleResize);
       ctx?.revert();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -254,7 +303,7 @@ const JourneySection = () => {
     if (!isLoading) ScrollTrigger.refresh();
   }, [isLoading]);
 
-  /* Galaxy visibility — fades in/out as section enters/leaves viewport */
+  /* Galaxy visibility */
   useEffect(() => {
     const container = galaxyContainerRef.current;
     const section   = sectionRef.current;
@@ -277,7 +326,7 @@ const JourneySection = () => {
   }, [isLoading]);
 
   /* ════════════════════════════════════════════════════
-     RENDER — <section> always in DOM (GSAP pin-spacer safety)
+     RENDER
      ═════════════════════════════════════════════════ */
   return (
     <>
@@ -303,7 +352,7 @@ const JourneySection = () => {
         )}
       </div>
 
-      {/* ── Section — always in DOM ── */}
+      {/* ── Section — always in DOM (GSAP pin-spacer safety) ── */}
       <section
         ref={sectionRef}
         id="journey"
@@ -342,33 +391,25 @@ const JourneySection = () => {
               </h2>
             </div>
 
-            {/* ── Timeline ── */}
+            {/* ── Timeline container — cursor is absolute inside here ── */}
             <div style={{ position: 'relative' }}>
 
-              {/* Vertical gutter line */}
-              <div style={{
-                position:   'absolute',
-                left:       '2.5rem',
-                top:        0,
-                bottom:     0,
-                width:      '2px',
-                background: `linear-gradient(to bottom, ${ACCENT}, ${ACCENT2})`,
-                opacity:    0.28,
-              }} />
-
-              {/* Flip cursor */}
+              {/* MotionPath cursor — glowing orb that zigzags between markers */}
               <div
                 ref={cursorRef}
                 style={{
-                  position:     'absolute',
-                  left:         'calc(2.5rem - 11px)',
-                  top:          0,
-                  width:        '22px',
-                  height:       '22px',
-                  borderRadius: '50%',
-                  background:    ACCENT,
-                  boxShadow:    `0 0 14px ${ACCENT}, 0 0 36px rgba(168,85,247,0.45)`,
-                  zIndex:       10,
+                  position:      'absolute',
+                  top:           0,
+                  left:          0,
+                  width:         '22px',
+                  height:        '22px',
+                  borderRadius:  '50%',
+                  background:    'radial-gradient(circle, #e879f9 0%, #a855f7 55%, transparent 100%)',
+                  boxShadow:     '0 0 10px 3px rgba(168,85,247,0.75), 0 0 28px 8px rgba(168,85,247,0.35)',
+                  opacity:       0,
+                  pointerEvents: 'none',
+                  zIndex:        20,
+                  transform:     'translate(-50%, -50%)',
                 }}
               />
 
@@ -378,7 +419,7 @@ const JourneySection = () => {
                 const isEdu    = entry.type === 'education';
                 const dotColor = isEdu ? ACCENT : ACCENT2;
 
-                /* Gradient veil: fades dark on text side → transparent toward center */
+                /* Gradient veil: dark on the text side, transparent toward center */
                 const veilBg = isLeft
                   ? 'linear-gradient(to right, rgba(0,0,5,0.82) 0%, rgba(0,0,5,0.55) 60%, transparent 100%)'
                   : 'linear-gradient(to left,  rgba(0,0,5,0.82) 0%, rgba(0,0,5,0.55) 60%, transparent 100%)';
@@ -401,21 +442,23 @@ const JourneySection = () => {
                         : 'none',
                     }}
                   >
-                    {/* Dot waypoint */}
+                    {/* Marker dot — MotionPath cursor travels to these */}
                     <div
-                      ref={el => { dotRefs.current[i] = el; }}
+                      ref={el => { markerRefs.current[i] = el; }}
                       style={{
                         position:     'absolute',
-                        left:         'calc(2.5rem - 5px)',
-                        top:          '7vh',
-                        width:        '10px',
-                        height:       '10px',
+                        ...(isLeft ? { left: '24vw' } : { right: '24vw' }),
+                        top:          '50%',
+                        transform:    'translateY(-50%)',
+                        width:        '12px',
+                        height:       '12px',
                         borderRadius: '50%',
                         background:    dotColor,
-                        border:       `2px solid ${isEdu ? 'rgba(168,85,247,0.4)' : 'rgba(6,182,212,0.4)'}`,
-                        boxShadow:    `0 0 8px ${isEdu ? 'rgba(168,85,247,0.5)' : 'rgba(6,182,212,0.5)'}`,
-                        opacity:      0.4,
+                        boxShadow:    `0 0 10px 2px ${isEdu ? 'rgba(168,85,247,0.6)' : 'rgba(6,182,212,0.6)'}`,
+                        border:       `2px solid ${isEdu ? 'rgba(168,85,247,0.5)' : 'rgba(6,182,212,0.5)'}`,
+                        opacity:      0.35,
                         zIndex:       5,
+                        pointerEvents: 'none',
                       }}
                     />
 
