@@ -3,15 +3,18 @@
  *
  * Vertical-scroll timeline for Education + Experience.
  *
- * Techniques:
- *  - GSAP Flip waypoints: a glowing cursor element is animated between
- *    per-entry dot markers using Flip.fit() inside a scrubbed timeline,
- *    exactly as in https://demos.gsap.com/demo/threejs-scroll-waypoints/
- *  - GSAP SplitText: organization names and descriptions are split into
- *    lines with a mask, then each line slides up on scroll (scrubbed),
- *    matching https://demos.gsap.com/demo/responsive-line-splits-on-scroll/
- *  - Large gradient titles use a plain gsap.from (opacity + y) so that
- *    webkit-background-clip: text does not conflict with SplitText wrappers.
+ * Layout:
+ *  - Entries alternate left ↔ right (even indices left, odd right)
+ *  - Galaxy fixed and centered behind all content
+ *  - Content blocks have a subtle gradient dark veil for readability
+ *
+ * Animations (GSAP):
+ *  1. Flip waypoints  — cursor tracks down left gutter (scrubbed)
+ *  2. SplitText chars — org names reveal letter-by-letter with rotationX
+ *  3. SplitText lines — description lines scrub-masked in
+ *  4. Gradient titles — gsap.from y + opacity (no SplitText — webkit-clip conflict)
+ *  5. Meta row        — slides in from the correct side per entry alignment
+ *  6. Tags            — scale + opacity pop with back easing
  */
 import { useEffect, useRef, lazy, Suspense } from 'react';
 import gsap from 'gsap';
@@ -42,7 +45,6 @@ const ACCENT   = 'var(--space-accent)';
 const ACCENT2  = 'var(--space-accent-2)';
 const TEXT     = 'var(--space-text)';
 const TEXT_DIM = 'var(--space-text-dim)';
-const BORDER   = 'var(--space-border)';
 
 /* ══════════════════════════════════════════════════════════════════════ */
 
@@ -75,12 +77,12 @@ const JourneySection = () => {
   ];
 
   /* ── Refs ─────────────────────────────────────────── */
-  const sectionRef        = useRef<HTMLElement>(null);
-  const cursorRef         = useRef<HTMLDivElement>(null);
-  const entryRefs         = useRef<(HTMLDivElement | null)[]>([]);
-  const dotRefs           = useRef<(HTMLDivElement | null)[]>([]);
-  const scrollProgressRef = useRef<number>(0);
-  const atomContainerRef  = useRef<HTMLDivElement>(null);
+  const sectionRef         = useRef<HTMLElement>(null);
+  const cursorRef          = useRef<HTMLDivElement>(null);
+  const entryRefs          = useRef<(HTMLDivElement | null)[]>([]);
+  const dotRefs            = useRef<(HTMLDivElement | null)[]>([]);
+  const scrollProgressRef  = useRef<number>(0);
+  const galaxyContainerRef = useRef<HTMLDivElement>(null);
 
   /* ── GSAP setup ───────────────────────────────────── */
   useEffect(() => {
@@ -90,17 +92,16 @@ const JourneySection = () => {
     let cancelled = false;
     let ctx: gsap.Context | undefined;
 
-    /* Wait for fonts before splitting text */
     document.fonts.ready.then(() => {
       if (cancelled || !sectionRef.current) return;
 
       ctx = gsap.context(() => {
 
         /* ────────────────────────────────────────────────
-           1. FLIP WAYPOINTS
+           1. FLIP WAYPOINTS — cursor tracks gutter dots
            ──────────────────────────────────────────────── */
-        const validDots  = dotRefs.current.filter(Boolean) as HTMLDivElement[];
-        const dotStates  = validDots.map(d => Flip.getState(d));
+        const validDots = dotRefs.current.filter(Boolean) as HTMLDivElement[];
+        const dotStates = validDots.map(d => Flip.getState(d));
 
         if (dotStates[0]) {
           Flip.fit(cursorRef.current!, dotStates[0], { duration: 0, scale: false });
@@ -113,9 +114,7 @@ const JourneySection = () => {
             end:                 'bottom bottom',
             scrub:               1.5,
             invalidateOnRefresh: true,
-            onUpdate: (self) => {
-              scrollProgressRef.current = self.progress;
-            },
+            onUpdate: (self) => { scrollProgressRef.current = self.progress; },
           },
         });
 
@@ -129,7 +128,7 @@ const JourneySection = () => {
           if (fit) flipTl.add(fit as gsap.core.Tween);
         });
 
-        /* Dot activation */
+        /* Dot activation pulse */
         validDots.forEach((dot, i) => {
           const entry = entryRefs.current[i];
           if (!entry) return;
@@ -145,46 +144,67 @@ const JourneySection = () => {
         });
 
         /* ────────────────────────────────────────────────
-           2. SPLITTEXT — org name + description
-           Uses dangerouslySetInnerHTML in JSX so React
-           doesn't manage children that SplitText rewrites.
+           2. TEXT ANIMATIONS per entry
            ──────────────────────────────────────────────── */
         entryRefs.current.forEach((entry) => {
           if (!entry) return;
 
+          const isRight = entry.dataset.align === 'right';
           const orgEl   = entry.querySelector<HTMLElement>('.jt-org');
           const descEl  = entry.querySelector<HTMLElement>('.jt-desc');
           const titleEl = entry.querySelector<HTMLElement>('.jt-title');
           const tagsEl  = entry.querySelector<HTMLElement>('.jt-tags');
+          const metaEl  = entry.querySelector<HTMLElement>('.jt-meta');
 
-          if (titleEl) {
-            gsap.from(titleEl, {
-              opacity: 0,
-              y:       40,
-              duration: 0.8,
-              ease:    'power3.out',
+          /* Meta row — slides in from the content side */
+          if (metaEl) {
+            gsap.from(metaEl, {
+              x:        isRight ? 80 : -80,
+              opacity:  0,
+              duration: 0.75,
+              ease:     'power3.out',
               scrollTrigger: {
                 trigger:       entry,
-                start:         'clamp(top 75%)',
+                start:         'clamp(top 82%)',
                 toggleActions: 'play none none reverse',
               },
             });
           }
 
-          if (orgEl) {
-            const split = new SplitText(orgEl, { type: 'lines', mask: 'lines' });
-            gsap.from(split.lines, {
-              yPercent: 120,
-              stagger:  0.06,
+          /* Title — large gradient, plain y+opacity (no SplitText — webkit-clip conflict) */
+          if (titleEl) {
+            gsap.from(titleEl, {
+              y:        80,
+              opacity:  0,
+              duration: 1.1,
+              ease:     'expo.out',
               scrollTrigger: {
-                trigger: entry,
-                scrub:   true,
-                start:   'clamp(top 72%)',
-                end:     'clamp(top 45%)',
+                trigger:       entry,
+                start:         'clamp(top 78%)',
+                toggleActions: 'play none none reverse',
               },
             });
           }
 
+          /* Org name — SplitText chars with 3D flip-in */
+          if (orgEl) {
+            const split = new SplitText(orgEl, { type: 'chars,words' });
+            gsap.from(split.chars, {
+              opacity:   0,
+              y:         18,
+              rotationX: -70,
+              stagger:   0.018,
+              duration:  0.5,
+              ease:      'back.out(1.5)',
+              scrollTrigger: {
+                trigger:       entry,
+                start:         'clamp(top 74%)',
+                toggleActions: 'play none none reverse',
+              },
+            });
+          }
+
+          /* Description — scrubbed line mask */
           if (descEl) {
             const split = new SplitText(descEl, { type: 'lines', mask: 'lines' });
             gsap.from(split.lines, {
@@ -194,20 +214,23 @@ const JourneySection = () => {
                 trigger: entry,
                 scrub:   true,
                 start:   'clamp(top 68%)',
-                end:     'clamp(top 30%)',
+                end:     'clamp(top 28%)',
               },
             });
           }
 
+          /* Tags — scale pop with back easing */
           if (tagsEl) {
             gsap.from(tagsEl.children, {
+              scale:    0.4,
               opacity:  0,
-              y:        12,
-              stagger:  0.05,
-              duration: 0.4,
+              y:        10,
+              stagger:  0.06,
+              duration: 0.45,
+              ease:     'back.out(2.2)',
               scrollTrigger: {
                 trigger:       entry,
-                start:         'clamp(top 50%)',
+                start:         'clamp(top 48%)',
                 toggleActions: 'play none none reverse',
               },
             });
@@ -226,14 +249,14 @@ const JourneySection = () => {
 
   const isLoading = eduLoading || expLoading;
 
-  /* Refresh ScrollTrigger positions once Journey content loads (section grows ~600vh) */
+  /* Refresh ScrollTrigger once content loads */
   useEffect(() => {
     if (!isLoading) ScrollTrigger.refresh();
   }, [isLoading]);
 
-  /* Fade fixed atom in/out as journey section enters/leaves the viewport */
+  /* Galaxy visibility — fades in/out as section enters/leaves viewport */
   useEffect(() => {
-    const container = atomContainerRef.current;
+    const container = galaxyContainerRef.current;
     const section   = sectionRef.current;
     if (!container) return;
 
@@ -244,35 +267,33 @@ const JourneySection = () => {
       trigger:     section,
       start:       'top 30%',
       end:         'bottom 50%',
-      onEnter:     () => gsap.to(container, { autoAlpha: 1, duration: 0.5 }),
-      onLeave:     () => gsap.to(container, { autoAlpha: 0, duration: 0.5 }),
-      onEnterBack: () => gsap.to(container, { autoAlpha: 1, duration: 0.5 }),
-      onLeaveBack: () => gsap.to(container, { autoAlpha: 0, duration: 0.5 }),
+      onEnter:     () => gsap.to(container, { autoAlpha: 1, duration: 0.6 }),
+      onLeave:     () => gsap.to(container, { autoAlpha: 0, duration: 0.6 }),
+      onEnterBack: () => gsap.to(container, { autoAlpha: 1, duration: 0.6 }),
+      onLeaveBack: () => gsap.to(container, { autoAlpha: 0, duration: 0.6 }),
     });
 
     return () => st.kill();
   }, [isLoading]);
 
   /* ════════════════════════════════════════════════════
-     RENDER — the <section> MUST always be in the DOM so
-     React doesn't try to insert/remove siblings of the
-     GSAP pin-spacer that wraps the pinned HeroSection.
+     RENDER — <section> always in DOM (GSAP pin-spacer safety)
      ═════════════════════════════════════════════════ */
   return (
     <>
-      {/* ── Fixed Atom — right side of viewport, shown only while section scrolls ── */}
+      {/* ── Galaxy — fixed, centered, large ── */}
       <div
-        ref={atomContainerRef}
+        ref={galaxyContainerRef}
         style={{
           position:      'fixed',
           top:           '50%',
-          right:         '1.5rem',
-          transform:     'translateY(-50%)',
-          width:         '42vw',
-          maxWidth:      '600px',
-          height:        '500px',
+          left:          '50%',
+          transform:     'translate(-50%, -50%)',
+          width:         '74vw',
+          maxWidth:      '960px',
+          height:        '74vh',
           pointerEvents: 'none',
-          zIndex:        5,
+          zIndex:        3,
         }}
       >
         {!isLoading && (
@@ -282,27 +303,27 @@ const JourneySection = () => {
         )}
       </div>
 
-      {/* ── Section — always in DOM (GSAP pin-spacer safety) ── */}
+      {/* ── Section — always in DOM ── */}
       <section
         ref={sectionRef}
         id="journey"
         style={{ position: 'relative', background: 'var(--space-bg)', overflow: 'hidden' }}
       >
-        {/* Starfield background — renders even while loading */}
+        {/* Starfield background */}
         <Suspense fallback={null}>
           <StarField />
         </Suspense>
 
         {!isLoading && (
-          <div style={{ position: 'relative', zIndex: 1, padding: '15vh 2rem 20vh', maxWidth: '55vw' }}>
+          <div style={{ position: 'relative', zIndex: 10, padding: '15vh 0 22vh' }}>
 
-            {/* Section header */}
-            <div style={{ marginBottom: '12vh', paddingTop: '4vh' }}>
+            {/* ── Section header ── */}
+            <div style={{ padding: '4vh 6vw 0', marginBottom: '14vh' }}>
               <span style={{
                 display:       'block',
                 fontSize:      '0.72rem',
                 textTransform: 'uppercase',
-                letterSpacing: '0.22em',
+                letterSpacing: '0.24em',
                 color:          ACCENT,
                 marginBottom:  '1rem',
               }}>
@@ -311,30 +332,28 @@ const JourneySection = () => {
               <h2 style={{
                 fontSize:             'clamp(2.5rem, 6vw, 5rem)',
                 fontWeight:           700,
-                background:          'linear-gradient(135deg, var(--space-text) 0%, var(--space-accent) 60%, var(--space-accent-2) 100%)',
+                background:          'linear-gradient(135deg, var(--space-text) 0%, var(--space-accent) 55%, var(--space-accent-2) 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor:  'transparent',
                 backgroundClip:       'text',
+                maxWidth:             '14ch',
               }}>
                 Educación &amp; Experiencia
               </h2>
             </div>
 
             {/* ── Timeline ── */}
-            <div style={{
-              position:     'relative',
-              paddingLeft:  '4rem',
-              paddingRight: '1.5rem',
-            }}>
-              {/* Vertical line */}
+            <div style={{ position: 'relative' }}>
+
+              {/* Vertical gutter line */}
               <div style={{
                 position:   'absolute',
-                left:       '1.5rem',
+                left:       '2.5rem',
                 top:        0,
                 bottom:     0,
                 width:      '2px',
                 background: `linear-gradient(to bottom, ${ACCENT}, ${ACCENT2})`,
-                opacity:    0.35,
+                opacity:    0.28,
               }} />
 
               {/* Flip cursor */}
@@ -342,33 +361,43 @@ const JourneySection = () => {
                 ref={cursorRef}
                 style={{
                   position:     'absolute',
-                  left:         'calc(1.5rem - 11px)',
+                  left:         'calc(2.5rem - 11px)',
                   top:          0,
                   width:        '22px',
                   height:       '22px',
                   borderRadius: '50%',
                   background:    ACCENT,
-                  boxShadow:    `0 0 14px ${ACCENT}, 0 0 32px rgba(168,85,247,0.45)`,
+                  boxShadow:    `0 0 14px ${ACCENT}, 0 0 36px rgba(168,85,247,0.45)`,
                   zIndex:       10,
                 }}
               />
 
               {/* ── Entries ── */}
               {entries.map((entry, i) => {
+                const isLeft   = i % 2 === 0;
                 const isEdu    = entry.type === 'education';
                 const dotColor = isEdu ? ACCENT : ACCENT2;
+
+                /* Gradient veil: fades dark on text side → transparent toward center */
+                const veilBg = isLeft
+                  ? 'linear-gradient(to right, rgba(0,0,5,0.82) 0%, rgba(0,0,5,0.55) 60%, transparent 100%)'
+                  : 'linear-gradient(to left,  rgba(0,0,5,0.82) 0%, rgba(0,0,5,0.55) 60%, transparent 100%)';
 
                 return (
                   <div
                     key={entry.id}
                     ref={el => { entryRefs.current[i] = el; }}
+                    data-align={isLeft ? 'left' : 'right'}
                     style={{
-                      position:      'relative',
-                      minHeight:     '70vh',
-                      paddingTop:    '6vh',
-                      paddingBottom: '10vh',
-                      borderBottom:  i < entries.length - 1
-                        ? `1px solid ${BORDER}`
+                      position:       'relative',
+                      minHeight:      '90vh',
+                      display:        'flex',
+                      alignItems:     'center',
+                      justifyContent: isLeft ? 'flex-start' : 'flex-end',
+                      paddingTop:     '7vh',
+                      paddingBottom:  '10vh',
+                      borderBottom:   i < entries.length - 1
+                        ? '1px solid rgba(255,255,255,0.04)'
                         : 'none',
                     }}
                   >
@@ -377,131 +406,156 @@ const JourneySection = () => {
                       ref={el => { dotRefs.current[i] = el; }}
                       style={{
                         position:     'absolute',
-                        left:         'calc(-4rem + 1.5rem - 5px)',
-                        top:          '6vh',
+                        left:         'calc(2.5rem - 5px)',
+                        top:          '7vh',
                         width:        '10px',
                         height:       '10px',
                         borderRadius: '50%',
                         background:    dotColor,
                         border:       `2px solid ${isEdu ? 'rgba(168,85,247,0.4)' : 'rgba(6,182,212,0.4)'}`,
+                        boxShadow:    `0 0 8px ${isEdu ? 'rgba(168,85,247,0.5)' : 'rgba(6,182,212,0.5)'}`,
                         opacity:      0.4,
                         zIndex:       5,
                       }}
                     />
 
-                    {/* Category tag + date */}
+                    {/* Content block with gradient veil */}
                     <div style={{
-                      display:        'flex',
-                      alignItems:     'center',
-                      justifyContent: 'space-between',
-                      flexWrap:       'wrap',
-                      gap:            '0.5rem',
-                      marginBottom:   '2rem',
+                      width:         'min(46vw, 600px)',
+                      background:     veilBg,
+                      paddingTop:    '2.5rem',
+                      paddingBottom: '2.5rem',
+                      paddingLeft:   isLeft ? '5rem' : '3rem',
+                      paddingRight:  isLeft ? '3rem' : '5rem',
                     }}>
-                      <span style={{
-                        fontSize:      '0.72rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.18em',
-                        color:          dotColor,
-                        background:    isEdu ? 'rgba(168,85,247,0.1)' : 'rgba(6,182,212,0.1)',
-                        border:        `1px solid ${isEdu ? 'rgba(168,85,247,0.3)' : 'rgba(6,182,212,0.3)'}`,
-                        padding:       '4px 14px',
-                        borderRadius:  '999px',
-                      }}>
-                        {isEdu ? 'Educación' : 'Experiencia'}
-                      </span>
-                      <span style={{
-                        fontSize:           '0.85rem',
-                        color:               TEXT_DIM,
-                        fontVariantNumeric: 'tabular-nums',
-                      }}>
-                        {entry.period}
-                      </span>
-                    </div>
 
-                    {/* Org */}
-                    <p
-                      className="jt-org"
-                      style={{
-                        fontSize:     'clamp(0.9rem, 1.8vw, 1.1rem)',
-                        color:         TEXT_DIM,
-                        fontWeight:   500,
-                        marginBottom: '0.75rem',
-                      }}
-                      dangerouslySetInnerHTML={{ __html: entry.org }}
-                    />
-
-                    {/* Title */}
-                    <h3
-                      className="jt-title"
-                      style={{
-                        fontSize:             'clamp(1.8rem, 4vw, 3.5rem)',
-                        fontWeight:           700,
-                        lineHeight:           1.1,
-                        marginBottom:         '2rem',
-                        background:          'linear-gradient(135deg, var(--space-text) 0%, var(--space-accent) 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor:  'transparent',
-                        backgroundClip:       'text',
-                      }}
-                    >
-                      {entry.title}
-                    </h3>
-
-                    {/* Location */}
-                    <p style={{
-                      fontSize:     '0.88rem',
-                      color:         TEXT_DIM,
-                      marginBottom: '1.5rem',
-                      display:      'flex',
-                      alignItems:   'center',
-                      gap:          '0.4rem',
-                    }}>
-                      <span aria-hidden>📍</span>
-                      <span>{entry.location}</span>
-                    </p>
-
-                    {/* Description */}
-                    <p
-                      className="jt-desc"
-                      style={{
-                        fontSize:     'clamp(1rem, 1.8vw, 1.1rem)',
-                        lineHeight:   1.75,
-                        color:         TEXT,
-                        opacity:      0.82,
-                        maxWidth:     '65ch',
-                        marginBottom: '1.5rem',
-                      }}
-                      dangerouslySetInnerHTML={{ __html: entry.description }}
-                    />
-
-                    {/* Tech tags */}
-                    {entry.tags.length > 0 && (
+                      {/* Meta row: category tag + period */}
                       <div
-                        className="jt-tags"
-                        style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '1rem' }}
+                        className="jt-meta"
+                        style={{
+                          display:        'flex',
+                          alignItems:     'center',
+                          flexWrap:       'wrap',
+                          gap:            '0.75rem',
+                          marginBottom:   '2.2rem',
+                          justifyContent: isLeft ? 'flex-start' : 'flex-end',
+                        }}
                       >
-                        {entry.tags.map((tag, idx) => (
-                          <span
-                            key={idx}
-                            style={{
-                              fontSize:     '0.8rem',
-                              padding:      '4px 14px',
-                              borderRadius: '999px',
-                              background:   'rgba(168,85,247,0.08)',
-                              color:          ACCENT,
-                              border:       '1px solid rgba(168,85,247,0.25)',
-                            }}
-                          >
-                            {tag}
-                          </span>
-                        ))}
+                        <span style={{
+                          fontSize:      '0.7rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.2em',
+                          color:          dotColor,
+                          background:    isEdu ? 'rgba(168,85,247,0.1)' : 'rgba(6,182,212,0.1)',
+                          border:        `1px solid ${isEdu ? 'rgba(168,85,247,0.3)' : 'rgba(6,182,212,0.3)'}`,
+                          padding:       '4px 14px',
+                          borderRadius:  '999px',
+                        }}>
+                          {isEdu ? 'Educación' : 'Experiencia'}
+                        </span>
+                        <span style={{
+                          fontSize:           '0.85rem',
+                          color:               TEXT_DIM,
+                          fontVariantNumeric: 'tabular-nums',
+                        }}>
+                          {entry.period}
+                        </span>
                       </div>
-                    )}
+
+                      {/* Org name */}
+                      <p
+                        className="jt-org"
+                        style={{
+                          fontSize:     'clamp(0.9rem, 1.6vw, 1.05rem)',
+                          color:         TEXT_DIM,
+                          fontWeight:   500,
+                          marginBottom: '0.8rem',
+                          textAlign:     isLeft ? 'left' : 'right',
+                        }}
+                        dangerouslySetInnerHTML={{ __html: entry.org }}
+                      />
+
+                      {/* Title */}
+                      <h3
+                        className="jt-title"
+                        style={{
+                          fontSize:             'clamp(1.6rem, 3.2vw, 3rem)',
+                          fontWeight:           700,
+                          lineHeight:           1.1,
+                          marginBottom:         '1.8rem',
+                          background:          'linear-gradient(135deg, var(--space-text) 0%, var(--space-accent) 100%)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor:  'transparent',
+                          backgroundClip:       'text',
+                          textAlign:             isLeft ? 'left' : 'right',
+                        }}
+                      >
+                        {entry.title}
+                      </h3>
+
+                      {/* Location */}
+                      <p style={{
+                        fontSize:       '0.85rem',
+                        color:           TEXT_DIM,
+                        marginBottom:   '1.5rem',
+                        display:        'flex',
+                        alignItems:     'center',
+                        gap:            '0.4rem',
+                        justifyContent: isLeft ? 'flex-start' : 'flex-end',
+                      }}>
+                        <span aria-hidden>📍</span>
+                        <span>{entry.location}</span>
+                      </p>
+
+                      {/* Description */}
+                      <p
+                        className="jt-desc"
+                        style={{
+                          fontSize:     'clamp(0.95rem, 1.5vw, 1.05rem)',
+                          lineHeight:   1.85,
+                          color:         TEXT,
+                          opacity:      0.85,
+                          marginBottom: '1.5rem',
+                          textAlign:     isLeft ? 'left' : 'right',
+                        }}
+                        dangerouslySetInnerHTML={{ __html: entry.description }}
+                      />
+
+                      {/* Tech tags */}
+                      {entry.tags.length > 0 && (
+                        <div
+                          className="jt-tags"
+                          style={{
+                            display:        'flex',
+                            flexWrap:       'wrap',
+                            gap:            '8px',
+                            marginTop:      '1.2rem',
+                            justifyContent: isLeft ? 'flex-start' : 'flex-end',
+                          }}
+                        >
+                          {entry.tags.map((tag, idx) => (
+                            <span
+                              key={idx}
+                              style={{
+                                fontSize:     '0.78rem',
+                                padding:      '4px 13px',
+                                borderRadius: '999px',
+                                background:   'rgba(168,85,247,0.08)',
+                                color:          ACCENT,
+                                border:       '1px solid rgba(168,85,247,0.22)',
+                              }}
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
             </div>
+
           </div>
         )}
       </section>
