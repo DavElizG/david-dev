@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from 'react';
 
 interface ThemeContextType {
   darkMode: boolean;
@@ -12,31 +12,10 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  // Obtener el tema guardado en localStorage o usar light como predeterminado
-  const [darkMode, setDarkMode] = useState(() => {
-    const savedTheme = localStorage.getItem('theme');
-    return savedTheme === 'dark';
-  });
-
-  // Actualizar el localStorage y aplicar clases al documento cuando cambia el tema
-  useEffect(() => {
-    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
-    
-    // Actualizar las clases del documento para aplicar estilos globales si es necesario
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
-  const toggleDarkMode = () => {
-    setDarkMode(prevMode => !prevMode);
-  };
-
-  const value = {
-    darkMode,
-    toggleDarkMode
+  // Fixed dark space theme — always dark
+  const value: ThemeContextType = {
+    darkMode: true,
+    toggleDarkMode: () => {},
   };
 
   return (
@@ -48,10 +27,10 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
 export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
-  
+
   if (context === undefined) {
     throw new Error('useTheme debe ser usado dentro de un ThemeProvider');
   }
-  
+
   return context;
 };

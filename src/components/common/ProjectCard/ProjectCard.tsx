@@ -30,14 +30,8 @@ const ProjectCard = ({
 
   const selectedGradient = gradients[id % gradients.length];
 
-  // Sombras adaptativas según el tema
-  const hoverShadow = darkMode 
-    ? '0px 20px 40px rgba(255, 255, 255, 0.1), 0px 5px 20px rgba(120, 120, 255, 0.1)'
-    : '0px 20px 40px rgba(0, 0, 0, 0.15), 0px 5px 20px rgba(0, 0, 150, 0.07)';
-    
-  const defaultShadow = darkMode
-    ? '0 8px 20px rgba(255, 255, 255, 0.05), 0px 2px 10px rgba(30, 30, 255, 0.05)'
-    : '0 8px 20px rgba(0, 0, 0, 0.1), 0px 2px 10px rgba(0, 0, 150, 0.03)';
+  const hoverShadow = '0px 20px 40px rgba(168, 85, 247, 0.15), 0px 5px 20px rgba(6, 182, 212, 0.1)';
+  const defaultShadow = '0 8px 20px rgba(168, 85, 247, 0.05), 0px 2px 10px rgba(6, 182, 212, 0.03)';
 
   // Verificar si es el proyecto de CTP La Mansión
   const isCtpProject = title.toLowerCase().includes('ctp la mansión') || 
@@ -46,14 +40,19 @@ const ProjectCard = ({
 
   return (
     <motion.div
-      className={`flex flex-col h-full rounded-xl overflow-hidden transition-all duration-300
-        ${darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-100'}`}
+      className="flex flex-col h-full rounded-xl overflow-hidden transition-all duration-300"
       whileHover={{
         scale: 1.02,
         boxShadow: hoverShadow,
         transition: { duration: 0.2 }
       }}
-      style={{ boxShadow: defaultShadow }}
+      style={{
+        boxShadow: defaultShadow,
+        background: 'var(--space-surface)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        border: '1px solid var(--space-border)',
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -104,25 +103,25 @@ const ProjectCard = ({
       {/* Contenido del proyecto */}
       <div className="flex flex-col flex-grow p-6">
         {/* Descripción */}
-        <p className={`mb-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        <p className="mb-6" style={{ color: 'var(--space-text-dim)' }}>
           {description}
         </p>
         
         {/* Tecnologías */}
         <div className="flex flex-wrap gap-2 mb-6">
           {technologies.map((tech, index) => (
-            <motion.button 
+            <motion.button
               key={index}
               onClick={() => window.open(getTechDocUrl(tech), '_blank', 'noopener,noreferrer')}
-              className={`flex items-center px-3 py-1 text-sm rounded-full
-                ${darkMode 
-                  ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-              whileHover={{ 
+              className="flex items-center px-3 py-1 text-sm rounded-full transition-colors"
+              style={{
+                background: 'var(--space-surface-2)',
+                color: 'var(--space-text)',
+                border: '1px solid var(--space-border)',
+              }}
+              whileHover={{
                 scale: 1.05,
-                boxShadow: darkMode 
-                  ? '0 3px 10px rgba(255, 255, 255, 0.1)' 
-                  : '0 3px 10px rgba(0, 0, 0, 0.1)'
+                boxShadow: '0 3px 10px rgba(168, 85, 247, 0.2)'
               }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
@@ -138,21 +137,17 @@ const ProjectCard = ({
         <div className="flex-grow"></div>
         
         {/* Enlaces - Siempre al final de la tarjeta */}
-        <div className="flex flex-wrap gap-y-3 justify-between mt-4 pt-4 border-t border-gray-700/30">
+        <div className="flex flex-wrap gap-y-3 justify-between mt-4 pt-4" style={{ borderTop: '1px solid var(--space-border)' }}>
           {/* Frontend Repository */}
-          <motion.a 
-            href={repoUrl} 
-            target="_blank" 
+          <motion.a
+            href={repoUrl}
+            target="_blank"
             rel="noopener noreferrer"
-            className={`flex items-center transition-colors
-              ${darkMode 
-                ? 'text-gray-300 hover:text-blue-400' 
-                : 'text-gray-700 hover:text-blue-600'}`}
-            whileHover={{ 
+            className="flex items-center transition-colors"
+            style={{ color: 'var(--space-text-dim)' }}
+            whileHover={{
               scale: 1.05,
-              textShadow: darkMode 
-                ? '0 0 8px rgba(120, 160, 255, 0.5)' 
-                : '0 0 8px rgba(0, 90, 255, 0.3)'
+              color: 'var(--space-accent)',
             }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
@@ -162,19 +157,15 @@ const ProjectCard = ({
           
           {/* Backend Repository (if available) */}
           {backendRepo && (
-            <motion.a 
-              href={backendRepo} 
-              target="_blank" 
+            <motion.a
+              href={backendRepo}
+              target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center transition-colors
-                ${darkMode 
-                  ? 'text-gray-300 hover:text-green-400' 
-                  : 'text-gray-700 hover:text-green-600'}`}
-              whileHover={{ 
+              className="flex items-center transition-colors"
+              style={{ color: 'var(--space-text-dim)' }}
+              whileHover={{
                 scale: 1.05,
-                textShadow: darkMode 
-                  ? '0 0 8px rgba(120, 255, 160, 0.5)' 
-                  : '0 0 8px rgba(0, 255, 90, 0.3)'
+                color: 'var(--space-accent-2)',
               }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
@@ -185,19 +176,15 @@ const ProjectCard = ({
           
           {/* Demo link (if not private) */}
           {!isPrivate ? (
-            <motion.a 
-              href={liveUrl} 
-              target="_blank" 
+            <motion.a
+              href={liveUrl}
+              target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center transition-colors
-                ${darkMode 
-                  ? 'text-gray-300 hover:text-blue-400' 
-                  : 'text-gray-700 hover:text-blue-600'}`}
-              whileHover={{ 
+              className="flex items-center transition-colors"
+              style={{ color: 'var(--space-text-dim)' }}
+              whileHover={{
                 scale: 1.05,
-                textShadow: darkMode 
-                  ? '0 0 8px rgba(120, 160, 255, 0.5)' 
-                  : '0 0 8px rgba(0, 90, 255, 0.3)'
+                color: 'var(--space-accent)',
               }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
@@ -205,7 +192,7 @@ const ProjectCard = ({
               <FaExternalLinkAlt className="ml-2" />
             </motion.a>
           ) : (
-            <div className={`flex items-center ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+            <div className="flex items-center" style={{ color: 'var(--space-text-dim)', opacity: 0.6 }}>
               <FaLock className="mr-2" /> 
               <span>Acceso privado</span>
             </div>

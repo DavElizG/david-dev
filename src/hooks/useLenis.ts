@@ -4,14 +4,13 @@ import Lenis from 'lenis';
 interface LenisOptions {
   duration?: number;
   easing?: (t: number) => number;
-  direction?: 'vertical' | 'horizontal';
-  gestureDirection?: 'vertical' | 'horizontal' | 'both';
-  smooth?: boolean;
-  mouseMultiplier?: number;
+  orientation?: 'vertical' | 'horizontal';
+  gestureOrientation?: 'vertical' | 'horizontal' | 'both';
+  smoothWheel?: boolean;
+  wheelMultiplier?: number;
   smoothTouch?: boolean;
   touchMultiplier?: number;
   infinite?: boolean;
-  orientation?: 'vertical' | 'horizontal';
 }
 
 /**
@@ -27,10 +26,10 @@ export function useLenis(options: LenisOptions = {}) {
     const defaultOptions = {
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      direction: 'vertical' as const,
-      gestureDirection: 'vertical' as const,
-      smooth: true,
-      mouseMultiplier: 1,
+      orientation: 'vertical' as const,
+      gestureOrientation: 'vertical' as const,
+      smoothWheel: true,
+      wheelMultiplier: 1,
       smoothTouch: false,
       touchMultiplier: 2,
       infinite: false,
@@ -41,26 +40,28 @@ export function useLenis(options: LenisOptions = {}) {
 
     // Crear instancia de Lenis
     lenisRef.current = new Lenis(lenisOptions);
-    
+
+    let rafId: number;
+
     // Función para actualizar Lenis en cada frame de animación
     function raf(time: number) {
       if (lenisRef.current) {
         lenisRef.current.raf(time);
       }
-      requestAnimationFrame(raf);
+      rafId = requestAnimationFrame(raf);
     }
 
     // Iniciar el loop de animación
-    requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
 
     return () => {
-      // Limpiar Lenis al desmontar el componente
+      cancelAnimationFrame(rafId);
       if (lenisRef.current) {
         lenisRef.current.destroy();
         lenisRef.current = null;
       }
     };
-  }, [options]);
+  }, []);
 
   return lenisRef.current;
 }

@@ -1,4 +1,3 @@
-import { useTheme } from '../../../context';
 import { useEducation } from '../../../hooks';
 import StyledEducationCard from './StyledEducationCard';
 import { useRef } from 'react';
@@ -8,24 +7,25 @@ interface EducationProps {
 }
 
 const Education = ({ isLoading: parentIsLoading }: EducationProps) => {
-  const { darkMode } = useTheme();
   const { education, loading: educationLoading } = useEducation();
   const containerRef = useRef(null);
-  
+
   const isLoading = parentIsLoading !== undefined ? parentIsLoading : educationLoading;
 
   return (
     <section className="mb-16" ref={containerRef}>
-      <h2 className="text-3xl font-bold mb-6">Educación</h2>
+      <h2 className="text-3xl font-bold mb-6" style={{ color: 'var(--space-text)' }}>
+        Education
+      </h2>
       {isLoading ? (
-        <p>Cargando educación...</p>
+        <p style={{ color: 'var(--space-text-dim)' }}>Loading...</p>
       ) : (
         <div className="space-y-8">
           {education?.map((edu, index) => (
-            <StyledEducationCard 
+            <StyledEducationCard
               key={edu.id_education || index}
               education={edu}
-              darkMode={darkMode}
+              darkMode={true}
               index={index}
             />
           ))}

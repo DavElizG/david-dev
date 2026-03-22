@@ -1,4 +1,3 @@
-import { useTheme } from '../../../context';
 import { useExperience } from '../../../hooks';
 import StyledExperienceCard from './StyledExperienceCard';
 import { useRef } from 'react';
@@ -8,24 +7,25 @@ interface ExperienceProps {
 }
 
 const Experience = ({ isLoading: parentIsLoading }: ExperienceProps) => {
-  const { darkMode } = useTheme();
   const { experience, loading: experienceLoading } = useExperience();
   const containerRef = useRef(null);
-  
+
   const isLoading = parentIsLoading !== undefined ? parentIsLoading : experienceLoading;
 
   return (
     <section className="mb-16" ref={containerRef}>
-      <h2 className="text-3xl font-bold mb-6">Experiencia</h2>
+      <h2 className="text-3xl font-bold mb-6" style={{ color: 'var(--space-text)' }}>
+        Experience
+      </h2>
       {isLoading ? (
-        <p>Cargando experiencia...</p>
+        <p style={{ color: 'var(--space-text-dim)' }}>Loading...</p>
       ) : (
         <div className="space-y-8">
           {experience?.map((exp, index) => (
             <StyledExperienceCard
               key={exp.id_experience || index}
               experience={exp}
-              darkMode={darkMode}
+              darkMode={true}
               index={index}
             />
           ))}

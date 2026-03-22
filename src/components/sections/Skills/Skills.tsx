@@ -1,72 +1,70 @@
 import { useSkills } from '../../../hooks';
-import { useTheme } from '../../../context';
 import { DraggableTechCard } from '../../common/TechCard';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 const Skills = () => {
   const { skills, loading: skillsLoading } = useSkills();
-  const { darkMode } = useTheme();
   const [mounted, setMounted] = useState(false);
-  
-  // Combinar todas las tecnologías en un solo array con verificación null/undefined
+
   const allTechItems = skills?.flatMap(category => category?.items || []) || [];
 
-  // Establecer el estado de montado después de que el componente se monte
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
   return (
-    <section id="skills" className="py-16 relative">
-      {/* Separador visual superior */}
-      <div className={`absolute top-0 left-0 w-full h-px ${darkMode ? 'bg-gradient-to-r from-transparent via-gray-700 to-transparent' : 'bg-gradient-to-r from-transparent via-gray-300 to-transparent'}`}></div>
-      
+    <section id="skills" className="py-20 relative">
+      {/* Top divider */}
+      <div className="space-divider absolute top-0 left-0 w-full" />
+
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Tecnologías
+          <h2
+            className="text-3xl md:text-4xl font-bold text-center mb-3"
+            style={{ color: 'var(--space-text)' }}
+          >
+            Tech Stack
           </h2>
+          <p className="text-center text-sm mb-12" style={{ color: 'var(--space-text-dim)' }}>
+            Drag the cards to explore
+          </p>
         </motion.div>
 
-        {/* Contenedor con altura mínima fija para evitar cambios de diseño */}
         <div className="min-h-[400px]">
           {skillsLoading || !mounted ? (
             <div className="flex justify-center items-center h-[400px]">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+              <div
+                className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2"
+                style={{ borderColor: 'var(--space-accent)' }}
+              />
             </div>
           ) : (
-            <div className="relative">
-              {/* Grid directo de tecnologías */}
+            <div className="flex flex-wrap justify-center gap-3 py-8">
               {allTechItems.length > 0 ? (
-                <div className="flex flex-wrap justify-center gap-3 py-8 relative z-10">
-                  {allTechItems.map((tech) => (
-                    <DraggableTechCard
-                      key={tech?.id_tech || `tech-${Math.random()}`}
-                      id={tech?.id_tech || 0}
-                      name={tech?.name || 'Sin nombre'}
-                      icon={tech?.icon || ''}
-                      url={tech?.url || ''}
-                      darkMode={darkMode}
-                    />
-                  ))}
-                </div>
+                allTechItems.map((tech) => (
+                  <DraggableTechCard
+                    key={tech?.id_tech || `tech-${Math.random()}`}
+                    id={tech?.id_tech || 0}
+                    name={tech?.name || 'Sin nombre'}
+                    icon={tech?.icon || ''}
+                    url={tech?.url || ''}
+                    darkMode={true}
+                  />
+                ))
               ) : (
-                <div className="text-center py-8">
-                  <p>No hay tecnologías disponibles</p>
-                </div>
+                <p style={{ color: 'var(--space-text-dim)' }}>No technologies available</p>
               )}
             </div>
           )}
         </div>
       </div>
-      
-      {/* Separador visual inferior */}
-      <div className={`absolute bottom-0 left-0 w-full h-px ${darkMode ? 'bg-gradient-to-r from-transparent via-gray-700 to-transparent' : 'bg-gradient-to-r from-transparent via-gray-300 to-transparent'}`}></div>
+
+      {/* Bottom divider */}
+      <div className="space-divider absolute bottom-0 left-0 w-full" />
     </section>
   );
 };
