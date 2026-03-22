@@ -274,7 +274,7 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
 
       /* Slow orbital rotation + scroll-driven zoom */
       const orbitAngle = t * 0.08;
-      const r          = 10.0 - p * 6.5;            // 10 → 3.5
+      const r          = 10.0 - p * 8.0;            // 10 → 2.0 (deep into darkness)
       const incline    = 12 * Math.PI / 180;        // look slightly down at disk
 
       camPos.set(

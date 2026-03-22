@@ -80,7 +80,7 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
       id="hero"
       ref={sectionRef}
       className="relative w-full flex flex-col items-center justify-center text-center px-4"
-      style={{ height: '100vh', overflow: 'hidden' }}
+      style={{ height: '100vh', overflow: 'hidden', background: 'var(--space-bg)' }}
     >
       {/* 3D Black Hole — lazy, isolated; fills viewport behind text */}
       <SceneBoundary>

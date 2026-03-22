@@ -6,11 +6,10 @@ import HeroSection from '../../components/sections/Hero/HeroSection';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Skills     = lazy(() => import('../../components/sections/Skills/Skills'));
-const Projects   = lazy(() => import('../../components/sections/Projects/Projects'));
-const Experience = lazy(() => import('../../components/sections/Experience/Experience'));
-const Education  = lazy(() => import('../../components/sections/Education/Education'));
-const Contact    = lazy(() => import('../../components/sections/Contact/Contact'));
+const JourneySection = lazy(() => import('../../components/sections/Journey/JourneySection'));
+const Skills         = lazy(() => import('../../components/sections/Skills/Skills'));
+const Projects       = lazy(() => import('../../components/sections/Projects/Projects'));
+const Contact        = lazy(() => import('../../components/sections/Contact/Contact'));
 
 const SectionLoader = () => (
   <div className="flex justify-center items-center h-48">
@@ -67,6 +66,11 @@ const HomePage = () => {
       <div style={{ position: 'relative', zIndex: 1 }}>
         <HeroSection scrollProgressRef={scrollProgressRef} />
 
+        {/* ── Journey: Education + Experience (vertical scroll) ── */}
+        <Suspense fallback={<SectionLoader />}>
+          <JourneySection />
+        </Suspense>
+
         {/* ── Horizontal scroll section ── */}
         <div
           ref={wrapperRef}
@@ -91,19 +95,7 @@ const HomePage = () => {
               </Suspense>
             </div>
 
-            {/* Panel 3 — Experience + Education */}
-            <div id="experience" className="no-scrollbar" style={{ ...panelBase, width: '100vw' }}>
-              <div className="container mx-auto px-6 py-16">
-                <Suspense fallback={<SectionLoader />}>
-                  <Experience />
-                </Suspense>
-                <Suspense fallback={<SectionLoader />}>
-                  <Education />
-                </Suspense>
-              </div>
-            </div>
-
-            {/* Panel 4 — Contact */}
+            {/* Panel 3 — Contact */}
             <div id="contact" className="no-scrollbar" style={{ ...panelBase, width: '80vw' }}>
               <Suspense fallback={<SectionLoader />}>
                 <Contact />
