@@ -21,10 +21,12 @@ const SectionLoader = () => (
 );
 
 // Transparent panels — fluid background shows through
+// overflow:'clip' (not 'auto') prevents inner vertical scroll
+// from conflicting with GSAP's page-scroll-driven horizontal progress
 const panelBase: React.CSSProperties = {
   flexShrink: 0,
   height: '100vh',
-  overflowY: 'auto',
+  overflow: 'clip',
 };
 
 const HomePage = () => {
@@ -51,7 +53,23 @@ const HomePage = () => {
       });
     }, wrapperRef);
 
-    return () => ctx.revert();
+    // Initial refresh after a short delay — catches layout after lazy panels load
+    const initialTimer = setTimeout(() => ScrollTrigger.refresh(), 300);
+
+    // Re-refresh whenever the strip changes size (lazy sections finish rendering)
+    let debounceTimer: number;
+    const ro = new ResizeObserver(() => {
+      clearTimeout(debounceTimer);
+      debounceTimer = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+    });
+    if (stripRef.current) ro.observe(stripRef.current);
+
+    return () => {
+      ctx.revert();
+      clearTimeout(initialTimer);
+      clearTimeout(debounceTimer);
+      ro.disconnect();
+    };
   }, []);
 
   return (

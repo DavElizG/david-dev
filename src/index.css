@@ -13,6 +13,7 @@
   --space-moon-glow:  #b0b0b0;
 
   /* Typography/rendering */
+  font-family: 'Space Grotesk', system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -100,6 +101,31 @@ body {
   border-radius: 16px;
 }
 
+/* ─── Floating Nav Link ──────────────────────────── */
+.nav-link {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--space-accent);
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-link:hover {
+  color: var(--space-accent) !important;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
 /* ─── Section divider ────────────────────────────── */
 .space-divider {
   height: 1px;
@@ -136,3 +162,36 @@ body {
 .hero-item-2 { animation-delay: 0.32s; }
 .hero-item-3 { animation-delay: 0.48s; }
 .hero-item-4 { animation-delay: 0.65s; }
+
+/* ─── Shooting stars ─────────────────────────────── */
+/*
+  Each star is a thin line rotated 45° and translated
+  along its own local X-axis (= NW→SE direction).
+  The shooting phase fills ~8% of the total cycle so
+  that — with staggered delays — stars fire sporadically
+  and never all at once.
+*/
+@keyframes shoot {
+  0%   { opacity: 0; transform: rotate(45deg) translateX(-120px); }
+  2%   { opacity: 0.85; }
+  8%   { opacity: 0;    transform: rotate(45deg) translateX(620px); }
+  8.5% { opacity: 0;    transform: rotate(45deg) translateX(-120px); }
+  100% { opacity: 0;    transform: rotate(45deg) translateX(-120px); }
+}
+
+.shooting-star {
+  position:        absolute;
+  height:          1.5px;
+  border-radius:   999px;
+  /* bright head, long fading tail */
+  background:      linear-gradient(90deg,
+                     transparent 0%,
+                     rgba(255,255,255,0.25) 20%,
+                     rgba(255,255,255,0.9)  70%,
+                     transparent 100%);
+  animation-name:            shoot;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  pointer-events:            none;
+  will-change:               transform, opacity;
+}

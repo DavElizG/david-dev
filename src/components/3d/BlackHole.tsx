@@ -40,6 +40,7 @@ const frag = /* glsl */`
   uniform vec3  uCamDir;
   uniform vec3  uCamUp;
   uniform float uFov;
+  uniform float uOffset;   /* horizontal gaze shift — moves black hole left when positive */
 
   const float DISK_IN  = 2.0;
   const float DISK_OUT = 6.0;
@@ -132,6 +133,7 @@ const frag = /* glsl */`
     float uvfov  = tan(uFov * 0.5 * (PI / 180.0));
     vec2  ndc    = (2.0 * gl_FragCoord.xy / uResolution - 1.0)
                  * vec2(aspect, 1.0);
+    ndc.x       += uOffset;   /* shift gaze → black hole moves left on screen */
 
     /* Camera basis */
     vec3 fwd   = normalize(uCamDir);
@@ -239,6 +241,7 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
       uCamDir: { value: new THREE.Vector3(0, -1.8, -10).normalize() },
       uCamUp:  { value: new THREE.Vector3(0, 1, 0) },
       uFov:    { value: 55.0 },
+      uOffset: { value: 0.6 },  // shift black hole left; eases to 0 on scroll
     };
 
     /* ── Fullscreen quad ─────────────────────────────── */
@@ -288,6 +291,7 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
       uniforms.uCamPos.value.copy(camPos);
       uniforms.uCamDir.value.copy(camDir);
       uniforms.uFov.value    = 55.0 - p * 15.0;     // 55° → 40° (zoom-lens feel)
+      uniforms.uOffset.value = Math.max(0, 0.6 * (1.0 - p / 0.42)); // ease to center
 
       renderer.render(scene, dummyCam);
     };

@@ -111,19 +111,28 @@ const JourneySection = () => {
       if (!validMarkers.length) return;
 
       ctx = gsap.context(() => {
-        const cursor = cursorRef.current!;
+        const cursor    = cursorRef.current!;
+        const container = cursor.parentElement!; // position:relative wrapper
 
-        /* Reset cursor to origin before measuring */
-        gsap.set(cursor, { x: 0, y: 0, opacity: 0 });
-        const cursorRect = cursor.getBoundingClientRect();
+        /* Use xPercent/yPercent for centering — avoids inline-transform conflict.
+           Reset to (0,0) so the container top-left is our coordinate origin.      */
+        gsap.set(cursor, { xPercent: -50, yPercent: -50, x: 0, y: 0, opacity: 0 });
 
-        /* Compute {x, y} offsets from cursor origin to each marker center
-           (identical to the CodePen getBoundingClientRect approach)       */
+        /* Compute positions in DOCUMENT space (scroll-corrected).
+           This stays correct even after GSAP adds/moves pin-spacers, because
+           both container and markers shift equally — the relative difference
+           is stable regardless of scroll position at setup time.                  */
+        const sy      = window.scrollY;
+        const sx      = window.scrollX;
+        const cr      = container.getBoundingClientRect();
+        const originX = cr.left + sx;
+        const originY = cr.top  + sy;
+
         const points = validMarkers.map(marker => {
           const r = marker.getBoundingClientRect();
           return {
-            x: r.left + r.width  / 2 - (cursorRect.left + cursorRect.width  / 2),
-            y: r.top  + r.height / 2 - (cursorRect.top  + cursorRect.height / 2),
+            x: (r.left + sx + r.width  / 2) - originX,
+            y: (r.top  + sy + r.height / 2) - originY,
           };
         });
 
@@ -278,6 +287,10 @@ const JourneySection = () => {
     /* ─── Init after fonts, attach resize handler (CodePen pattern) ─── */
     document.fonts.ready.then(() => {
       if (cancelled) return;
+
+      // Refresh all ScrollTrigger positions before measuring — ensures the
+      // Hero's 2500px pin-spacer is in place before we call getBoundingClientRect.
+      ScrollTrigger.refresh();
       setup();
 
       handleResize = () => {
@@ -314,8 +327,8 @@ const JourneySection = () => {
 
     const st = ScrollTrigger.create({
       trigger:     section,
-      start:       'top 30%',
-      end:         'bottom 50%',
+      start:       'top 15%',      // show when section is mostly in view
+      end:         'bottom bottom', // hide only when section bottom leaves viewport
       onEnter:     () => gsap.to(container, { autoAlpha: 1, duration: 0.6 }),
       onLeave:     () => gsap.to(container, { autoAlpha: 0, duration: 0.6 }),
       onEnterBack: () => gsap.to(container, { autoAlpha: 1, duration: 0.6 }),
@@ -409,7 +422,7 @@ const JourneySection = () => {
                   opacity:       0,
                   pointerEvents: 'none',
                   zIndex:        20,
-                  transform:     'translate(-50%, -50%)',
+                  /* centering is handled by GSAP xPercent/yPercent — no inline transform */
                 }}
               />
 

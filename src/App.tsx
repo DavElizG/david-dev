@@ -6,6 +6,7 @@ import { ThemeProvider } from './context'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import { HelmetProvider } from 'react-helmet-async'
+import ShootingStars from './components/3d/ShootingStars'
 
 const HomePage = lazy(() => import('./pages/Home/HomePage'))
 
@@ -34,6 +35,8 @@ function AppContent() {
       style={{ color: 'var(--space-text)' }}
     >
       <SEO />
+      {/* Shooting stars — fixed, behind everything, above aurora blobs */}
+      <ShootingStars />
       <Header />
       <SmoothScroll options={smoothScrollOptions}>
         <main className="flex-grow w-full">
