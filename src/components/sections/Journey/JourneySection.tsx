@@ -21,7 +21,8 @@ import { Flip } from 'gsap/Flip';
 import { useEducation } from '../../../hooks';
 import { useExperience } from '../../../hooks';
 
-const Atom = lazy(() => import('../../3d/Atom'));
+const Galaxy    = lazy(() => import('../../3d/Galaxy'));
+const StarField = lazy(() => import('../../3d/StarField'));
 
 gsap.registerPlugin(ScrollTrigger, SplitText, Flip);
 
@@ -241,8 +242,8 @@ const JourneySection = () => {
 
     const st = ScrollTrigger.create({
       trigger:     section,
-      start:       'top 70%',
-      end:         'bottom 30%',
+      start:       'top 30%',
+      end:         'bottom 50%',
       onEnter:     () => gsap.to(container, { autoAlpha: 1, duration: 0.5 }),
       onLeave:     () => gsap.to(container, { autoAlpha: 0, duration: 0.5 }),
       onEnterBack: () => gsap.to(container, { autoAlpha: 1, duration: 0.5 }),
@@ -276,7 +277,7 @@ const JourneySection = () => {
       >
         {!isLoading && (
           <Suspense fallback={null}>
-            <Atom scrollProgressRef={scrollProgressRef} />
+            <Galaxy scrollProgressRef={scrollProgressRef} />
           </Suspense>
         )}
       </div>
@@ -285,10 +286,15 @@ const JourneySection = () => {
       <section
         ref={sectionRef}
         id="journey"
-        style={{ position: 'relative', background: 'var(--space-bg)' }}
+        style={{ position: 'relative', background: 'var(--space-bg)', overflow: 'hidden' }}
       >
+        {/* Starfield background — renders even while loading */}
+        <Suspense fallback={null}>
+          <StarField />
+        </Suspense>
+
         {!isLoading && (
-          <div style={{ padding: '15vh 2rem 20vh', maxWidth: '55vw' }}>
+          <div style={{ position: 'relative', zIndex: 1, padding: '15vh 2rem 20vh', maxWidth: '55vw' }}>
 
             {/* Section header */}
             <div style={{ marginBottom: '12vh', paddingTop: '4vh' }}>

@@ -1,13 +1,16 @@
 /**
- * Atom.tsx — Three.js atom with proper 3D lighting and scroll-driven rotation.
+ * Atom.tsx — 3D atom with orbiting rings and scroll-driven rotation.
  *
- * Architecture:
- *  - Each ring uses a TWO-GROUP hierarchy:
- *      tiltGroup (permanent tilt rotation) → spinGroup (Z-rotation updated each frame)
- *    This guarantees the ring spins correctly in its own tilted plane without
- *    the per-frame rotation.set() → rotateZ() drift bug.
- *  - MeshStandardMaterial + PointLights give real 3D shading (highlights / shadows).
- *  - scrollProgressRef drives ring speed via GSAP ScrollTrigger (written externally).
+ * Visual layers:
+ *  1. Ring trail particles — 60 additive Points per ring, orbit with spinGroup
+ *  2. Orbit rings — TorusGeometry with MeshStandardMaterial (emissive + metalness)
+ *  3. Electrons — sphere on each ring, orbits via spinGroup.rotation.z
+ *  4. Nucleus — glowing sphere + pulsing halo
+ *
+ * Ring orbital planes slowly precess (tiltGroup rotation) so the rings
+ * visually orbit the nucleus in 3D, not just spin in a fixed plane.
+ *
+ * Canvas uses alpha:true — composites over section's StarField background.
  */
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
@@ -27,7 +30,40 @@ const RING_CONFIGS = [
   { radius: 2.2, color: LILAC,  tilt: [0.5, -1.05,  0.4 ] as const, speed: 0.8 },
 ];
 
+/* ── Ring trail particles ────────────────────────────────────────────── */
+function createRingParticles(radius: number, color: number): THREE.Points {
+  const COUNT = 60;
+  const positions = new Float32Array(COUNT * 3);
+
+  for (let i = 0; i < COUNT; i++) {
+    const a  = (i / COUNT) * Math.PI * 2 + (Math.random() - 0.5) * 0.15;
+    const r  = radius + (Math.random() - 0.5) * 0.25;
+    const i3 = i * 3;
+    positions[i3]     = r * Math.cos(a);
+    positions[i3 + 1] = r * Math.sin(a);
+    positions[i3 + 2] = (Math.random() - 0.5) * 0.12;
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+  const mat = new THREE.PointsMaterial({
+    color,
+    size:            0.06,
+    transparent:     true,
+    opacity:         0.45,
+    sizeAttenuation: true,
+    blending:        THREE.AdditiveBlending,
+    depthTest:       false,
+  });
+
+  return new THREE.Points(geo, mat);
+}
+
+/* ══════════════════════════════════════════════════════════════════════ */
+
 interface RingEntry {
+  tiltGroup: THREE.Group;
   spinGroup: THREE.Group;
   cfg: typeof RING_CONFIGS[0];
 }
@@ -57,11 +93,10 @@ const Atom = ({ scrollProgressRef }: AtomProps) => {
       0.1,
       100,
     );
-    /* Slight offset so the atom has visible depth/perspective */
     camera.position.set(1.2, 0.6, 10);
     camera.lookAt(0, 0, 0);
 
-    /* ── Lighting ──────────────────────────────────────── */
+    /* ── Lighting ────────────────────────────────────── */
     scene.add(new THREE.AmbientLight(0x281840, 1.2));
 
     const purpleLight = new THREE.PointLight(PURPLE, 4, 28);
@@ -72,36 +107,36 @@ const Atom = ({ scrollProgressRef }: AtomProps) => {
     cyanLight.position.set(-5, -3, 5);
     scene.add(cyanLight);
 
-    /* ── Nucleus ────────────────────────────────────────── */
+    /* ── Nucleus ─────────────────────────────────────── */
     const nucleusMat = new THREE.MeshStandardMaterial({
-      color:              PURPLE,
-      emissive:           PURPLE,
-      emissiveIntensity:  0.55,
-      roughness:          0.15,
-      metalness:          0.75,
+      color:             PURPLE,
+      emissive:          PURPLE,
+      emissiveIntensity: 0.55,
+      roughness:         0.15,
+      metalness:         0.75,
     });
-    const nucleus = new THREE.Mesh(new THREE.SphereGeometry(0.42, 32, 32), nucleusMat);
-    scene.add(nucleus);
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(0.42, 32, 32), nucleusMat));
 
-    /* Outer glow halo */
     const glowMat = new THREE.MeshBasicMaterial({ color: PURPLE, transparent: true, opacity: 0.10 });
     const glow    = new THREE.Mesh(new THREE.SphereGeometry(0.72, 16, 16), glowMat);
     scene.add(glow);
 
-    /* ── Rings + electrons ──────────────────────────────── */
+    const glow2Mat = new THREE.MeshBasicMaterial({ color: LILAC, transparent: true, opacity: 0.04 });
+    const glow2    = new THREE.Mesh(new THREE.SphereGeometry(1.2, 16, 16), glow2Mat);
+    scene.add(glow2);
+
+    /* ── Rings + electrons + trail particles ─────────── */
     const rings: RingEntry[] = [];
 
     RING_CONFIGS.forEach(cfg => {
-      /* Outer group: permanent tilt — NEVER modified after creation */
       const tiltGroup = new THREE.Group();
       tiltGroup.rotation.set(cfg.tilt[0], cfg.tilt[1], cfg.tilt[2]);
       scene.add(tiltGroup);
 
-      /* Inner group: spins around local Z each frame */
       const spinGroup = new THREE.Group();
       tiltGroup.add(spinGroup);
 
-      /* Ring — thicker tube + more radial segments = rounder, 3D-looking tube */
+      /* Ring tube */
       const ringMat = new THREE.MeshStandardMaterial({
         color:             cfg.color,
         emissive:          cfg.color,
@@ -116,7 +151,7 @@ const Atom = ({ scrollProgressRef }: AtomProps) => {
         ringMat,
       ));
 
-      /* Electron — fixed at (radius, 0, 0) in spinGroup space; orbits via group rotation */
+      /* Electron */
       const elMat = new THREE.MeshStandardMaterial({
         color:             cfg.color,
         emissive:          cfg.color,
@@ -128,10 +163,13 @@ const Atom = ({ scrollProgressRef }: AtomProps) => {
       el.position.set(cfg.radius, 0, 0);
       spinGroup.add(el);
 
-      rings.push({ spinGroup, cfg });
+      /* Trail particles */
+      spinGroup.add(createRingParticles(cfg.radius, cfg.color));
+
+      rings.push({ tiltGroup, spinGroup, cfg });
     });
 
-    /* ── Resize observer ────────────────────────────────── */
+    /* ── Resize ──────────────────────────────────────── */
     const ro = new ResizeObserver(() => {
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
@@ -141,21 +179,25 @@ const Atom = ({ scrollProgressRef }: AtomProps) => {
     });
     ro.observe(canvas);
 
-    /* ── Animation loop ─────────────────────────────────── */
+    /* ── Animation loop ──────────────────────────────── */
     const startMs = Date.now();
     let animId: number;
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
       const t = (Date.now() - startMs) / 1000;
-      const p = scrollProgressRef.current; // 0 → 1
+      const p = scrollProgressRef.current;
 
-      /* Spin each ring's inner group — tiltGroup never touched */
-      rings.forEach(({ spinGroup, cfg }) => {
+      rings.forEach(({ tiltGroup, spinGroup, cfg }) => {
+        /* Spin electron + trail around ring */
         spinGroup.rotation.z = t * 0.45 * cfg.speed + p * Math.PI * 6 * cfg.speed;
+
+        /* Precess orbital plane — makes the ring visually orbit the nucleus in 3D */
+        tiltGroup.rotation.x = cfg.tilt[0] + t * 0.12 * cfg.speed;
+        tiltGroup.rotation.y = cfg.tilt[1] + t * 0.09 * cfg.speed;
       });
 
-      /* Slowly orbit the primary light for dynamic highlights */
+      /* Orbit primary light for dynamic highlights */
       purpleLight.position.set(
         4 * Math.cos(t * 0.28),
         4 * Math.sin(t * 0.35),
@@ -164,6 +206,7 @@ const Atom = ({ scrollProgressRef }: AtomProps) => {
 
       /* Pulse nucleus glow */
       glow.scale.setScalar(1 + Math.sin(t * 2.1) * 0.13);
+      glow2.scale.setScalar(1 + Math.sin(t * 1.3) * 0.08);
 
       renderer.render(scene, camera);
     };
@@ -173,9 +216,11 @@ const Atom = ({ scrollProgressRef }: AtomProps) => {
       cancelAnimationFrame(animId);
       ro.disconnect();
       scene.traverse(obj => {
-        if (obj instanceof THREE.Mesh) {
+        if (obj instanceof THREE.Mesh || obj instanceof THREE.Points) {
           obj.geometry.dispose();
-          (obj.material as THREE.Material).dispose();
+          const mat = obj.material;
+          if (Array.isArray(mat)) mat.forEach(m => m.dispose());
+          else (mat as THREE.Material).dispose();
         }
       });
       renderer.dispose();
