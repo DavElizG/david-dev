@@ -20,14 +20,14 @@ interface AtomProps {
   scrollProgressRef: MutableRefObject<number>;
 }
 
-const PURPLE = 0xa855f7;
-const CYAN   = 0x06b6d4;
-const LILAC  = 0xc084fc;
+const SILVER = 0xe0e0e0;
+const GRAY   = 0x909090;
+const MIST   = 0xcccccc;
 
 const RING_CONFIGS = [
-  { radius: 2.8, color: PURPLE, tilt: [1.05, 0,     0.3 ] as const, speed: 1.0 },
-  { radius: 3.4, color: CYAN,   tilt: [-0.6, 0.78,  0   ] as const, speed: 1.4 },
-  { radius: 2.2, color: LILAC,  tilt: [0.5, -1.05,  0.4 ] as const, speed: 0.8 },
+  { radius: 2.8, color: SILVER, tilt: [1.05, 0,     0.3 ] as const, speed: 1.0 },
+  { radius: 3.4, color: GRAY,   tilt: [-0.6, 0.78,  0   ] as const, speed: 1.4 },
+  { radius: 2.2, color: MIST,  tilt: [0.5, -1.05,  0.4 ] as const, speed: 0.8 },
 ];
 
 /* ── Ring trail particles ────────────────────────────────────────────── */
@@ -99,29 +99,29 @@ const Atom = ({ scrollProgressRef }: AtomProps) => {
     /* ── Lighting ────────────────────────────────────── */
     scene.add(new THREE.AmbientLight(0x281840, 1.2));
 
-    const purpleLight = new THREE.PointLight(PURPLE, 4, 28);
+    const purpleLight = new THREE.PointLight(SILVER, 4, 28);
     purpleLight.position.set(4, 4, 6);
     scene.add(purpleLight);
 
-    const cyanLight = new THREE.PointLight(CYAN, 2.5, 22);
+    const cyanLight = new THREE.PointLight(GRAY, 2.5, 22);
     cyanLight.position.set(-5, -3, 5);
     scene.add(cyanLight);
 
     /* ── Nucleus ─────────────────────────────────────── */
     const nucleusMat = new THREE.MeshStandardMaterial({
-      color:             PURPLE,
-      emissive:          PURPLE,
+      color:             SILVER,
+      emissive:          SILVER,
       emissiveIntensity: 0.55,
       roughness:         0.15,
       metalness:         0.75,
     });
     scene.add(new THREE.Mesh(new THREE.SphereGeometry(0.42, 32, 32), nucleusMat));
 
-    const glowMat = new THREE.MeshBasicMaterial({ color: PURPLE, transparent: true, opacity: 0.10 });
+    const glowMat = new THREE.MeshBasicMaterial({ color: SILVER, transparent: true, opacity: 0.10 });
     const glow    = new THREE.Mesh(new THREE.SphereGeometry(0.72, 16, 16), glowMat);
     scene.add(glow);
 
-    const glow2Mat = new THREE.MeshBasicMaterial({ color: LILAC, transparent: true, opacity: 0.04 });
+    const glow2Mat = new THREE.MeshBasicMaterial({ color: MIST, transparent: true, opacity: 0.04 });
     const glow2    = new THREE.Mesh(new THREE.SphereGeometry(1.2, 16, 16), glow2Mat);
     scene.add(glow2);
 

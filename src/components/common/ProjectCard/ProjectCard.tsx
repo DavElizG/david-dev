@@ -20,18 +20,18 @@ const ProjectCard = ({
 
   // Colores de gradiente para las tarjetas (diferentes según el ID)
   const gradients = [
-    'from-blue-600 to-indigo-700',
-    'from-purple-600 to-pink-700',
-    'from-emerald-600 to-teal-700',
-    'from-amber-600 to-orange-700',
-    'from-rose-600 to-red-700',
-    'from-cyan-600 to-blue-700'
+    'from-zinc-800 to-gray-900',
+    'from-neutral-700 to-zinc-800',
+    'from-stone-800 to-neutral-900',
+    'from-gray-700 to-zinc-900',
+    'from-zinc-700 to-gray-800',
+    'from-slate-700 to-gray-900'
   ];
 
   const selectedGradient = gradients[id % gradients.length];
 
-  const hoverShadow = '0px 20px 40px rgba(168, 85, 247, 0.15), 0px 5px 20px rgba(6, 182, 212, 0.1)';
-  const defaultShadow = '0 8px 20px rgba(168, 85, 247, 0.05), 0px 2px 10px rgba(6, 182, 212, 0.03)';
+  const hoverShadow = '0px 20px 40px rgba(255,255,255,0.08), 0px 5px 20px rgba(255,255,255,0.04)';
+  const defaultShadow = '0 8px 20px rgba(255,255,255,0.02), 0px 2px 10px rgba(255,255,255,0.01)';
 
   // Verificar si es el proyecto de CTP La Mansión
   const isCtpProject = title.toLowerCase().includes('ctp la mansión') || 
@@ -121,7 +121,7 @@ const ProjectCard = ({
               }}
               whileHover={{
                 scale: 1.05,
-                boxShadow: '0 3px 10px rgba(168, 85, 247, 0.2)'
+                boxShadow: '0 3px 10px rgba(255,255,255,0.08)'
               }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >

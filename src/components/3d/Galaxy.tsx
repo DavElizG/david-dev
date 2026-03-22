@@ -20,9 +20,9 @@ interface GalaxyProps {
   scrollProgressRef: MutableRefObject<number>;
 }
 
-const PURPLE = 0xa855f7;
-const CYAN   = 0x06b6d4;
-const LILAC  = 0xc084fc;
+const SILVER = 0xe0e0e0;
+const GRAY   = 0x909090;
+const MIST   = 0xcccccc;
 
 /* ── Circular soft-dot texture (prevents square particles) ── */
 function createCircleTexture(): THREE.Texture {
@@ -58,7 +58,7 @@ function createCore(tex: THREE.Texture): THREE.Points {
 
     const b = 0.6 + Math.random() * 0.4;
     col[i3]     = b;
-    col[i3 + 1] = b * 0.72;
+    col[i3 + 1] = b;
     col[i3 + 2] = b;
   }
 
@@ -88,9 +88,9 @@ function createArms(tex: THREE.Texture): THREE.Points {
   const pos     = new Float32Array(COUNT * 3);
   const col     = new Float32Array(COUNT * 3);
 
-  // Purple #a855f7 → Cyan #06b6d4
-  const PR = 0.659, PG = 0.333, PB = 0.969;
-  const CR = 0.024, CG = 0.714, CB = 0.831;
+  // Light silver → mid gray gradient along arm length
+  const PR = 0.88, PG = 0.88, PB = 0.88;   /* near-white (inner arm) */
+  const CR = 0.45, CG = 0.45, CB = 0.45;   /* mid gray   (outer arm) */
 
   for (let i = 0; i < COUNT; i++) {
     const arm       = i % ARMS;
@@ -147,7 +147,7 @@ function createScatter(tex: THREE.Texture): THREE.Points {
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
 
   return new THREE.Points(geo, new THREE.PointsMaterial({
-    color:           0x8866aa,
+    color:           0x999999,
     size:            0.035,
     map:             tex,
     alphaMap:        tex,
@@ -201,9 +201,9 @@ const Galaxy = ({ scrollProgressRef }: GalaxyProps) => {
 
     /* ── Central glow sprites ────────────────────────── */
     const glowCfgs = [
-      { color: PURPLE, scale: 3.0, opacity: 0.14 },
-      { color: LILAC,  scale: 5.0, opacity: 0.05 },
-      { color: CYAN,   scale: 2.0, opacity: 0.09 },
+      { color: SILVER, scale: 3.0, opacity: 0.14 },
+      { color: MIST,  scale: 5.0, opacity: 0.05 },
+      { color: GRAY,   scale: 2.0, opacity: 0.09 },
     ];
     const glowSprites: THREE.Sprite[] = [];
     glowCfgs.forEach(cfg => {

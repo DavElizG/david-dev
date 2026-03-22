@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
-/* ─── Aurora Theme Tokens ───────────────────────────── */
+/* ─── Monochrome Space Tokens ───────────────────────── */
 :root {
   --space-bg:         #000000;
-  --space-surface:    rgba(168, 85, 247, 0.07);
-  --space-surface-2:  rgba(168, 85, 247, 0.12);
-  --space-border:     rgba(168, 85, 247, 0.2);
-  --space-text:       #f0eeff;
-  --space-text-dim:   #7070a8;
-  --space-accent:     #a855f7;
-  --space-accent-2:   #06b6d4;
-  --space-moon-glow:  #c084fc;
+  --space-surface:    rgba(255, 255, 255, 0.04);
+  --space-surface-2:  rgba(255, 255, 255, 0.07);
+  --space-border:     rgba(255, 255, 255, 0.1);
+  --space-text:       #f0f0f0;
+  --space-text-dim:   #6e6e6e;
+  --space-accent:     #d4d4d4;
+  --space-accent-2:   #8a8a8a;
+  --space-moon-glow:  #b0b0b0;
 
   /* Typography/rendering */
   font-synthesis: none;
@@ -60,7 +60,7 @@ body {
 .aurora-blob-1 {
   width: 65vw;
   height: 65vw;
-  background: radial-gradient(circle, #7c3aed 0%, #4f1d96 100%);
+  background: radial-gradient(circle, #2a2a2a 0%, #111111 100%);
   top: -20%;
   left: -15%;
   animation-duration: 20s;
@@ -69,7 +69,7 @@ body {
 .aurora-blob-2 {
   width: 55vw;
   height: 55vw;
-  background: radial-gradient(circle, #0891b2 0%, #06b6d4 100%);
+  background: radial-gradient(circle, #1e1e1e 0%, #0a0a0a 100%);
   bottom: -20%;
   right: -15%;
   animation-duration: 24s;
@@ -79,7 +79,7 @@ body {
 .aurora-blob-3 {
   width: 40vw;
   height: 40vw;
-  background: radial-gradient(circle, #a855f7 0%, #9333ea 100%);
+  background: radial-gradient(circle, #242424 0%, #0d0d0d 100%);
   top: 25%;
   left: 45%;
   animation-duration: 17s;
@@ -93,10 +93,10 @@ body {
 
 /* ─── Glassmorphism Utility ──────────────────────── */
 .glass {
-  background: rgba(168, 85, 247, 0.07);
+  background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(168, 85, 247, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
 }
 

@@ -88,13 +88,13 @@ const frag = /* glsl */`
       float gw  = smoothstep(0.07, 0.0, d);
       float b   = (h2 - 0.965) / 0.035 * gw;
       float t2  = hash(grid2 + 33.3);
-      col += mix(vec3(0.80, 0.70, 1.0), vec3(0.70, 0.90, 1.0), t2) * b * 0.40;
+      col += mix(vec3(0.75, 0.75, 0.80), vec3(0.70, 0.70, 0.75), t2) * b * 0.40;
     }
 
     /* Faint nebula tint — large-scale colour blobs */
     vec2 nbCell = floor(uv * 10.0);
     float nb    = hash(nbCell + 99.7) * 0.07;
-    col += mix(vec3(0.20, 0.04, 0.45), vec3(0.00, 0.08, 0.30),
+    col += mix(vec3(0.06, 0.06, 0.08), vec3(0.03, 0.03, 0.05),
                hash(nbCell)) * nb;
 
     return col;
@@ -111,16 +111,16 @@ const frag = /* glsl */`
     float swirl  = sin(phi * 5.0 - uTime * 1.6 + r * 2.8) * 0.5 + 0.5;
     float swirl2 = sin(phi * 3.0 + uTime * 1.1 - r * 4.5) * 0.5 + 0.5;
 
-    vec3 purple = vec3(0.66, 0.33, 0.97);   /* #a855f7 */
-    vec3 cyan   = vec3(0.02, 0.71, 0.83);   /* #06b6d4 */
-    vec3 pink   = vec3(0.93, 0.28, 0.60);   /* #ec4899 */
+    vec3 bright = vec3(0.95, 0.95, 1.00);   /* near-white w/ cool tint */
+    vec3 mid    = vec3(0.60, 0.60, 0.65);   /* cool gray               */
+    vec3 light  = vec3(0.80, 0.80, 0.85);   /* silver-gray             */
 
-    vec3 col = mix(purple, cyan,  swirl);
-    col      = mix(col,    pink,  swirl2 * 0.45);
+    vec3 col = mix(bright, mid,   swirl);
+    col      = mix(col,    light, swirl2 * 0.45);
     col     *= 0.35 + t * 2.2;
 
-    /* Hot, bright inner edge — near the Schwarzschild radius */
-    col += vec3(1.0, 0.85, 1.0) * smoothstep(0.50, 1.00, t) * 1.4;
+    /* Hot, bright inner edge — pure white */
+    col += vec3(1.0, 1.0, 1.0) * smoothstep(0.50, 1.00, t) * 1.4;
 
     float alpha = clamp(dot(col, col) / 3.0, 0.0, 1.0);
     return vec4(col, alpha);

@@ -6,14 +6,14 @@ import { TechCardProps } from '../../../types/techCard.types';
 const DraggableTechCard = memo(({ id, name, icon, url, darkMode }: TechCardProps) => {
   // Colores aleatorios para las tarjetas
   const colors = [
-    'from-blue-500 to-cyan-500',
-    'from-purple-500 to-pink-500',
-    'from-green-400 to-emerald-500',
-    'from-amber-400 to-orange-500',
-    'from-indigo-500 to-purple-500',
-    'from-rose-400 to-red-500',
-    'from-teal-400 to-cyan-500',
-    'from-fuchsia-400 to-pink-500',
+    'from-zinc-800 to-gray-900',
+    'from-neutral-700 to-zinc-800',
+    'from-stone-800 to-neutral-900',
+    'from-gray-700 to-zinc-900',
+    'from-slate-700 to-gray-800',
+    'from-zinc-700 to-neutral-800',
+    'from-neutral-700 to-gray-900',
+    'from-stone-700 to-zinc-800',
   ];
   
   const randomColor = colors[id % colors.length];
@@ -38,7 +38,7 @@ const DraggableTechCard = memo(({ id, name, icon, url, darkMode }: TechCardProps
       style={{
         animationDelay,
         animationDuration,
-        borderColor: 'rgba(168, 85, 247, 0.3)',
+        borderColor: 'rgba(255,255,255,0.15)',
       }}
     >
       {/* Efecto de resplandor al hacer hover */}

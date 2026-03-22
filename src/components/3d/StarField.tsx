@@ -23,8 +23,8 @@ const StarField = () => {
       const rand = Math.random();
       // 15% purple-tinted, 10% cyan-tinted, 75% white
       const tint =
-        rand > 0.90 ? 'rgba(168,85,247,' :
-        rand > 0.80 ? 'rgba(6,182,212,' :
+        rand > 0.90 ? 'rgba(200,200,210,' :
+        rand > 0.80 ? 'rgba(155,155,165,' :
                        'rgba(255,255,255,';
       return {
         x: Math.random(),

@@ -18,9 +18,9 @@ interface NexusProps {
   scrollProgressRef: MutableRefObject<number>;
 }
 
-const PURPLE = 0xa855f7;
-const CYAN   = 0x06b6d4;
-const LILAC  = 0xc084fc;
+const SILVER = 0xe0e0e0;
+const GRAY   = 0x909090;
+const MIST   = 0xcccccc;
 
 /* ── Particle cloud builder ───────────────────────────── */
 function createParticles(): { points: THREE.Points; speeds: Float32Array; phases: Float32Array } {
@@ -47,7 +47,7 @@ function createParticles(): { points: THREE.Points; speeds: Float32Array; phases
   geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
   const mat = new THREE.PointsMaterial({
-    color:           LILAC,
+    color:           MIST,
     size:            0.055,
     transparent:     true,
     opacity:         0.5,
@@ -92,11 +92,11 @@ const Nexus = ({ scrollProgressRef }: NexusProps) => {
     /* ── Lighting ────────────────────────────────────── */
     scene.add(new THREE.AmbientLight(0x1a0a2e, 1.5));
 
-    const purpleLight = new THREE.PointLight(PURPLE, 5, 30);
+    const purpleLight = new THREE.PointLight(SILVER, 5, 30);
     purpleLight.position.set(4, 3, 5);
     scene.add(purpleLight);
 
-    const cyanLight = new THREE.PointLight(CYAN, 3, 25);
+    const cyanLight = new THREE.PointLight(GRAY, 3, 25);
     cyanLight.position.set(-4, -2, 4);
     scene.add(cyanLight);
 
@@ -104,8 +104,8 @@ const Nexus = ({ scrollProgressRef }: NexusProps) => {
     const knotGeo = new THREE.TorusKnotGeometry(2.2, 0.45, 200, 32, 2, 3);
 
     const solidMat = new THREE.MeshStandardMaterial({
-      color:             PURPLE,
-      emissive:          PURPLE,
+      color:             SILVER,
+      emissive:          SILVER,
       emissiveIntensity: 0.35,
       roughness:         0.18,
       metalness:         0.85,
@@ -117,7 +117,7 @@ const Nexus = ({ scrollProgressRef }: NexusProps) => {
 
     /* ── Torus Knot — wireframe overlay ──────────────── */
     const wireMat = new THREE.MeshBasicMaterial({
-      color:       CYAN,
+      color:       GRAY,
       wireframe:   true,
       transparent: true,
       opacity:     0.08,
@@ -127,7 +127,7 @@ const Nexus = ({ scrollProgressRef }: NexusProps) => {
 
     /* ── Inner glow core ─────────────────────────────── */
     const glowMat = new THREE.MeshBasicMaterial({
-      color:       PURPLE,
+      color:       SILVER,
       transparent: true,
       opacity:     0.06,
     });

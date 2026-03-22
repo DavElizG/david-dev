@@ -95,7 +95,7 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(168,85,247,0.14) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(255,255,255,0.06) 0%, transparent 70%)',
           pointerEvents: 'none',
           zIndex: 1,
         }}
@@ -112,8 +112,8 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
           className="text-xs uppercase tracking-[0.35em] mb-5 px-4 py-1.5 rounded-full"
           style={{
             color: 'var(--space-accent)',
-            background: 'rgba(168,85,247,0.12)',
-            border: '1px solid rgba(168,85,247,0.3)',
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.16)',
           }}
         >
           Full Stack Developer
@@ -124,7 +124,7 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
           className="font-bold leading-none mb-5"
           style={{
             fontSize: 'clamp(3.5rem, 10vw, 9rem)',
-            background: 'linear-gradient(135deg, #f0eeff 0%, #a855f7 50%, #06b6d4 100%)',
+            background: 'linear-gradient(135deg, #ffffff 0%, #d4d4d4 50%, #8a8a8a 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
