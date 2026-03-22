@@ -224,6 +224,11 @@ const JourneySection = () => {
 
   const isLoading = eduLoading || expLoading;
 
+  /* Refresh ScrollTrigger positions once Journey content loads (section grows ~600vh) */
+  useEffect(() => {
+    if (!isLoading) ScrollTrigger.refresh();
+  }, [isLoading]);
+
   /* ════════════════════════════════════════════════════
      RENDER — the <section> MUST always be in the DOM so
      React doesn't try to insert/remove siblings of the
@@ -237,26 +242,30 @@ const JourneySection = () => {
     >
       {!isLoading && (
         <>
-      {/* ── Section header with 3D Atom ── */}
+      {/* ── Sticky Atom — stays visible for entire section scroll ── */}
       <div style={{
-        position:     'relative',
-        textAlign:    'center',
-        marginBottom: '12vh',
-        padding:      '0 1.5rem',
-        minHeight:    '340px',
-        display:      'flex',
-        flexDirection: 'column',
-        alignItems:   'center',
-        justifyContent: 'center',
+        position:      'sticky',
+        top:           'calc(50vh - 170px)',
+        height:        '340px',
+        width:         '100%',
+        zIndex:        0,
+        pointerEvents: 'none',
+        marginBottom:  '-340px',
       }}>
-        {/* Atom canvas — behind text */}
         <Suspense fallback={null}>
           <Atom scrollProgressRef={scrollProgressRef} />
         </Suspense>
+      </div>
 
+      {/* ── Section header text ── */}
+      <div style={{
+        position:     'relative',
+        zIndex:       1,
+        textAlign:    'center',
+        marginBottom: '12vh',
+        padding:      '8vh 1.5rem 0',
+      }}>
         <span style={{
-          position:      'relative',
-          zIndex:        1,
           display:       'block',
           fontSize:      '0.72rem',
           textTransform: 'uppercase',
@@ -267,8 +276,6 @@ const JourneySection = () => {
           Mi historia
         </span>
         <h2 style={{
-          position:             'relative',
-          zIndex:               1,
           fontSize:             'clamp(2.5rem, 6vw, 5rem)',
           fontWeight:           700,
           background:          'linear-gradient(135deg, var(--space-text) 0%, var(--space-accent) 60%, var(--space-accent-2) 100%)',
