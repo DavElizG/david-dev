@@ -208,6 +208,7 @@ const Galaxy = ({ scrollProgressRef }: GalaxyProps) => {
     const glowSprites: THREE.Sprite[] = [];
     glowCfgs.forEach(cfg => {
       const mat = new THREE.SpriteMaterial({
+        map:         circleTex,
         color:       cfg.color,
         transparent: true,
         opacity:     cfg.opacity,
