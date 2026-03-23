@@ -9,6 +9,12 @@
   overflow: visible;
 }
 
+/* ShootingStars inside section — absolute instead of fixed */
+.skills-section > [aria-hidden]:first-child {
+  position: absolute !important;
+  z-index: 0 !important;
+}
+
 /* ── Section Header ── */
 .skills-header {
   text-align: center;

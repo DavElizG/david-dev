@@ -11,6 +11,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { usePersonalInfo } from '../../../hooks';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import ContactForm from '../../common/ContactForm';
+import ShootingStars from '../../3d/ShootingStars';
 import './Contact.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -75,6 +76,8 @@ const Contact = () => {
 
   return (
     <section id="contact" className="contact-section" ref={sectionRef}>
+      <ShootingStars />
+
       {/* Bars — white, slide right on scroll */}
       {Array.from({ length: BAR_COUNT }).map((_, i) => (
         <div key={i} className="contact-bar" />

@@ -13,6 +13,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useSkills } from '../../../hooks';
 import { getTechIcon, getTechDocUrl } from '../../../utils/iconUtils';
+import ShootingStars from '../../3d/ShootingStars';
 import './Skills.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -176,6 +177,8 @@ const Skills = () => {
 
   return (
     <section id="skills" className="skills-section" ref={sectionRef}>
+      <ShootingStars />
+
       {/* Section header */}
       <div className="skills-header">
         <span className="skills-header__tag">Tech Stack</span>

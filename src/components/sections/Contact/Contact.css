@@ -15,6 +15,12 @@
   background: var(--space-bg);
 }
 
+/* ShootingStars inside section — absolute instead of fixed */
+.contact-section > [aria-hidden]:first-child {
+  position: absolute !important;
+  z-index: 0 !important;
+}
+
 /* ── Bars — white, BEHIND content ── */
 .contact-bar {
   height: 1.2vh;
