@@ -2,21 +2,23 @@
  * Skills.tsx
  *
  * Marquee + 3D fold effect for Tech Stack section.
- * Adapted from CodePen fold-marquee pattern:
  *  - Each skill category is a marquee row with tech icons scrolling horizontally
  *  - Alternating scroll directions driven by GSAP ScrollTrigger scrub
+ *  - Each marquee track is also Draggable (drag + inertia throw)
  *  - 3D fold panels (top/center/bottom) with perspective
  *  - Dark space theme
  */
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Draggable } from 'gsap/Draggable';
+import { InertiaPlugin } from 'gsap/InertiaPlugin';
 import { useSkills } from '../../../hooks';
 import { getTechIcon, getTechDocUrl } from '../../../utils/iconUtils';
 import ShootingStars from '../../3d/ShootingStars';
 import './Skills.css';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, Draggable, InertiaPlugin);
 
 /* Build a long repeating string of items for a marquee row */
 const REPEATS = 6;
@@ -52,23 +54,69 @@ const Skills = () => {
       if (cancelled || !sectionRef.current) return;
 
       ctxRef.current = gsap.context(() => {
-        /* ── Marquee scroll ── */
+        /* ── Marquee scroll + Draggable ── */
         gsap.utils.toArray<HTMLElement>('.skills-marquee').forEach((el, index) => {
           const track = el.querySelector<HTMLElement>('.skills-track');
           if (!track) return;
 
-          const [x, xEnd] = index % 2 === 0 ? [0, -track.scrollWidth / 2] : [-track.scrollWidth / 2, 0];
+          const halfWidth = track.scrollWidth / 2;
+          const isEven    = index % 2 === 0;
 
-          gsap.fromTo(track, { x }, {
-            x: xEnd,
+          // ScrollTrigger range
+          const [stStart, stEnd] = isEven ? [0, -halfWidth] : [-halfWidth, 0];
+
+          // Store a drag offset that compounds with scroll
+          let dragOffset = 0;
+
+          // The scroll-driven tween
+          gsap.fromTo(track, { x: stStart }, {
+            x: stEnd,
             ease: 'none',
             scrollTrigger: {
               trigger: sectionRef.current,
               start:   'top bottom',
               end:     'bottom top',
               scrub:   1,
+              onUpdate() {
+                // Apply combined transform: scroll position + drag offset, wrapped
+                const scrollX = gsap.getProperty(track, 'x') as number;
+                const combined = scrollX + dragOffset;
+                // Wrap into [-scrollWidth, 0] range for seamless loop
+                const total = track.scrollWidth / 2;
+                const wrapped = ((combined % total) + total) % total - total;
+                track.style.transform = `translateX(${wrapped}px)`;
+              },
             },
           });
+
+          // Make the track draggable via an invisible proxy
+          // The proxy accumulates x offset; we read deltaX to shift the track
+          const proxy = document.createElement('div');
+          el.appendChild(proxy);
+          gsap.set(proxy, { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, zIndex: 5 });
+
+          Draggable.create(proxy, {
+            type: 'x',
+            inertia: true,
+            cursor: 'grab',
+            activeCursor: 'grabbing',
+            edgeResistance: 0,
+            onDrag() {
+              dragOffset += this.deltaX;
+              const total = track.scrollWidth / 2;
+              dragOffset = ((dragOffset % total) + total) % total - total;
+              track.style.transform = `translateX(${dragOffset}px)`;
+            },
+            onThrowUpdate() {
+              dragOffset += this.deltaX;
+              const total = track.scrollWidth / 2;
+              dragOffset = ((dragOffset % total) + total) % total - total;
+              track.style.transform = `translateX(${dragOffset}px)`;
+            },
+          });
+
+          // Reset proxy so its x doesn't shift the marquee container
+          gsap.set(proxy, { x: 0 });
         });
 
         /* ── 3D fold smooth scroll ── */

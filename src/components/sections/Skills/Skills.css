@@ -132,6 +132,13 @@
   overflow: hidden;
   position: relative;
   width: 100vw;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.skills-marquee:active {
+  cursor: grabbing;
 }
 
 .skills-track {
