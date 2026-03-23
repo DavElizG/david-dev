@@ -4,9 +4,10 @@ import SmoothScroll from './components/common/SmoothScroll'
 import { SEO } from './components/common'
 import { ThemeProvider } from './context'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { HelmetProvider } from 'react-helmet-async'
 import ShootingStars from './components/3d/ShootingStars'
+import Loader from './components/layout/Loader/Loader'
 
 const HomePage = lazy(() => import('./pages/Home/HomePage'))
 
@@ -20,6 +21,8 @@ const PageLoader = () => (
 )
 
 function AppContent() {
+  const [showLoader, setShowLoader] = useState(true);
+
   const smoothScrollOptions = {
     duration: 1.2,
     easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -34,6 +37,7 @@ function AppContent() {
       className="flex flex-col min-h-screen w-full overflow-x-hidden"
       style={{ color: 'var(--space-text)' }}
     >
+      {showLoader && <Loader onComplete={() => setShowLoader(false)} />}
       <SEO />
       {/* Shooting stars — fixed, behind everything, above aurora blobs */}
       <ShootingStars />
