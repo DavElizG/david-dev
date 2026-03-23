@@ -1,16 +1,12 @@
 /* ═══════════════════════════════════════════════════
-   Contact — Bar Curtain Reveal
-   Based on CodePen elegantseagulls/wvMgXxN
-   
-   Trick: ALL content is colored same as bg (invisible).
-   White bars sit BEHIND the content (lower z-index).
-   When bars overlap content → dark text on white = visible.
+   Contact — ScrambleText + SplitText Reveal
+   Floating quotes + entrance animations on scroll
    ═══════════════════════════════════════════════════ */
 
 .contact-section {
   position: relative;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  min-height: 100vh;
   overflow: hidden;
   background: var(--space-bg);
   z-index: 1;
@@ -22,25 +18,220 @@
   z-index: 0 !important;
 }
 
-/* ── Bars — white, BEHIND content ── */
-.contact-bar {
-  height: 1.2vh;
-  width: 50vw;
-  margin-bottom: -0.2vh;
-  background: #f0f0f0;
-  display: block;
-  position: relative;
-  z-index: 1;
-}
-
-/* ── Content — ABOVE bars, transparent bg, dark text ── */
-.contact-content {
+/* ── Scan-line overlay ── */
+.contact-scanlines {
   position: absolute;
   inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.01) 2px,
+    rgba(255, 255, 255, 0.01) 4px
+  );
+}
+
+/* ── HUD frame ── */
+.contact-hud {
+  position: absolute;
+  inset: clamp(1rem, 2.5vw, 2.5rem);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.contact-hud__corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: rgba(255, 255, 255, 0.1);
+  border-style: solid;
+  border-width: 0;
+  opacity: 0;
+}
+
+.contact-hud__corner--tl { top: 0; left: 0; border-top-width: 1px; border-left-width: 1px; }
+.contact-hud__corner--tr { top: 0; right: 0; border-top-width: 1px; border-right-width: 1px; }
+.contact-hud__corner--bl { bottom: 0; left: 0; border-bottom-width: 1px; border-left-width: 1px; }
+.contact-hud__corner--br { bottom: 0; right: 0; border-bottom-width: 1px; border-right-width: 1px; }
+
+.contact-hud__line {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.contact-hud__line--h {
+  height: 1px;
+  left: 18px;
+  right: 18px;
+  transform-origin: left;
+}
+
+.contact-hud__line--v {
+  width: 1px;
+  top: 18px;
+  bottom: 18px;
+  transform-origin: top;
+}
+
+.contact-hud__line--top    { top: 0; }
+.contact-hud__line--bottom { bottom: 0; }
+.contact-hud__line--left   { left: 0; }
+.contact-hud__line--right  { right: 0; }
+
+/* Tick marks on HUD lines */
+.contact-hud__line--h::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 0;
+  right: 0;
+  height: 7px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 80px,
+    rgba(255, 255, 255, 0.04) 80px,
+    rgba(255, 255, 255, 0.04) 81px
+  );
+}
+
+.contact-hud__line--v::after {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: 0;
+  bottom: 0;
+  width: 7px;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 80px,
+    rgba(255, 255, 255, 0.04) 80px,
+    rgba(255, 255, 255, 0.04) 81px
+  );
+}
+
+/* ── Status indicator (top-left inside HUD) ── */
+.contact-status {
+  position: absolute;
+  top: clamp(1.8rem, 3.5vw, 3.5rem);
+  left: clamp(2.2rem, 4vw, 4.5rem);
+  z-index: 4;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  opacity: 0;
+}
+
+.contact-status__row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contact-status__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--space-accent-2);
+  animation: contact-pulse 2s ease-in-out infinite;
+}
+
+.contact-status__label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.25);
+  font-weight: 600;
+}
+
+.contact-status__coord {
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.12);
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes contact-pulse {
+  0%, 100% { opacity: 0.4; box-shadow: 0 0 4px rgba(138, 138, 138, 0.3); }
+  50%      { opacity: 1;   box-shadow: 0 0 8px rgba(138, 138, 138, 0.6); }
+}
+
+/* ── Data stream (right edge) ── */
+.contact-datastream {
+  position: absolute;
+  right: clamp(2.2rem, 4vw, 4.5rem);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: flex-end;
+}
+
+.contact-datastream__line {
+  font-size: 0.55rem;
+  font-family: 'Space Grotesk', monospace;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.06);
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  animation: contact-data-drift 8s linear infinite;
+  animation-delay: calc(var(--i, 0) * 0.6s);
+}
+
+.contact-datastream__line:nth-child(odd) {
+  color: rgba(255, 255, 255, 0.08);
+}
+
+@keyframes contact-data-drift {
+  0%, 100% { opacity: 0.3; }
+  30%      { opacity: 1; }
+  70%      { opacity: 1; }
+}
+
+/* ── Grid dot overlay ── */
+.contact-grid-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 70%);
+}
+
+/* ── Floating scramble quotes ── */
+.contact-quote {
+  position: absolute;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.18);
+  letter-spacing: 0.06em;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+/* ── Content grid ── */
+.contact-content {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
   z-index: 2;
-  pointer-events: none;
+  min-height: 100vh;
+  padding: clamp(4rem, 8vh, 8rem) clamp(2rem, 5vw, 5rem);
+  gap: clamp(2rem, 4vw, 4rem);
 }
 
 /* ── Shared panel ── */
@@ -48,14 +239,12 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(2rem, 5vw, 5rem);
   overflow: hidden;
-  background: transparent;
 }
 
 /* ── Left panel — info ── */
 .contact-panel--info {
-  background: transparent;
+  padding-right: clamp(1rem, 3vw, 3rem);
 }
 
 .contact-panel__tag {
@@ -63,19 +252,15 @@
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.24em;
-  color: var(--space-bg, #000);
+  color: var(--space-accent-2);
   margin-bottom: 1.2rem;
+  opacity: 0;
 }
 
 .contact-panel__title {
   font-size: clamp(2.8rem, 6vw, 5rem);
   font-weight: 900;
-  color: var(--space-bg, #000);
-  /* Override any gradient text */
-  background: none;
-  -webkit-background-clip: unset;
-  -webkit-text-fill-color: var(--space-bg, #000);
-  background-clip: unset;
+  color: var(--space-text, #f0f0f0);
   line-height: 1.05;
   margin: 0 0 1.2rem;
   letter-spacing: -0.02em;
@@ -83,10 +268,11 @@
 
 .contact-panel__sub {
   font-size: 0.95rem;
-  color: var(--space-bg, #000);
+  color: var(--space-text-dim);
   line-height: 1.75;
   max-width: 34ch;
   margin-bottom: 2.5rem;
+  opacity: 0;
 }
 
 .contact-info-list {
@@ -99,25 +285,35 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  color: var(--space-bg, #000);
+  color: var(--space-accent);
   text-decoration: none;
   font-size: 0.9rem;
-  pointer-events: auto;
+  opacity: 0;
+  transition: color 0.3s ease;
+}
+
+.contact-info-item:hover {
+  color: var(--space-text);
 }
 
 .contact-info-item svg {
-  color: var(--space-bg, #000);
+  color: var(--space-accent-2);
   font-size: 1rem;
   flex-shrink: 0;
+  transition: color 0.3s ease;
+}
+
+.contact-info-item:hover svg {
+  color: var(--space-text);
 }
 
 /* ── Right panel — form ── */
 .contact-panel--form {
-  background: transparent;
-  overflow-y: auto;
+  opacity: 0;
+  padding-left: clamp(1rem, 3vw, 3rem);
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* All form text/elements match background color */
 .contact-panel--form > div {
   background: transparent !important;
   height: 100%;
@@ -127,56 +323,66 @@
 }
 
 .contact-panel--form h2,
-.contact-panel--form h3,
+.contact-panel--form h3 {
+  color: var(--space-text) !important;
+}
+
 .contact-panel--form label,
 .contact-panel--form p,
 .contact-panel--form span {
-  color: var(--space-bg, #000) !important;
+  color: var(--space-accent) !important;
 }
 
 .contact-panel--form input,
 .contact-panel--form textarea {
-  background: transparent !important;
-  border-color: var(--space-bg, #000) !important;
-  color: var(--space-bg, #000) !important;
-  pointer-events: auto;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: var(--space-text) !important;
+  transition: border-color 0.3s ease;
+}
+
+.contact-panel--form input:focus,
+.contact-panel--form textarea:focus {
+  border-color: var(--space-accent) !important;
 }
 
 .contact-panel--form input::placeholder,
 .contact-panel--form textarea::placeholder {
-  color: var(--space-bg, #000) !important;
+  color: var(--space-text-dim) !important;
   opacity: 0.6;
 }
 
 .contact-panel--form button[type="submit"] {
-  background: var(--space-bg, #000) !important;
-  color: var(--space-bg, #000) !important;
-  border: 1px solid var(--space-bg, #000) !important;
+  background: transparent !important;
+  color: var(--space-text) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
   font-weight: 700;
   letter-spacing: 0.04em;
-  pointer-events: auto;
+  transition: all 0.3s ease;
+}
+
+.contact-panel--form button[type="submit"]:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--space-accent) !important;
 }
 
 /* ═══════════════════════════════════════════════════
    Mobile
    ═══════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  .contact-section {
-    height: auto;
-    min-height: 100vh;
-  }
-
   .contact-content {
-    position: relative;
     grid-template-columns: 1fr;
-    min-height: 100vh;
+    padding: 4rem 1.5rem;
   }
 
-  .contact-bar {
-    width: 100vw;
+  .contact-panel--info {
+    padding-right: 0;
   }
 
-  .contact-panel {
-    padding: 2.5rem 1.5rem;
+  .contact-panel--form {
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 2rem;
   }
 }

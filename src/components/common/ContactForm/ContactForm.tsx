@@ -1,5 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { FormData, FormStatus } from '../../../types/contact.types';
+import HoverButton from '../HoverButton';
+
+gsap.registerPlugin(ScrambleTextPlugin);
 
 interface ContactFormProps {
   darkMode: boolean;
@@ -13,6 +18,25 @@ const ContactForm = ({ darkMode }: ContactFormProps) => {
   });
   const [formStatus, setFormStatus] = useState<FormStatus | null>(null);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    const el = headingRef.current;
+    if (!el) return;
+    const original = el.textContent || '';
+    const timer = setTimeout(() => {
+      gsap.to(el, {
+        duration: 1.4,
+        scrambleText: {
+          text: original,
+          chars: 'upperAndLowerCase',
+          revealDelay: 0.4,
+          speed: 0.9,
+        },
+      });
+    }, 700);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -83,7 +107,7 @@ const ContactForm = ({ darkMode }: ContactFormProps) => {
 
   return (
     <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-8 rounded-lg shadow-md`}>
-      <h3 className={`text-2xl font-semibold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+      <h3 ref={headingRef} className={`text-2xl font-semibold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
         Envíame un mensaje
       </h3>
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -147,17 +171,22 @@ const ContactForm = ({ darkMode }: ContactFormProps) => {
           {errors.message && <p className="mt-1 text-sm text-red-500">{errors.message}</p>}
         </div>
         
-        <button
-          type="submit"
-          className={`w-full px-6 py-3 text-white rounded-lg transition-colors ${
-            formStatus?.message === 'Enviando mensaje...' 
-              ? 'bg-blue-400 cursor-not-allowed' 
-              : 'bg-blue-600 hover:bg-blue-700'
-          }`}
-          disabled={formStatus?.message === 'Enviando mensaje...'}
-        >
-          {formStatus?.message === 'Enviando mensaje...' ? 'Enviando...' : 'Enviar mensaje'}
-        </button>
+        {formStatus?.message === 'Enviando mensaje...' ? (
+          <button
+            type="submit"
+            disabled
+            className="w-full px-6 py-3 text-xs uppercase tracking-widest font-bold rounded-lg"
+            style={{ border: '1px solid rgba(255,255,255,0.1)', color: 'var(--space-text-dim)', opacity: 0.5, cursor: 'not-allowed' }}
+          >
+            Enviando...
+          </button>
+        ) : (
+          <HoverButton
+            type="submit"
+            label="Enviar mensaje"
+            className="w-full"
+          />
+        )}
 
         {/* Mensaje de estado */}
         {formStatus && (

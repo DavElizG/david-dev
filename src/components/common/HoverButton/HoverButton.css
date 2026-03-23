@@ -1,0 +1,99 @@
+/* ── HoverButton ── double-layer SplitText scatter effect ─────────────────── */
+
+.hover-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  white-space: nowrap;
+  padding: 0 2.5rem;
+  height: 3rem;
+  color: var(--space-text, #f0f0f0);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  overflow: hidden;
+  font-family: inherit;
+  user-select: none;
+  border-radius: 0.5rem;
+  transition: border-color 0.4s cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+/* White fill slides up from below */
+.hover-btn::after {
+  content: '';
+  display: block;
+  background: var(--space-text, #f0f0f0);
+  position: absolute;
+  inset: 0;
+  transform: translateY(101%);
+  transition: transform 0.4s cubic-bezier(0.7, 0, 0.3, 1);
+  z-index: 0;
+  border-radius: inherit;
+}
+
+.hover-btn:hover::after {
+  transform: translateY(0);
+}
+
+.hover-btn:hover {
+  border-color: var(--space-text, #f0f0f0);
+}
+
+.hover-btn__inner {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  line-height: 1;
+}
+
+/* Primary text layer */
+.hover-btn .hover-split__text {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.4s cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+/* Restore word spacing — SplitText word wrappers strip whitespace */
+.hover-btn .hover-split__text > *:not(:last-child),
+.hover-btn .hover-split__hover > *:not(:last-child) {
+  margin-right: 0.38em;
+}
+
+/* Hover text layer — starts translated below, comes to y=0 on hover */
+.hover-btn .hover-split__hover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(40px);
+  color: var(--space-bg, #000);
+  transition: transform 0.4s cubic-bezier(0.7, 0, 0.3, 1);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.hover-btn:hover .hover-split__text {
+  transform: translateY(-40px);
+}
+
+.hover-btn:hover .hover-split__hover {
+  transform: translateY(0);
+}
+
+.hover-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
