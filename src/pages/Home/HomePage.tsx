@@ -42,18 +42,14 @@ const HomePage = () => {
         </Suspense>
 
         {/* ── Skills ── */}
-        <div id="skills">
-          <Suspense fallback={<SectionLoader />}>
-            <Skills />
-          </Suspense>
-        </div>
+        <Suspense fallback={<SectionLoader />}>
+          <Skills />
+        </Suspense>
 
         {/* ── Contact ── */}
-        <div id="contact">
-          <Suspense fallback={<SectionLoader />}>
-            <Contact />
-          </Suspense>
-        </div>
+        <Suspense fallback={<SectionLoader />}>
+          <Contact />
+        </Suspense>
       </div>
     </>
   );
