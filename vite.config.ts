@@ -29,7 +29,7 @@ export default defineConfig({
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'framer-motion': ['framer-motion'],
           'styled-components': ['styled-components'],
-          '3d-libs': ['three', '@react-three/drei', '@react-three/fiber'],
+          '3d-libs': ['three', '@react-three/fiber', '@react-three/drei'],
           'icons': ['react-icons', 'devicons-react', 'simple-icons'],
         }
       },

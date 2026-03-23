@@ -1,39 +1,142 @@
 @import "tailwindcss";
 
-/* Base styling for consistent rendering */
+/* ─── Monochrome Space Tokens ───────────────────────── */
 :root {
+  --space-bg:         #000000;
+  --space-surface:    rgba(255, 255, 255, 0.04);
+  --space-surface-2:  rgba(255, 255, 255, 0.07);
+  --space-border:     rgba(255, 255, 255, 0.1);
+  --space-text:       #f0f0f0;
+  --space-text-dim:   #6e6e6e;
+  --space-accent:     #d4d4d4;
+  --space-accent-2:   #8a8a8a;
+  --space-moon-glow:  #b0b0b0;
+
+  /* Typography/rendering */
+  font-family: 'Space Grotesk', system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Fix for horizontal overflow issue */
-html, body {
+/* ─── Base Reset ─────────────────────────────────── */
+html {
   width: 100%;
-  max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: clip; /* clip (not hidden) keeps position:sticky & GSAP pin on window.scrollY */
   margin: 0;
   padding: 0;
 }
 
-#root {
+body {
   width: 100%;
-  max-width: 100vw;
-  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  background-color: var(--space-bg);
+  color: var(--space-text);
 }
 
-/* Animación de flotación para las tarjetas de tecnología */
+#root {
+  width: 100%;
+}
+
+/* ─── Aurora Background ──────────────────────────── */
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.18;
+  animation: blob-float ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.aurora-blob-1 {
+  width: 65vw;
+  height: 65vw;
+  background: radial-gradient(circle, #2a2a2a 0%, #111111 100%);
+  top: -20%;
+  left: -15%;
+  animation-duration: 20s;
+}
+
+.aurora-blob-2 {
+  width: 55vw;
+  height: 55vw;
+  background: radial-gradient(circle, #1e1e1e 0%, #0a0a0a 100%);
+  bottom: -20%;
+  right: -15%;
+  animation-duration: 24s;
+  animation-delay: -10s;
+}
+
+.aurora-blob-3 {
+  width: 40vw;
+  height: 40vw;
+  background: radial-gradient(circle, #242424 0%, #0d0d0d 100%);
+  top: 25%;
+  left: 45%;
+  animation-duration: 17s;
+  animation-delay: -5s;
+}
+
+@keyframes blob-float {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(6vw, 5vh) scale(1.12); }
+}
+
+/* ─── Glassmorphism Utility ──────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+}
+
+/* ─── Floating Nav Link ──────────────────────────── */
+.nav-link {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--space-accent);
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-link:hover {
+  color: var(--space-accent) !important;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* ─── Section divider ────────────────────────────── */
+.space-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--space-border), transparent);
+}
+
+/* ─── Float animation ────────────────────────────── */
 @keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
 }
 
 .animate-float {
@@ -42,11 +145,53 @@ html, body {
   animation-iteration-count: infinite;
 }
 
-/* Sombras personalizadas para dark/light mode */
-.hover\:shadow-dark:hover {
-  box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.25);
+/* ─── Hide scrollbars (keep scroll functionality) ── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── Hero entrance animations (CSS-only — always works) ── */
+@keyframes hero-enter {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 
-.hover\:shadow-light:hover {
-  box-shadow: 0px 15px 30px rgba(255, 255, 255, 0.15);
+.hero-item {
+  animation: hero-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.hero-item-1 { animation-delay: 0.15s; }
+.hero-item-2 { animation-delay: 0.32s; }
+.hero-item-3 { animation-delay: 0.48s; }
+.hero-item-4 { animation-delay: 0.65s; }
+
+/* ─── Shooting stars ─────────────────────────────── */
+/*
+  Each star is a thin line rotated 45° and translated
+  along its own local X-axis (= NW→SE direction).
+  The shooting phase fills ~8% of the total cycle so
+  that — with staggered delays — stars fire sporadically
+  and never all at once.
+*/
+@keyframes shoot {
+  0%   { opacity: 0; transform: rotate(45deg) translateX(-120px); }
+  2%   { opacity: 0.85; }
+  8%   { opacity: 0;    transform: rotate(45deg) translateX(620px); }
+  8.5% { opacity: 0;    transform: rotate(45deg) translateX(-120px); }
+  100% { opacity: 0;    transform: rotate(45deg) translateX(-120px); }
+}
+
+.shooting-star {
+  position:        absolute;
+  height:          1.5px;
+  border-radius:   999px;
+  /* bright head, long fading tail */
+  background:      linear-gradient(90deg,
+                     transparent 0%,
+                     rgba(255,255,255,0.25) 20%,
+                     rgba(255,255,255,0.9)  70%,
+                     transparent 100%);
+  animation-name:            shoot;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  pointer-events:            none;
+  will-change:               transform, opacity;
 }

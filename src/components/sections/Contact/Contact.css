@@ -1,0 +1,181 @@
+/* ═══════════════════════════════════════════════════
+   Contact — Bar Curtain Reveal
+   Based on CodePen elegantseagulls/wvMgXxN
+   
+   Trick: ALL content is colored same as bg (invisible).
+   White bars sit BEHIND the content (lower z-index).
+   When bars overlap content → dark text on white = visible.
+   ═══════════════════════════════════════════════════ */
+
+.contact-section {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--space-bg);
+}
+
+/* ShootingStars inside section — absolute instead of fixed */
+.contact-section > [aria-hidden]:first-child {
+  position: absolute !important;
+  z-index: 0 !important;
+}
+
+/* ── Bars — white, BEHIND content ── */
+.contact-bar {
+  height: 1.2vh;
+  width: 50vw;
+  margin-bottom: -0.2vh;
+  background: #f0f0f0;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Content — ABOVE bars, transparent bg, dark text ── */
+.contact-content {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ── Shared panel ── */
+.contact-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(2rem, 5vw, 5rem);
+  overflow: hidden;
+  background: transparent;
+}
+
+/* ── Left panel — info ── */
+.contact-panel--info {
+  background: transparent;
+}
+
+.contact-panel__tag {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  color: var(--space-bg, #000);
+  margin-bottom: 1.2rem;
+}
+
+.contact-panel__title {
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 900;
+  color: var(--space-bg, #000);
+  /* Override any gradient text */
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: var(--space-bg, #000);
+  background-clip: unset;
+  line-height: 1.05;
+  margin: 0 0 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.contact-panel__sub {
+  font-size: 0.95rem;
+  color: var(--space-bg, #000);
+  line-height: 1.75;
+  max-width: 34ch;
+  margin-bottom: 2.5rem;
+}
+
+.contact-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.contact-info-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--space-bg, #000);
+  text-decoration: none;
+  font-size: 0.9rem;
+  pointer-events: auto;
+}
+
+.contact-info-item svg {
+  color: var(--space-bg, #000);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* ── Right panel — form ── */
+.contact-panel--form {
+  background: transparent;
+  overflow-y: auto;
+}
+
+/* All form text/elements match background color */
+.contact-panel--form > div {
+  background: transparent !important;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.contact-panel--form h2,
+.contact-panel--form h3,
+.contact-panel--form label,
+.contact-panel--form p,
+.contact-panel--form span {
+  color: var(--space-bg, #000) !important;
+}
+
+.contact-panel--form input,
+.contact-panel--form textarea {
+  background: transparent !important;
+  border-color: var(--space-bg, #000) !important;
+  color: var(--space-bg, #000) !important;
+  pointer-events: auto;
+}
+
+.contact-panel--form input::placeholder,
+.contact-panel--form textarea::placeholder {
+  color: var(--space-bg, #000) !important;
+  opacity: 0.6;
+}
+
+.contact-panel--form button[type="submit"] {
+  background: var(--space-bg, #000) !important;
+  color: var(--space-bg, #000) !important;
+  border: 1px solid var(--space-bg, #000) !important;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  pointer-events: auto;
+}
+
+/* ═══════════════════════════════════════════════════
+   Mobile
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .contact-section {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .contact-content {
+    position: relative;
+    grid-template-columns: 1fr;
+    min-height: 100vh;
+  }
+
+  .contact-bar {
+    width: 100vw;
+  }
+
+  .contact-panel {
+    padding: 2.5rem 1.5rem;
+  }
+}

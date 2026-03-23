@@ -1,70 +1,116 @@
+/**
+ * Contact.tsx — Bar-curtain reveal (CodePen elegantseagulls/wvMgXxN)
+ *
+ * Single set of 100 bars (50vw wide) that slide right on scroll,
+ * rotating 45° mid-travel. Two ghost labels split into "blocks".
+ * Content layer sits behind the bars and is revealed as they move.
+ */
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { usePersonalInfo } from '../../../hooks';
-import { useTheme } from '../../../context';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
-import ContactForm from '../../../components/common/ContactForm';
+import ContactForm from '../../common/ContactForm';
+import ShootingStars from '../../3d/ShootingStars';
+import './Contact.css';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const BAR_COUNT = 100;
 
 const Contact = () => {
   const { personalInfo, loading } = usePersonalInfo();
-  const { darkMode } = useTheme();
+  const sectionRef = useRef<HTMLElement>(null);
+  const ctxRef     = useRef<gsap.Context | null>(null);
+
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    let cancelled = false;
+
+    const setup = () => {
+      ctxRef.current?.revert();
+      if (cancelled || !sectionRef.current) return;
+
+      ctxRef.current = gsap.context(() => {
+        gsap
+          .timeline({
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              scrub:   0.5,
+              pin:     true,
+              start:   'top top',
+              end:     '+=150%',
+            },
+          })
+          .to('.contact-bar', {
+            force3D:  true,
+            duration: 1,
+            xPercent: 100,
+            ease:     'power1.inOut',
+            stagger:  { amount: 1 },
+          })
+          .to('.contact-bar', {
+            ease:     'power1.out',
+            duration: 1,
+            rotation: '45deg',
+          }, 0)
+          .to('.contact-bar', {
+            ease:     'power1.in',
+            duration: 1,
+            rotation: '0deg',
+          }, 1);
+      }, sectionRef);
+    };
+
+    const timer = setTimeout(() => {
+      if (!cancelled) { ScrollTrigger.refresh(); setup(); }
+    }, 150);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      ctxRef.current?.revert();
+      ctxRef.current = null;
+    };
+  }, []);
 
   return (
-    <section id="contact" className={`py-16 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-      <div className="container mx-auto px-4">
-        <h2 className={`text-3xl font-bold text-center mb-12 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-          Contacto
-        </h2>
+    <section id="contact" className="contact-section" ref={sectionRef}>
+      <ShootingStars />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Información de contacto */}
-          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-8 rounded-lg shadow-md`}>
-            <h3 className={`text-2xl font-semibold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              Información de contacto
-            </h3>
-            {loading ? (
-              <p className="text-center">Cargando información...</p>
-            ) : (
-              <div className="space-y-6">
-                <div className="flex items-start">
-                  <FaEnvelope className={`text-xl mt-1 mr-4 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
-                  <div>
-                    <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Correo electrónico</h4>
-                    <a 
-                      href={`mailto:${personalInfo?.email}`} 
-                      className={`${darkMode ? 'text-gray-300 hover:text-blue-400' : 'text-gray-600 hover:text-blue-600'} hover:underline transition-colors`}
-                    >
-                      {personalInfo?.email}
-                    </a>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <FaPhone className={`text-xl mt-1 mr-4 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
-                  <div>
-                    <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Teléfono</h4>
-                    <a 
-                      href="tel:+50685707955" 
-                      className={`${darkMode ? 'text-gray-300 hover:text-blue-400' : 'text-gray-600 hover:text-blue-600'} hover:underline transition-colors`}
-                    >
-                      +506 8570 7955
-                    </a>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <FaMapMarkerAlt className={`text-xl mt-1 mr-4 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
-                  <div>
-                    <h4 className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Ubicación</h4>
-                    <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                      {personalInfo?.location}
-                    </p>
-                  </div>
-                </div>
+      {/* Bars — white, slide right on scroll */}
+      {Array.from({ length: BAR_COUNT }).map((_, i) => (
+        <div key={i} className="contact-bar" />
+      ))}
+
+      {/* Content — behind bars */}
+      <div className="contact-content">
+        <div className="contact-panel contact-panel--info">
+          <span className="contact-panel__tag">Hablemos</span>
+          <h2 className="contact-panel__title">Contacto</h2>
+          <p className="contact-panel__sub">
+            Disponible para proyectos freelance y oportunidades laborales.
+          </p>
+          {!loading && personalInfo && (
+            <div className="contact-info-list">
+              <a href={`mailto:${personalInfo.email}`} className="contact-info-item">
+                <FaEnvelope />
+                <span>{personalInfo.email}</span>
+              </a>
+              <a href="tel:+50685707955" className="contact-info-item">
+                <FaPhone />
+                <span>+506 8570 7955</span>
+              </a>
+              <div className="contact-info-item">
+                <FaMapMarkerAlt />
+                <span>{personalInfo.location}</span>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
 
-          {/* Formulario de contacto */}
-          <ContactForm darkMode={darkMode} />
+        <div className="contact-panel contact-panel--form">
+          <ContactForm darkMode={true} />
         </div>
       </div>
     </section>

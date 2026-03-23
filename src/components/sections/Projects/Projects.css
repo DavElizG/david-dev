@@ -1,0 +1,369 @@
+/* ═══════════════════════════════════════════════════════
+   Projects — Slide-based layout (inspired by CodePen)
+   Adapted to dark space theme
+   ═══════════════════════════════════════════════════════ */
+
+.project-slides-container {
+  position: relative;
+}
+
+/* ── Section header ──────────────────────────────────── */
+
+.project-slides__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem 2rem;
+}
+
+.project-slides__heading {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--space-text);
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.project-slides__subheading {
+  font-size: 0.875rem;
+  color: var(--space-text-dim);
+  margin: 0;
+  text-align: center;
+}
+
+/* ── Individual slide ────────────────────────────────── */
+
+.project-slide {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.project-slide:nth-of-type(even) {
+  flex-direction: row-reverse;
+}
+
+/* ── Columns ─────────────────────────────────────────── */
+
+.project-slide__col {
+  flex-basis: 50%;
+}
+
+.project-slide__col--content {
+  position: relative;
+  z-index: 1;
+}
+
+.project-slide__col--image {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Content area ────────────────────────────────────── */
+
+.project-slide__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  height: 100%;
+  padding: 6vw 6vw 10vw;
+}
+
+/* Subtle glass-like backgrounds per slide */
+.project-slide__content--0 {
+  background: rgba(255, 255, 255, 0.02);
+  border-right: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.project-slide__content--1 {
+  background: rgba(36, 23, 23, 0.02);
+  border-left: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.project-slide__content--2 {
+  background: rgba(255, 255, 255, 0.02);
+  border-right: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.project-slide__content--3 {
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.project-slide__content--4 {
+  background: rgba(255, 255, 255, 0.02);
+  border-right: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.project-slide__content--5 {
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+/* ── Title ───────────────────────────────────────────── */
+
+.project-slide__title {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: clamp(2rem, 6vw, 5.5rem);
+  font-weight: 700;
+  color: var(--space-text);
+  margin: 0 0 2vw;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  overflow: hidden;
+}
+
+.project-slide__title-inner {
+  display: block;
+}
+
+.project-slide__title-num {
+  font-size: 0.4em;
+  color: var(--space-text-dim);
+  letter-spacing: 0.05em;
+  font-weight: 400;
+}
+
+/* ── Details (desc, techs, links) ────────────────────── */
+
+.project-slide__details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.project-slide__desc {
+  max-width: 28vw;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--space-text-dim);
+  margin: 0;
+}
+
+/* ── Tech tags ───────────────────────────────────────── */
+
+.project-slide__techs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.project-slide__tech-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  color: var(--space-accent);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.project-slide__tech-tag:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.project-slide__tech-tag svg {
+  font-size: 0.85rem;
+}
+
+/* ── Links ───────────────────────────────────────────── */
+
+.project-slide__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.project-slide__link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--space-accent);
+  text-decoration: none;
+  padding: 0.5rem 0;
+  transition: color 0.3s ease;
+}
+
+.project-slide__link:hover {
+  color: var(--space-text);
+}
+
+.project-slide__link-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--space-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.project-slide__link:hover .project-slide__link-line {
+  transform: scaleX(1);
+}
+
+.project-slide__link--disabled {
+  color: var(--space-text-dim);
+  cursor: default;
+  opacity: 0.6;
+}
+
+.project-slide__link svg {
+  font-size: 1rem;
+}
+
+/* ── Scroll indicator ────────────────────────────────── */
+
+.project-slide__scroll-indicator {
+  position: absolute;
+  right: -60px;
+  bottom: 3.5vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  overflow: hidden;
+}
+
+.project-slide__scroll-line {
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--space-accent-2) 50%,
+    transparent 100%
+  );
+  animation: scroll-pulse 2s ease-in-out infinite;
+}
+
+@keyframes scroll-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scaleY(0.6);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scaleY(1);
+  }
+}
+
+/* ── Image column ────────────────────────────────────── */
+
+.project-slide__image-wrap {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 160vh;
+}
+
+.project-slide__img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  filter: brightness(0.7) contrast(1.1);
+  transition: filter 0.6s ease;
+}
+
+.project-slide:hover .project-slide__img {
+  filter: brightness(0.85) contrast(1.05);
+}
+
+.project-slide__img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   Responsive — Mobile / Tablet
+   ═══════════════════════════════════════════════════════ */
+
+@media all and (max-width: 768px) {
+  .project-slide {
+    display: block;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  .project-slide:nth-of-type(even) {
+    flex-direction: row;
+  }
+
+  .project-slide__col {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  .project-slide__col--content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .project-slide__col--image {
+    position: absolute;
+    z-index: 0;
+    left: 0;
+    top: 0;
+    height: 100%;
+  }
+
+  .project-slide__content {
+    width: 85%;
+    padding: 8vw 6vw 12vw;
+    background: rgba(0, 0, 0, 0.82) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .project-slide__title {
+    font-size: clamp(1.6rem, 10vw, 3rem);
+    margin-bottom: 6vw;
+  }
+
+  .project-slide__desc {
+    max-width: 80vw;
+    font-size: 0.85rem;
+  }
+
+  .project-slide__scroll-indicator {
+    display: none;
+  }
+}
+
+@media all and (min-width: 769px) and (max-width: 1024px) {
+  .project-slide__title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .project-slide__desc {
+    max-width: 35vw;
+  }
+
+  .project-slide__content {
+    padding: 4vw 4vw 8vw;
+  }
+}

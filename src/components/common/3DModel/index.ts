@@ -1,1 +1,0 @@
-export { default as ThreeDHeader } from './3DHeader';

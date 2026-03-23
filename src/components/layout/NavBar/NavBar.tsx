@@ -1,129 +1,97 @@
 import { useState } from 'react';
-import { useTheme } from '../../../context';
-import { Link, useLocation } from 'react-router-dom';
+import SoundToggle from '../../ui/SoundToggle/SoundToggle';
+
+const navItems = [
+  { name: 'Home',       href: '#hero' },
+  { name: 'Skills',     href: '#skills' },
+  { name: 'Projects',   href: '#projects' },
+  { name: 'Experience', href: '#experience' },
+  { name: 'Contact',    href: '#contact' },
+];
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { darkMode } = useTheme();
-  const location = useLocation();
-  
-  // Estructura de navegación actualizada (quitando Contacto)
-  const navItems = [
-    { name: 'Inicio', href: '/' },
-    { name: 'Sobre mí', href: '/about' },
-    { name: 'CV', href: '/resume' }
-  ];
 
-  // Función para manejar la navegación
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    // Si el enlace es un ancla dentro de la página home, realizamos scroll suave
-    if (href.includes('#')) {
-      // Solo hacemos scroll si estamos en la página de inicio
-      if (location.pathname === '/') {
-        e.preventDefault();
-        const targetId = href.substring(href.indexOf('#') + 1);
-        const targetElement = document.getElementById(targetId);
-        
-        if (targetElement) {
-          // Ajustamos el desplazamiento para tener en cuenta la barra de navegación fija
-          const targetPosition = targetElement.offsetTop - 64;
-          
-          window.scrollTo({
-            top: targetPosition,
-            behavior: 'smooth'
-          });
-        }
-      }
-    }
-    
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
     setIsOpen(false);
-  };
-
-  // Función para determinar si un enlace está activo
-  const isActive = (href: string) => {
-    if (href === '/') {
-      return location.pathname === '/';
+    const id = href.replace('#', '');
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (window.__lenis) {
+      window.__lenis.scrollTo(el, { offset: -64, duration: 1.2 });
+    } else {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    return location.pathname.startsWith(href);
   };
 
   return (
     <nav className="relative">
-      {/* Menú para dispositivos móviles */}
+      {/* Mobile hamburger */}
       <div className="md:hidden">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`p-2 focus:outline-none ${darkMode ? 'text-white' : 'text-gray-800'}`}
-          aria-label="Menú"
+          className="p-2 focus:outline-none"
+          style={{ color: 'var(--space-text-dim)' }}
+          aria-label="Menu"
         >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {isOpen ? (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
             ) : (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
             )}
           </svg>
         </button>
 
-        {/* Menú desplegable en móvil */}
         {isOpen && (
-          <div 
-            className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 ${
-              darkMode 
-                ? 'bg-gray-700 text-white' 
-                : 'bg-white text-gray-900'
-            } ring-1 ring-black ring-opacity-5 z-50`}
+          <div
+            className="absolute right-0 mt-3 w-44 rounded-sm py-2 z-50"
+            style={{
+              background: 'rgba(0,0,0,0.9)',
+              backdropFilter: 'blur(24px)',
+              border: '1px solid rgba(255,255,255,0.07)',
+            }}
           >
             {navItems.map((item) => (
-              <Link
+              <a
                 key={item.name}
-                to={item.href}
-                className={`block px-4 py-2 text-sm ${
-                  isActive(item.href)
-                    ? `${darkMode ? 'bg-gray-800 text-blue-300' : 'bg-gray-100 text-blue-600'}`
-                    : `${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-50'}`
-                }`}
-                onClick={(e) => handleNavClick(e, item.href)}
+                href={item.href}
+                className="nav-link block px-5 py-3 text-[11px] uppercase tracking-[0.2em]"
+                style={{ color: 'var(--space-text-dim)' }}
+                onClick={(e) => handleClick(e, item.href)}
               >
                 {item.name}
-              </Link>
+              </a>
             ))}
+            <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', margin: '4px 20px' }} />
+            <div className="px-5 py-3 flex items-center gap-3">
+              <SoundToggle />
+              <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--space-text-dim)' }}>
+                Sound
+              </span>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Menú para escritorio */}
-      <div className="hidden md:flex space-x-8">
+      {/* Desktop links */}
+      <div className="hidden md:flex items-center gap-10">
         {navItems.map((item) => (
-          <Link
+          <a
             key={item.name}
-            to={item.href}
-            className={`text-sm font-medium ${
-              isActive(item.href)
-                ? `${darkMode ? 'text-blue-300' : 'text-blue-600'}`
-                : `${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900'}`
-            } transition-colors`}
-            onClick={(e) => handleNavClick(e, item.href)}
+            href={item.href}
+            className="nav-link text-[11px] uppercase tracking-[0.2em] font-medium"
+            style={{ color: 'var(--space-text-dim)' }}
+            onClick={(e) => handleClick(e, item.href)}
           >
             {item.name}
-          </Link>
+          </a>
         ))}
+
+        {/* Separator + sound toggle */}
+        <div style={{ width: '1px', height: '12px', background: 'rgba(255,255,255,0.12)' }} />
+        <SoundToggle />
       </div>
     </nav>
   );
