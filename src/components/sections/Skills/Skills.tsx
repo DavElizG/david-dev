@@ -62,8 +62,9 @@ const Skills = () => {
           const halfWidth = track.scrollWidth / 2;
           const isEven    = index % 2 === 0;
 
-          // ScrollTrigger range
-          const [stStart, stEnd] = isEven ? [0, -halfWidth] : [-halfWidth, 0];
+          // ScrollTrigger range — 0.35 factor → slower, subtler movement
+          const travel = halfWidth * 0.35;
+          const [stStart, stEnd] = isEven ? [0, -travel] : [-travel, 0];
 
           // Store a drag offset that compounds with scroll
           let dragOffset = 0;

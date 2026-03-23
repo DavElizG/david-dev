@@ -40,7 +40,13 @@ const Contact = () => {
               pin:     true,
               start:   'top top',
               end:     '+=150%',
+              invalidateOnRefresh: true,
             },
+          })
+          .to('.contact-bar', {
+            opacity:  1,
+            duration: 0.01,
+            stagger:  0,
           })
           .to('.contact-bar', {
             force3D:  true,
@@ -64,7 +70,7 @@ const Contact = () => {
 
     const timer = setTimeout(() => {
       if (!cancelled) { ScrollTrigger.refresh(); setup(); }
-    }, 150);
+    }, 300);
 
     return () => {
       cancelled = true;
