@@ -43,7 +43,7 @@ const frag = /* glsl */`
   uniform float uOffset;
 
   const float DISK_IN  = 2.6;
-  const float DISK_OUT = 7.0;
+  const float DISK_OUT = 9.0;
 
   /* ── Hash / noise ─────────────────────────────────────── */
   float hash(vec2 p) {
@@ -194,7 +194,6 @@ const frag = /* glsl */`
     vec3  pos         = uCamPos;
     vec3  prevPos     = uCamPos;
     float closestR    = 100.0;
-
     for (int i = 0; i < NSTEPS; i++) {
       prevPos = pos;
       pos    += vel * STEP;
@@ -233,8 +232,6 @@ const frag = /* glsl */`
 
     /* ── Event horizon: pure black ──────────────────────── */
     if (hitHorizon) {
-      /* Only keep disk light that was accumulated before falling in */
-      /* The shadow itself is black — no photon ring or glow inside */
       gl_FragColor = vec4(color, 1.0);
       return;
     }
@@ -334,9 +331,9 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
       const p = scrollProgressRef.current;          // 0 → 1
 
       /* Slow orbital rotation + scroll-driven zoom */
-      const orbitAngle = t * 0.06;
-      const r          = 10.0 - p * 8.0;            // 10 → 2.0 (deep into darkness)
-      const incline    = 8 * Math.PI / 180;         // near edge-on like Gargantua
+      const orbitAngle = t * 0.05 + p * Math.PI * 2.0; // 0 → 360° as you scroll
+      const r          = 9.0 - p * 8.0;            // 10 → 2.0 (deep into darkness)
+      const incline    = 8 * Math.PI / 180;        // Gargantua-like viewing angle
 
       camPos.set(
         r * Math.cos(incline) * Math.sin(orbitAngle),
