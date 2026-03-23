@@ -333,7 +333,7 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
       /* Slow orbital rotation + scroll-driven zoom */
       const orbitAngle = t * 0.05 + p * Math.PI * 2.0; // 0 → 360° as you scroll
       const r          = 9.0 - p * 8.0;            // 10 → 2.0 (deep into darkness)
-      const incline    = 8 * Math.PI / 180;        // Gargantua-like viewing angle
+      const incline    = 9 * Math.PI / 180;        // Gargantua-like viewing angle
 
       camPos.set(
         r * Math.cos(incline) * Math.sin(orbitAngle),
