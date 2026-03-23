@@ -1,85 +1,112 @@
+/**
+ * Contact.tsx — Bar-curtain reveal (CodePen elegantseagulls/wvMgXxN)
+ *
+ * Single set of 100 bars (50vw wide) that slide right on scroll,
+ * rotating 45° mid-travel. Two ghost labels split into "blocks".
+ * Content layer sits behind the bars and is revealed as they move.
+ */
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { usePersonalInfo } from '../../../hooks';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
-import ContactForm from '../../../components/common/ContactForm';
+import ContactForm from '../../common/ContactForm';
+import './Contact.css';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const BAR_COUNT = 100;
 
 const Contact = () => {
   const { personalInfo, loading } = usePersonalInfo();
+  const sectionRef = useRef<HTMLElement>(null);
+  const ctxRef     = useRef<gsap.Context | null>(null);
+
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    let cancelled = false;
+
+    const setup = () => {
+      ctxRef.current?.revert();
+      if (cancelled || !sectionRef.current) return;
+
+      ctxRef.current = gsap.context(() => {
+        gsap
+          .timeline({
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              scrub:   0.5,
+              pin:     true,
+              start:   'top top',
+              end:     '+=150%',
+            },
+          })
+          .to('.contact-bar', {
+            force3D:  true,
+            duration: 1,
+            xPercent: 100,
+            ease:     'power1.inOut',
+            stagger:  { amount: 1 },
+          })
+          .to('.contact-bar', {
+            ease:     'power1.out',
+            duration: 1,
+            rotation: '45deg',
+          }, 0)
+          .to('.contact-bar', {
+            ease:     'power1.in',
+            duration: 1,
+            rotation: '0deg',
+          }, 1);
+      }, sectionRef);
+    };
+
+    const timer = setTimeout(() => {
+      if (!cancelled) { ScrollTrigger.refresh(); setup(); }
+    }, 150);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      ctxRef.current?.revert();
+      ctxRef.current = null;
+    };
+  }, []);
 
   return (
-    <section
-      id="contact"
-      className="py-20"
-      style={{ color: 'var(--space-text)' }}
-    >
-      <div className="container mx-auto px-4">
-        <h2
-          className="text-3xl md:text-4xl font-bold text-center mb-3"
-          style={{ color: 'var(--space-text)' }}
-        >
-          Contact
-        </h2>
-        <p className="text-center text-sm mb-12" style={{ color: 'var(--space-text-dim)' }}>
-          Let's work together
-        </p>
+    <section id="contact" className="contact-section" ref={sectionRef}>
+      {/* Bars — white, slide right on scroll */}
+      {Array.from({ length: BAR_COUNT }).map((_, i) => (
+        <div key={i} className="contact-bar" />
+      ))}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact info card */}
-          <div
-            className="p-8 rounded-xl"
-            style={{
-              background: 'var(--space-surface)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-              border: '1px solid var(--space-border)',
-            }}
-          >
-            <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--space-text)' }}>
-              Contact information
-            </h3>
-            {loading ? (
-              <p style={{ color: 'var(--space-text-dim)' }}>Loading...</p>
-            ) : (
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <FaEnvelope className="text-xl mt-1 shrink-0" style={{ color: 'var(--space-accent)' }} />
-                  <div>
-                    <h4 className="font-medium" style={{ color: 'var(--space-text)' }}>Email</h4>
-                    <a
-                      href={`mailto:${personalInfo?.email}`}
-                      className="hover:underline transition-colors"
-                      style={{ color: 'var(--space-text-dim)' }}
-                    >
-                      {personalInfo?.email}
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <FaPhone className="text-xl mt-1 shrink-0" style={{ color: 'var(--space-accent)' }} />
-                  <div>
-                    <h4 className="font-medium" style={{ color: 'var(--space-text)' }}>Phone</h4>
-                    <a
-                      href="tel:+50685707955"
-                      className="hover:underline transition-colors"
-                      style={{ color: 'var(--space-text-dim)' }}
-                    >
-                      +506 8570 7955
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <FaMapMarkerAlt className="text-xl mt-1 shrink-0" style={{ color: 'var(--space-accent)' }} />
-                  <div>
-                    <h4 className="font-medium" style={{ color: 'var(--space-text)' }}>Location</h4>
-                    <p style={{ color: 'var(--space-text-dim)' }}>{personalInfo?.location}</p>
-                  </div>
-                </div>
+      {/* Content — behind bars */}
+      <div className="contact-content">
+        <div className="contact-panel contact-panel--info">
+          <span className="contact-panel__tag">Hablemos</span>
+          <h2 className="contact-panel__title">Contacto</h2>
+          <p className="contact-panel__sub">
+            Disponible para proyectos freelance y oportunidades laborales.
+          </p>
+          {!loading && personalInfo && (
+            <div className="contact-info-list">
+              <a href={`mailto:${personalInfo.email}`} className="contact-info-item">
+                <FaEnvelope />
+                <span>{personalInfo.email}</span>
+              </a>
+              <a href="tel:+50685707955" className="contact-info-item">
+                <FaPhone />
+                <span>+506 8570 7955</span>
+              </a>
+              <div className="contact-info-item">
+                <FaMapMarkerAlt />
+                <span>{personalInfo.location}</span>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
 
-          {/* Contact form */}
+        <div className="contact-panel contact-panel--form">
           <ContactForm darkMode={true} />
         </div>
       </div>
