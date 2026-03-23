@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SoundToggle from '../../ui/SoundToggle/SoundToggle';
 
 const navItems = [
   { name: 'Home',       href: '#hero' },
@@ -63,6 +64,13 @@ const NavBar = () => {
                 {item.name}
               </a>
             ))}
+            <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', margin: '4px 20px' }} />
+            <div className="px-5 py-3 flex items-center gap-3">
+              <SoundToggle />
+              <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--space-text-dim)' }}>
+                Sound
+              </span>
+            </div>
           </div>
         )}
       </div>
@@ -80,6 +88,10 @@ const NavBar = () => {
             {item.name}
           </a>
         ))}
+
+        {/* Separator + sound toggle */}
+        <div style={{ width: '1px', height: '12px', background: 'rgba(255,255,255,0.12)' }} />
+        <SoundToggle />
       </div>
     </nav>
   );
