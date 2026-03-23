@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import SoundToggle from '../../ui/SoundToggle/SoundToggle';
+import { useHoverSplitText } from '../../../hooks';
 
 const navItems = [
   { name: 'Home',       href: '#hero' },
@@ -8,6 +9,30 @@ const navItems = [
   { name: 'Experience', href: '#experience' },
   { name: 'Contact',    href: '#contact' },
 ];
+
+/** Desktop-only nav link with SplitText per-char hover scatter. */
+const NavItem = ({
+  item,
+  onClick,
+}: {
+  item: { name: string; href: string };
+  onClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void;
+}) => {
+  const linkRef = useRef<HTMLAnchorElement>(null);
+  useHoverSplitText(linkRef, { amplitude: 10, duration: 0.35 });
+
+  return (
+    <a
+      ref={linkRef}
+      href={item.href}
+      className="nav-link text-[11px] uppercase tracking-[0.2em] font-medium"
+      style={{ color: 'var(--space-text-dim)', position: 'relative', cursor: 'pointer' }}
+      onClick={(e) => onClick(e, item.href)}
+    >
+      <span className="hover-split__text">{item.name}</span>
+    </a>
+  );
+};
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -78,15 +103,7 @@ const NavBar = () => {
       {/* Desktop links */}
       <div className="hidden md:flex items-center gap-10">
         {navItems.map((item) => (
-          <a
-            key={item.name}
-            href={item.href}
-            className="nav-link text-[11px] uppercase tracking-[0.2em] font-medium"
-            style={{ color: 'var(--space-text-dim)' }}
-            onClick={(e) => handleClick(e, item.href)}
-          >
-            {item.name}
-          </a>
+          <NavItem key={item.name} item={item} onClick={handleClick} />
         ))}
 
         {/* Separator + sound toggle */}

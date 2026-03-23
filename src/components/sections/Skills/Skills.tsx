@@ -53,6 +53,8 @@ const Skills = () => {
       cancelAnimationFrame(rafRef.current);
       if (cancelled || !sectionRef.current) return;
 
+      const section = sectionRef.current;
+
       ctxRef.current = gsap.context(() => {
         /* ── Marquee scroll + Draggable ── */
         gsap.utils.toArray<HTMLElement>('.skills-marquee').forEach((el, index) => {
@@ -60,70 +62,88 @@ const Skills = () => {
           if (!track) return;
 
           const halfWidth = track.scrollWidth / 2;
-          const isEven    = index % 2 === 0;
+          if (halfWidth <= 0) return;
+          const isEven = index % 2 === 0;
+          // Slower — 0.25 factor vs previous 0.35
+          const travel = halfWidth * 0.25;
 
-          // ScrollTrigger range — 0.35 factor → slower, subtler movement
-          const travel = halfWidth * 0.35;
-          const [stStart, stEnd] = isEven ? [0, -travel] : [-travel, 0];
+          // Separate accumulators: scroll drives one, drag drives the other
+          let scrollProgress = 0;
+          let dragOffset     = 0;
 
-          // Store a drag offset that compounds with scroll
-          let dragOffset = 0;
+          const applyTransform = () => {
+            // Scroll contrib: even rows go 0→−travel, odd rows go −travel→0
+            const scrollX = isEven ? -scrollProgress * travel : -(1 - scrollProgress) * travel;
+            // Combine and wrap to [−halfWidth, 0] for seamless loop
+            const raw     = scrollX + dragOffset;
+            const wrapped = ((raw % halfWidth) + halfWidth) % halfWidth - halfWidth;
+            gsap.set(track, { x: wrapped });
+          };
 
-          // The scroll-driven tween
-          gsap.fromTo(track, { x: stStart }, {
-            x: stEnd,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start:   'top bottom',
-              end:     'bottom top',
-              scrub:   1,
-              onUpdate() {
-                // Apply combined transform: scroll position + drag offset, wrapped
-                const scrollX = gsap.getProperty(track, 'x') as number;
-                const combined = scrollX + dragOffset;
-                // Wrap into [-scrollWidth, 0] range for seamless loop
-                const total = track.scrollWidth / 2;
-                const wrapped = ((combined % total) + total) % total - total;
-                track.style.transform = `translateX(${wrapped}px)`;
-              },
+          // Set correct initial position immediately (no flash on entry)
+          {
+            const rect   = section.getBoundingClientRect();
+            const scrollH = section.scrollHeight - window.innerHeight;
+            if (scrollH > 0) {
+              scrollProgress = Math.max(0, Math.min(1, -rect.top / scrollH));
+            }
+            applyTransform();
+          }
+
+          // Scroll drives only the progress value — never touches track directly
+          ScrollTrigger.create({
+            trigger: section,
+            start:   'top bottom',
+            end:     'bottom top',
+            scrub:   1.5,
+            onUpdate(self) {
+              scrollProgress = self.progress;
+              applyTransform();
+            },
+            onRefresh(self) {
+              scrollProgress = self.progress;
+              applyTransform();
             },
           });
 
-          // Make the track draggable via an invisible proxy
-          // The proxy accumulates x offset; we read deltaX to shift the track
-          const proxy = document.createElement('div');
-          el.appendChild(proxy);
-          gsap.set(proxy, { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, zIndex: 5 });
+          // Invisible drag layer on top of the marquee row
+          const dragProxy = document.createElement('div');
+          el.appendChild(dragProxy);
+          gsap.set(dragProxy, {
+            position: 'absolute',
+            top: 0, left: 0,
+            width: '100%', height: '100%',
+            opacity: 0,
+            zIndex: 5,
+          });
 
-          Draggable.create(proxy, {
-            type: 'x',
-            inertia: true,
-            cursor: 'grab',
-            activeCursor: 'grabbing',
+          Draggable.create(dragProxy, {
+            type:           'x',
+            inertia:        true,
+            cursor:         'grab',
+            activeCursor:   'grabbing',
             edgeResistance: 0,
             onDrag() {
               dragOffset += this.deltaX;
-              const total = track.scrollWidth / 2;
-              dragOffset = ((dragOffset % total) + total) % total - total;
-              track.style.transform = `translateX(${dragOffset}px)`;
+              applyTransform();
             },
             onThrowUpdate() {
               dragOffset += this.deltaX;
-              const total = track.scrollWidth / 2;
-              dragOffset = ((dragOffset % total) + total) % total - total;
-              track.style.transform = `translateX(${dragOffset}px)`;
+              applyTransform();
+            },
+            onThrowComplete() {
+              // Reset proxy so deltaX stays accurate on the next drag
+              gsap.set(dragProxy, { x: 0 });
             },
           });
-
-          // Reset proxy so its x doesn't shift the marquee container
-          gsap.set(proxy, { x: 0 });
         });
 
         /* ── 3D fold smooth scroll ── */
         const centerContent = document.getElementById('skills-center-content');
         const centerFold    = centerFoldRef.current;
-        const foldContents  = Array.from(document.querySelectorAll<HTMLElement>('.skills-fold-content'));
+        const foldContents  = Array.from(
+          section.querySelectorAll<HTMLElement>('.skills-fold-content')
+        );
 
         if (centerContent && centerFold && foldContents.length) {
           let targetY  = 0;
@@ -131,14 +151,10 @@ const Skills = () => {
 
           const tick = () => {
             const overflowH = centerContent.clientHeight - centerFold.clientHeight;
-            const section   = sectionRef.current;
-            if (!section) { rafRef.current = requestAnimationFrame(tick); return; }
-
-            const rect   = section.getBoundingClientRect();
-            const progress = -rect.top / (section.scrollHeight - window.innerHeight);
-            targetY = -progress * overflowH;
+            const rect      = section.getBoundingClientRect();
+            const progress  = -rect.top / (section.scrollHeight - window.innerHeight);
+            targetY   = -progress * overflowH;
             currentY += (targetY - currentY) * 0.1;
-
             foldContents.forEach(c => {
               c.style.transform = `translateY(${currentY}px)`;
             });
@@ -146,15 +162,12 @@ const Skills = () => {
           };
           rafRef.current = requestAnimationFrame(tick);
         }
-      }, sectionRef);
+      }, section);
     };
 
     const timer = setTimeout(() => {
-      if (!cancelled) {
-        ScrollTrigger.refresh();
-        setup();
-      }
-    }, 100);
+      if (!cancelled) setup();
+    }, 150);
 
     return () => {
       cancelled = true;

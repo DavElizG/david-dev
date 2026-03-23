@@ -9,3 +9,4 @@ export * from './useAboutInfo';
 export * from './useSoftSkills';
 export * from './useTechSkills';
 export * from './useLenis';
+export * from './useHoverSplitText';

@@ -178,11 +178,9 @@ const Footer = () => {
     const split = splitsRef.current[rowId];
     if (!split?.chars) return;
 
-    gsap.to(split.chars, {
-      y: -5,
-      duration: 0.35,
-      stagger: { amount: 0.25, from: 'start' },
-      ease: 'power2.out',
+    // Per-char random y scatter — the chars fly up unique amounts
+    split.chars.forEach((c) => {
+      gsap.to(c, { y: -(8 + Math.random() * 18), duration: 0.35, ease: 'power2.out' });
     });
 
     const textEl = footerRef.current?.querySelector<HTMLElement>(`[data-row-id="${rowId}"]`);
