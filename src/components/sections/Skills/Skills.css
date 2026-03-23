@@ -1,0 +1,237 @@
+/* ═══════════════════════════════════════════════════
+   Skills — Marquee + 3D Fold Effect
+   Dark space theme adaptation
+   ═══════════════════════════════════════════════════ */
+
+.skills-section {
+  position: relative;
+  min-height: 100vh;
+  background: var(--space-bg);
+  overflow: hidden;
+  padding: 6rem 0 0;
+}
+
+/* ── Section Header ── */
+.skills-header {
+  text-align: center;
+  padding: 0 2rem 4rem;
+  position: relative;
+  z-index: 5;
+}
+
+.skills-header__tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  color: var(--space-accent);
+  margin-bottom: 1.2rem;
+}
+
+.skills-header__title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--space-text) 0%, var(--space-accent) 55%, var(--space-accent-2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.15;
+  margin: 0 0 1rem;
+}
+
+.skills-header__sub {
+  font-size: 1rem;
+  color: var(--space-text-dim);
+  max-width: 38ch;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ── Loading ── */
+.skills-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+}
+
+/* ── 3D Fold Screen ── */
+.skills-screen {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 4rem;
+}
+
+.skills-wrapper-3d {
+  position: relative;
+  perspective: 20vw;
+  transform-style: preserve-3d;
+}
+
+/* ── Fold panels ── */
+.skills-fold {
+  overflow: hidden;
+  width: 100vw;
+}
+
+.skills-fold--center {
+  height: 65vh;
+}
+
+.skills-fold--top {
+  position: absolute;
+  transform-origin: bottom center;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 65vh;
+  transform: rotateX(-120deg);
+}
+
+.skills-fold--bottom {
+  position: absolute;
+  transform-origin: top center;
+  right: 0;
+  left: 0;
+  top: 100%;
+  height: 65vh;
+  transform: rotateX(120deg);
+}
+
+.skills-fold__align {
+  width: 100%;
+  height: 100%;
+}
+
+.skills-fold--bottom .skills-fold__align {
+  transform: translateY(-100%);
+}
+
+.skills-fold--top .skills-fold__align {
+  transform: translateY(100%);
+}
+
+/* ── Marquee rows ── */
+.skills-marquee {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  font-weight: 700;
+  height: calc(100px + 3rem);
+  overflow: hidden;
+  position: relative;
+  width: 100vw;
+}
+
+.skills-track {
+  height: 100%;
+  overflow: hidden;
+  padding: 1.5rem 0;
+  position: absolute;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.skills-track__segment {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+/* Category label (dimmed) */
+.skills-track__label {
+  color: rgba(255, 255, 255, 0.08);
+  font-weight: 900;
+  font-size: 1em;
+  margin-right: 0.3em;
+  user-select: none;
+}
+
+.skills-track__label.-focus {
+  color: var(--space-accent);
+  opacity: 0.6;
+}
+
+/* Tech item — icon + name */
+.skills-track__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  margin: 0 0.5em;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.4em;
+  font-weight: 600;
+  padding: 0.3em 0.8em;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.35s ease;
+  white-space: nowrap;
+}
+
+.skills-track__item:hover {
+  color: var(--space-text);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 16px 2px rgba(255, 255, 255, 0.08);
+  transform: scale(1.08);
+}
+
+.skills-track__icon {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.4em;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.skills-track__item:hover .skills-track__icon {
+  opacity: 1;
+}
+
+.skills-track__name {
+  letter-spacing: 0.02em;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .skills-marquee {
+    height: calc(70px + 2rem);
+    font-size: clamp(1.8rem, 4vw, 3rem);
+  }
+
+  .skills-track__item {
+    font-size: 0.5em;
+    padding: 0.25em 0.6em;
+    gap: 0.25em;
+  }
+
+  .skills-fold--center,
+  .skills-fold--top,
+  .skills-fold--bottom {
+    height: 50vh;
+  }
+
+  .skills-header {
+    padding: 0 1.5rem 3rem;
+  }
+
+  .skills-section {
+    padding: 4rem 0 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .skills-marquee {
+    height: calc(55px + 1.5rem);
+    font-size: 1.6rem;
+  }
+
+  .skills-track__item {
+    font-size: 0.55em;
+    margin: 0 0.3em;
+  }
+}
