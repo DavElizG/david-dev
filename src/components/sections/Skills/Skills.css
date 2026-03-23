@@ -6,7 +6,8 @@
 .skills-section {
   position: relative;
   background: var(--space-bg);
-  overflow: visible;
+  overflow: hidden;
+  z-index: 2;
 }
 
 /* ShootingStars inside section — absolute instead of fixed */

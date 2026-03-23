@@ -13,6 +13,7 @@
   height: 100vh;
   overflow: hidden;
   background: var(--space-bg);
+  z-index: 1;
 }
 
 /* ShootingStars inside section — absolute instead of fixed */
