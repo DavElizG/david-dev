@@ -214,7 +214,9 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
           style={{
             fontSize: 'clamp(3.5rem, 10vw, 9rem)',
             letterSpacing: '-0.02em',
-            background: 'linear-gradient(135deg, #ffffff 0%, #d4d4d4 50%, #8a8a8a 100%)',
+            background: darkMode
+              ? 'linear-gradient(135deg, #ffffff 0%, #d4d4d4 50%, #8a8a8a 100%)'
+              : 'linear-gradient(135deg, #1a1a1a 0%, #2e2e2e 50%, #555555 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
@@ -226,7 +228,7 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
         {/* Title */}
         <p
           className="text-base md:text-xl font-light tracking-[0.05em]"
-          style={{ color: 'rgba(255,255,255,0.65)' }}
+          style={{ color: darkMode ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.55)' }}
         >
           {title}
         </p>
