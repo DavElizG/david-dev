@@ -149,13 +149,13 @@ const Footer = () => {
       });
     }, footer);
 
-    /* Mouse parallax on ghost watermark */
+    /* Parallax on ghost watermark — mouse + touch */
     const ghost = footer.querySelector<HTMLElement>('.footer-ghost');
-    const onMouse = (e: MouseEvent) => {
+    const applyParallax = (clientX: number, clientY: number) => {
       if (!ghost) return;
       const rect = footer.getBoundingClientRect();
-      const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-      const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+      const nx = ((clientX - rect.left) / rect.width - 0.5) * 2;
+      const ny = ((clientY - rect.top) / rect.height - 0.5) * 2;
       gsap.to(ghost, {
         x: nx * 30,
         y: ny * 15,
@@ -164,10 +164,17 @@ const Footer = () => {
         overwrite: 'auto',
       });
     };
+    const onMouse = (e: MouseEvent) => applyParallax(e.clientX, e.clientY);
+    const onTouch = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (t) applyParallax(t.clientX, t.clientY);
+    };
     footer.addEventListener('mousemove', onMouse);
+    footer.addEventListener('touchmove', onTouch, { passive: true });
 
     return () => {
       footer.removeEventListener('mousemove', onMouse);
+      footer.removeEventListener('touchmove', onTouch);
       ctxRef.current?.revert();
       splitsRef.current = {};
     };
@@ -271,6 +278,8 @@ const Footer = () => {
               className="footer-row"
               onMouseEnter={() => handleRowEnter(row.id)}
               onMouseLeave={() => handleRowLeave(row.id)}
+              onTouchStart={() => handleRowEnter(row.id)}
+              onTouchEnd={() => handleRowLeave(row.id)}
               onClick={() => navigateTo(row.id)}
               onKeyDown={(e) => { if (e.key === 'Enter') navigateTo(row.id); }}
               role="link"

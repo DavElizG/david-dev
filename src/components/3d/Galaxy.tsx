@@ -180,14 +180,17 @@ const Galaxy = ({ scrollProgressRef }: GalaxyProps) => {
     renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
 
     const scene  = new THREE.Scene();
+    const aspect = canvas.clientWidth / canvas.clientHeight;
+    const isNarrow = aspect < 1;
     const camera = new THREE.PerspectiveCamera(
-      50,
-      canvas.clientWidth / canvas.clientHeight,
+      isNarrow ? 62 : 50,
+      aspect,
       0.1,
       100,
     );
-    /* Slightly overhead so the spiral is visible */
-    camera.position.set(0, 4, 9);
+    /* Slightly overhead so the spiral is visible;
+       pull back on narrow/portrait screens to avoid cropping. */
+    camera.position.set(0, isNarrow ? 5 : 4, isNarrow ? 11 : 9);
     camera.lookAt(0, 0, 0);
 
     /* ── Galaxy group (all layers rotate together) ──── */
@@ -227,6 +230,10 @@ const Galaxy = ({ scrollProgressRef }: GalaxyProps) => {
       const h = canvas.clientHeight;
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
+      const narrow = w < h;
+      camera.fov = narrow ? 62 : 50;
+      camera.position.set(0, narrow ? 5 : 4, narrow ? 11 : 9);
+      camera.lookAt(0, 0, 0);
       camera.updateProjectionMatrix();
     });
     ro.observe(canvas);

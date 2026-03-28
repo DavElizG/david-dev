@@ -348,14 +348,14 @@ const JourneySection = () => {
       {/* ── Galaxy — fixed, centered, large ── */}
       <div
         ref={galaxyContainerRef}
+        className="journey-galaxy-container"
         style={{
           position:      'fixed',
           top:           '50%',
           left:          '50%',
           transform:     'translate(-50%, -50%)',
-          width:         '74vw',
-          maxWidth:      '960px',
-          height:        '74vh',
+          width:         'min(90vw, 960px)',
+          height:        '80vh',
           pointerEvents: 'none',
           zIndex:        3,
         }}

@@ -228,6 +228,9 @@ const frag = /* glsl */`
           totalAlpha = totalAlpha + dcol.a * (1.0 - totalAlpha);
         }
       }
+
+      /* Early out once disk fully occludes the ray */
+      if (totalAlpha > 0.99) break;
     }
 
     /* ── Event horizon: pure black ──────────────────────── */
@@ -239,7 +242,7 @@ const frag = /* glsl */`
     /* ── Photon ring — only for escaped rays that grazed close ── */
     /* Very thin, bright ring right at the photon sphere r ≈ 1.5  */
     float photonDist = abs(closestR - 1.5);
-    float photonRing = exp(-photonDist * photonDist * 80.0) * 1.2;
+    float photonRing = exp(-photonDist * photonDist * 50.0) * 1.2;
     color += vec3(1.0, 0.95, 0.85) * photonRing * (1.0 - totalAlpha);
 
     /* ── Background stars ──────────────────────────────── */
@@ -277,7 +280,7 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
       return; // WebGL unavailable — SceneErrorBoundary will hide the canvas
     }
 
-    const dpr = Math.min(window.devicePixelRatio, 1.0);
+    const dpr = Math.min(window.devicePixelRatio, 1.5);
     renderer.setPixelRatio(dpr);
     renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
 
