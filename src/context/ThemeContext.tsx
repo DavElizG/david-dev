@@ -1,4 +1,5 @@
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 
 interface ThemeContextType {
   darkMode: boolean;
@@ -12,14 +13,22 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  // Fixed dark space theme — always dark
-  const value: ThemeContextType = {
-    darkMode: true,
-    toggleDarkMode: () => {},
-  };
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    const stored = localStorage.getItem('theme');
+    // Default to dark if no preference stored
+    return stored ? stored === 'dark' : true;
+  });
+
+  /* Keep <html data-theme> in sync so CSS variables update globally */
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+  }, [darkMode]);
+
+  const toggleDarkMode = () => setDarkMode(prev => !prev);
 
   return (
-    <ThemeContext.Provider value={value}>
+    <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -27,10 +36,8 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
 export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
-
   if (context === undefined) {
     throw new Error('useTheme debe ser usado dentro de un ThemeProvider');
   }
-
   return context;
 };

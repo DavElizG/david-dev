@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { usePersonalInfo } from '../../../hooks';
+import { useTheme } from '../../../context';
 
 gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
 
@@ -24,6 +25,7 @@ interface HeroSectionProps {
 
 const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
   const { personalInfo } = usePersonalInfo();
+  const { darkMode } = useTheme();
   const sectionRef   = useRef<HTMLElement>(null);
   const textRef      = useRef<HTMLDivElement>(null);
   const scrollRef    = useRef<HTMLDivElement>(null);
@@ -137,7 +139,7 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
             />
           </div>
 
-          <div className="w-full h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
+          <div className="w-full h-px" style={{ background: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
 
           {/* Role */}
           <div className="flex flex-col items-end gap-0.5">
@@ -149,7 +151,7 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
             </span>
           </div>
 
-          <div className="w-full h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
+          <div className="w-full h-px" style={{ background: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
 
           {/* Description */}
           <p className="text-right text-[11px] leading-[1.9]" style={{ color: 'var(--space-text-dim)', maxWidth: '160px' }}>
@@ -158,7 +160,7 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
             with precision.
           </p>
 
-          <div className="w-full h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
+          <div className="w-full h-px" style={{ background: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
 
           {/* Tech stack */}
           <div className="flex flex-col items-end gap-1.5">
@@ -169,7 +171,7 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
             ))}
           </div>
 
-          <div className="w-full h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
+          <div className="w-full h-px" style={{ background: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
 
           {/* Stats */}
           <div className="flex gap-6">
@@ -198,8 +200,8 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
           className="text-[10px] uppercase tracking-[0.4em] mb-5 px-4 py-1.5 rounded-full"
           style={{
             color: 'var(--space-accent-2)',
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            background: darkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+            border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
           }}
         >
           Full Stack Developer
@@ -224,7 +226,7 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
         {/* Title */}
         <p
           className="text-base md:text-xl font-light tracking-[0.05em]"
-          style={{ color: 'var(--space-text-dim)' }}
+          style={{ color: 'rgba(255,255,255,0.65)' }}
         >
           {title}
         </p>

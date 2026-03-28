@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 import SoundToggle from '../../ui/SoundToggle/SoundToggle';
+import ThemeToggle from '../../ui/ThemeToggle/ThemeToggle';
 import { useHoverSplitText } from '../../../hooks';
+import { useTheme } from '../../../context';
 
 const navItems = [
   { name: 'Home',       href: '#hero' },
@@ -36,6 +38,7 @@ const NavItem = ({
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { darkMode } = useTheme();
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
@@ -73,9 +76,9 @@ const NavBar = () => {
           <div
             className="absolute right-0 mt-3 w-44 rounded-sm py-2 z-50"
             style={{
-              background: 'rgba(0,0,0,0.9)',
+              background: darkMode ? 'rgba(0,0,0,0.9)' : 'rgba(240,240,240,0.95)',
               backdropFilter: 'blur(24px)',
-              border: '1px solid rgba(255,255,255,0.07)',
+              border: darkMode ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(0,0,0,0.08)',
             }}
           >
             {navItems.map((item) => (
@@ -89,12 +92,17 @@ const NavBar = () => {
                 {item.name}
               </a>
             ))}
-            <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', margin: '4px 20px' }} />
-            <div className="px-5 py-3 flex items-center gap-3">
-              <SoundToggle />
-              <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--space-text-dim)' }}>
-                Sound
-              </span>
+            <div style={{ height: '1px', background: darkMode ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.08)', margin: '4px 20px' }} />
+            <div className="px-5 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <SoundToggle />
+                <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--space-text-dim)' }}>Sound</span>
+              </div>
+              <div style={{ width: '1px', height: '12px', background: darkMode ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.12)' }} />
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--space-text-dim)' }}>Theme</span>
+              </div>
             </div>
           </div>
         )}
@@ -106,9 +114,10 @@ const NavBar = () => {
           <NavItem key={item.name} item={item} onClick={handleClick} />
         ))}
 
-        {/* Separator + sound toggle */}
-        <div style={{ width: '1px', height: '12px', background: 'rgba(255,255,255,0.12)' }} />
+        {/* Separator + controls */}
+        <div style={{ width: '1px', height: '12px', background: darkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.15)' }} />
         <SoundToggle />
+        <ThemeToggle />
       </div>
     </nav>
   );

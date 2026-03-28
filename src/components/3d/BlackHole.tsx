@@ -15,6 +15,7 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import type { MutableRefObject } from 'react';
+import { useTheme } from '../../context';
 
 /* ──────────────────────────────────────────────────────────────────────────
    VERTEX SHADER — trivial passthrough; clip-space quad fills screen exactly
@@ -30,7 +31,7 @@ const vert = /* glsl */`
    ────────────────────────────────────────────────────────────────────────── */
 const frag = /* glsl */`
   #define STEP    0.08
-  #define NSTEPS  180
+  #define NSTEPS  400
   #define PI      3.14159265358979323846
   #define TAU     6.28318530717958647692
 
@@ -41,6 +42,7 @@ const frag = /* glsl */`
   uniform vec3  uCamUp;
   uniform float uFov;
   uniform float uOffset;
+  uniform float uLightMode;  /* 0.0 = dark, 1.0 = light */
 
   const float DISK_IN  = 2.6;
   const float DISK_OUT = 9.0;
@@ -195,17 +197,8 @@ const frag = /* glsl */`
     vec3  prevPos     = uCamPos;
     float closestR    = 100.0;
     for (int i = 0; i < NSTEPS; i++) {
-      /* Adaptive step: very fine near the photon sphere for a crisp ring,
-         coarse in the far empty field where no detail exists.            */
-      float rPre = length(pos);
-      float stepSize;
-      if      (rPre < 2.5)  stepSize = STEP * 0.35;  /* photon sphere region */
-      else if (rPre < 6.0)  stepSize = STEP;           /* disk region          */
-      else if (rPre < 10.0) stepSize = STEP * 2.0;    /* outer disk / near    */
-      else                   stepSize = STEP * 3.5;    /* far empty space      */
-
       prevPos = pos;
-      pos    += vel * stepSize;
+      pos    += vel * STEP;
 
       float r2 = dot(pos, pos);
       float r  = sqrt(r2);
@@ -213,7 +206,7 @@ const frag = /* glsl */`
       if (!hitHorizon) closestR = min(closestR, r);
 
       /* Geodesic acceleration */
-      vel += -1.5 * h2 / (r2 * r2 * r) * pos * stepSize;
+      vel += -1.5 * h2 / (r2 * r2 * r) * pos * STEP;
 
       /* Event horizon — pure black, no glow leaks */
       if (r < 1.0) {
@@ -221,7 +214,7 @@ const frag = /* glsl */`
         break;
       }
 
-      if (r > 18.0) break;
+      if (r > 30.0) break;
 
       /* Accretion disk — y = 0 plane crossing */
       if (prevPos.y * pos.y < 0.0) {
@@ -237,13 +230,13 @@ const frag = /* glsl */`
           totalAlpha = totalAlpha + dcol.a * (1.0 - totalAlpha);
         }
       }
-
-      /* Early out once disk fully occludes the ray */
-      if (totalAlpha > 0.99) break;
     }
 
-    /* ── Event horizon: pure black ──────────────────────── */
+    /* ── Event horizon: no light escapes ───────────────────────────── */
     if (hitHorizon) {
+      /* Keep accumulated disk light (natural wrap-around).
+         In light mode, invert same as the rest of the image. */
+      color = mix(color, 1.0 - color, uLightMode);
       gl_FragColor = vec4(color, 1.0);
       return;
     }
@@ -251,7 +244,7 @@ const frag = /* glsl */`
     /* ── Photon ring — only for escaped rays that grazed close ── */
     /* Very thin, bright ring right at the photon sphere r ≈ 1.5  */
     float photonDist = abs(closestR - 1.5);
-    float photonRing = exp(-photonDist * photonDist * 50.0) * 1.2;
+    float photonRing = exp(-photonDist * photonDist * 80.0) * 1.2;
     color += vec3(1.0, 0.95, 0.85) * photonRing * (1.0 - totalAlpha);
 
     /* ── Background stars ──────────────────────────────── */
@@ -262,6 +255,11 @@ const frag = /* glsl */`
     /* ── Tone mapping (Reinhard) ──────────────────────── */
     color = color / (1.0 + color * 0.35);
     color = pow(color, vec3(0.94));
+
+    /* ── Light mode: invert the whole image ─────────────
+       Background 0→1 (white), bright disk→dark blue disk,
+       bright stars→dark specks, bright ring→dark ring.    */
+    color = mix(color, 1.0 - color, uLightMode);
 
     gl_FragColor = vec4(color, 1.0);
   }
@@ -275,7 +273,16 @@ interface BlackHoleProps {
 }
 
 const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const uniformsRef  = useRef<Record<string, THREE.IUniform> | null>(null);
+  const { darkMode } = useTheme();
+
+  /* Update the shader uniform whenever the theme toggles — no WebGL rebuild */
+  useEffect(() => {
+    if (uniformsRef.current) {
+      uniformsRef.current.uLightMode.value = darkMode ? 0.0 : 1.0;
+    }
+  }, [darkMode]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -312,9 +319,11 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
       uCamPos: { value: new THREE.Vector3(0, 1.8, 10) },
       uCamDir: { value: new THREE.Vector3(0, -1.8, -10).normalize() },
       uCamUp:  { value: new THREE.Vector3(0, 1, 0) },
-      uFov:    { value: 55.0 },
-      uOffset: { value: 0.6 },  // shift black hole left; eases to 0 on scroll
+      uFov:      { value: 55.0 },
+      uOffset:   { value: 0.6 },  // shift black hole left; eases to 0 on scroll
+      uLightMode: { value: document.documentElement.getAttribute('data-theme') === 'light' ? 1.0 : 0.0 },
     };
+    uniformsRef.current = uniforms;
 
     /* ── Fullscreen quad ─────────────────────────────── */
     const material = new THREE.ShaderMaterial({
