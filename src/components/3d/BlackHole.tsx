@@ -30,7 +30,7 @@ const vert = /* glsl */`
    ────────────────────────────────────────────────────────────────────────── */
 const frag = /* glsl */`
   #define STEP    0.08
-  #define NSTEPS  400
+  #define NSTEPS  180
   #define PI      3.14159265358979323846
   #define TAU     6.28318530717958647692
 
@@ -195,8 +195,17 @@ const frag = /* glsl */`
     vec3  prevPos     = uCamPos;
     float closestR    = 100.0;
     for (int i = 0; i < NSTEPS; i++) {
+      /* Adaptive step: very fine near the photon sphere for a crisp ring,
+         coarse in the far empty field where no detail exists.            */
+      float rPre = length(pos);
+      float stepSize;
+      if      (rPre < 2.5)  stepSize = STEP * 0.35;  /* photon sphere region */
+      else if (rPre < 6.0)  stepSize = STEP;           /* disk region          */
+      else if (rPre < 10.0) stepSize = STEP * 2.0;    /* outer disk / near    */
+      else                   stepSize = STEP * 3.5;    /* far empty space      */
+
       prevPos = pos;
-      pos    += vel * STEP;
+      pos    += vel * stepSize;
 
       float r2 = dot(pos, pos);
       float r  = sqrt(r2);
@@ -204,7 +213,7 @@ const frag = /* glsl */`
       if (!hitHorizon) closestR = min(closestR, r);
 
       /* Geodesic acceleration */
-      vel += -1.5 * h2 / (r2 * r2 * r) * pos * STEP;
+      vel += -1.5 * h2 / (r2 * r2 * r) * pos * stepSize;
 
       /* Event horizon — pure black, no glow leaks */
       if (r < 1.0) {
@@ -212,7 +221,7 @@ const frag = /* glsl */`
         break;
       }
 
-      if (r > 30.0) break;
+      if (r > 18.0) break;
 
       /* Accretion disk — y = 0 plane crossing */
       if (prevPos.y * pos.y < 0.0) {
@@ -280,7 +289,12 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
       return; // WebGL unavailable — SceneErrorBoundary will hide the canvas
     }
 
-    const dpr = Math.min(window.devicePixelRatio, 1.5);
+    /* Pixel budget: keep rendered pixels ≤ 1.5M so the GPU stays at 60 fps.
+       On large / high-DPI screens this scales DPR down automatically.       */
+    const computeDpr = (w: number, h: number) =>
+      Math.min(window.devicePixelRatio, Math.max(Math.sqrt(1_500_000 / (w * h)), 0.5));
+
+    let dpr = computeDpr(canvas.clientWidth, canvas.clientHeight);
     renderer.setPixelRatio(dpr);
     renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
 
@@ -317,6 +331,8 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
     const ro = new ResizeObserver(() => {
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
+      dpr = computeDpr(w, h);
+      renderer.setPixelRatio(dpr);
       renderer.setSize(w, h, false);
       uniforms.uResolution.value.set(w * dpr, h * dpr);
     });
@@ -325,12 +341,18 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
     /* ── Animation loop ──────────────────────────────── */
     const camPos = new THREE.Vector3();
     const camDir = new THREE.Vector3();
-    const startMs = Date.now();
+    const startMs = performance.now();
     let animId: number;
+    /* Cap at 60 fps — on 120/144 Hz screens rAF fires at screen rate,
+       which doubles GPU work with no visible benefit.                  */
+    const FRAME_MS = 1000 / 60;
+    let lastFrameTime = 0;
 
-    const animate = () => {
+    const animate = (now: DOMHighResTimeStamp) => {
       animId = requestAnimationFrame(animate);
-      const t = (Date.now() - startMs) / 1000;
+      if (now - lastFrameTime < FRAME_MS - 0.5) return;
+      lastFrameTime = now;
+      const t = (now - startMs) / 1000;
       const p = scrollProgressRef.current;          // 0 → 1
 
       /* Slow orbital rotation + scroll-driven zoom */
@@ -353,7 +375,7 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
 
       renderer.render(scene, dummyCam);
     };
-    animate();
+    animate(performance.now());
 
     return () => {
       cancelAnimationFrame(animId);
