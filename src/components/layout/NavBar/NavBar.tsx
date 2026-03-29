@@ -1,16 +1,9 @@
 import { useRef, useState } from 'react';
 import SoundToggle from '../../ui/SoundToggle/SoundToggle';
 import ThemeToggle from '../../ui/ThemeToggle/ThemeToggle';
+import LanguageToggle from '../../ui/LanguageToggle/LanguageToggle';
 import { useHoverSplitText } from '../../../hooks';
-import { useTheme } from '../../../context';
-
-const navItems = [
-  { name: 'Home',       href: '#hero' },
-  { name: 'Skills',     href: '#skills' },
-  { name: 'Projects',   href: '#projects' },
-  { name: 'Experience', href: '#experience' },
-  { name: 'Contact',    href: '#contact' },
-];
+import { useTheme, useLanguage } from '../../../context';
 
 /** Desktop-only nav link with SplitText per-char hover scatter. */
 const NavItem = ({
@@ -39,6 +32,15 @@ const NavItem = ({
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { darkMode } = useTheme();
+  const { t } = useLanguage();
+
+  const navItems = [
+    { name: t.nav.home,       href: '#hero' },
+    { name: t.nav.skills,     href: '#skills' },
+    { name: t.nav.projects,   href: '#projects' },
+    { name: t.nav.experience, href: '#experience' },
+    { name: t.nav.contact,    href: '#contact' },
+  ];
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
@@ -96,13 +98,17 @@ const NavBar = () => {
             <div className="px-5 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <SoundToggle />
-                <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--space-text-dim)' }}>Sound</span>
+                <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--space-text-dim)' }}>{t.navbar.sound}</span>
               </div>
               <div style={{ width: '1px', height: '12px', background: darkMode ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.12)' }} />
               <div className="flex items-center gap-2">
                 <ThemeToggle />
-                <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--space-text-dim)' }}>Theme</span>
+                <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--space-text-dim)' }}>{t.navbar.theme}</span>
               </div>
+            </div>
+            <div style={{ height: '1px', background: darkMode ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.08)', margin: '4px 20px' }} />
+            <div className="px-5 py-3 flex justify-center">
+              <LanguageToggle />
             </div>
           </div>
         )}
@@ -118,6 +124,7 @@ const NavBar = () => {
         <div style={{ width: '1px', height: '12px', background: darkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.15)' }} />
         <SoundToggle />
         <ThemeToggle />
+        <LanguageToggle />
       </div>
     </nav>
   );

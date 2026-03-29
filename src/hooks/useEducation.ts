@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { getAllEducation, getEducationById } from '../services';
+import { useLanguage } from '../context';
 import { Education } from '../types/education.types';
 
 export function useEducation() {
+  const { language } = useLanguage();
   const [education, setEducation] = useState<Education[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -11,11 +13,11 @@ export function useEducation() {
     const fetchEducation = async () => {
       try {
         setLoading(true);
-        const data = await getAllEducation();
+        const data = await getAllEducation(language);
         setEducation(data);
         setError(null);
       } catch (err) {
-        setError('Error al cargar la información educativa');
+        setError('Error loading education data');
         console.error(err);
       } finally {
         setLoading(false);
@@ -23,21 +25,16 @@ export function useEducation() {
     };
 
     fetchEducation();
-  }, []);
+  }, [language]);
 
   const getById = async (id: number): Promise<Education | undefined> => {
     try {
-      return await getEducationById(id);
+      return await getEducationById(id, language);
     } catch (err) {
-      console.error(`Error al buscar educación con ID ${id}:`, err);
+      console.error(`Error fetching education ID ${id}:`, err);
       return undefined;
     }
   };
 
-  return {
-    education,
-    loading,
-    error,
-    getById
-  };
+  return { education, loading, error, getById };
 }

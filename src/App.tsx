@@ -2,7 +2,7 @@ import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import SmoothScroll from './components/common/SmoothScroll'
 import { SEO } from './components/common'
-import { ThemeProvider } from './context'
+import { ThemeProvider, LanguageProvider } from './context'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { lazy, Suspense, useState } from 'react'
 import { HelmetProvider } from 'react-helmet-async'
@@ -60,11 +60,13 @@ function AppContent() {
 function App() {
   return (
     <HelmetProvider>
-      <ThemeProvider>
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </ThemeProvider>
+      <LanguageProvider>
+        <ThemeProvider>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </ThemeProvider>
+      </LanguageProvider>
     </HelmetProvider>
   );
 }

@@ -1,0 +1,104 @@
+[
+  {
+    "id_skill": 1,
+    "category": "Frontend",
+    "items": [
+      {
+        "id_tech": 1,
+        "name": "HTML5",
+        "icon": "html5",
+        "url": "https://developer.mozilla.org/es/docs/Web/HTML"
+      },
+      {
+        "id_tech": 2,
+        "name": "CSS3",
+        "icon": "css3",
+        "url": "https://developer.mozilla.org/es/docs/Web/CSS"
+      },
+      {
+        "id_tech": 3,
+        "name": "JavaScript",
+        "icon": "javascript",
+        "url": "https://developer.mozilla.org/es/docs/Web/JavaScript"
+      },
+      {
+        "id_tech": 4,
+        "name": "React",
+        "icon": "react",
+        "url": "https://es.react.dev/"
+      },
+      {
+        "id_tech": 5,
+        "name": "TypeScript",
+        "icon": "typescript",
+        "url": "https://www.typescriptlang.org/docs/"
+      },
+      {
+        "id_tech": 6,
+        "name": "Tailwind CSS",
+        "icon": "tailwindcss",
+        "url": "https://tailwindcss.com/docs"
+      }
+    ]
+  },
+  {
+    "id_skill": 2,
+    "category": "Backend",
+    "items": [
+      {
+        "id_tech": 7,
+        "name": ".NET C#",
+        "icon": "dotnet",
+        "url": "https://learn.microsoft.com/es-es/dotnet/csharp/"
+      },
+      {
+        "id_tech": 8,
+        "name": "SQL Server",
+        "icon": "sqlserver",
+        "url": "https://learn.microsoft.com/es-es/sql/sql-server/"
+      },
+      {
+        "id_tech": 9,
+        "name": "MySQL",
+        "icon": "mysql",
+        "url": "https://dev.mysql.com/doc/"
+      }
+    ]
+  },
+  {
+    "id_skill": 3,
+    "category": "Herramientas",
+    "items": [
+      {
+        "id_tech": 10,
+        "name": "Git",
+        "icon": "git",
+        "url": "https://git-scm.com/doc"
+      },
+      {
+        "id_tech": 11,
+        "name": "GitHub",
+        "icon": "github",
+        "url": "https://docs.github.com/es"
+      },
+      {
+        "id_tech": 12,
+        "name": "VS Code",
+        "icon": "visualstudiocode",
+        "url": "https://code.visualstudio.com/docs"
+      },
+      {
+        "id_tech": 13,
+        "name": "Visual Studio",
+        "icon": "visualstudio",
+        "url": "https://learn.microsoft.com/es-es/visualstudio/windows/"
+      },
+      {
+        "id_tech": 14,
+        "name": "Figma",
+        "icon": "figma",
+        "url": "https://help.figma.com/hc/"
+      }
+    ]
+  }
+]

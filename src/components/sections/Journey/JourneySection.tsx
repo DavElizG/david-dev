@@ -25,7 +25,7 @@ import { ScrollTrigger }    from 'gsap/ScrollTrigger';
 import { SplitText }        from 'gsap/SplitText';
 import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
 import { useEducation, useExperience } from '../../../hooks';
-import { useTheme }         from '../../../context';
+import { useTheme } from '../../../context';
 import type { JourneyEntry } from './journey.types';
 import TrackLine  from './TrackLine';
 import IntroPanel from './IntroPanel';

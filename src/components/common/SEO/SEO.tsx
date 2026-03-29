@@ -1,5 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useLanguage } from '../../../context';
 
 interface SEOProps {
   title?: string;
@@ -13,17 +14,19 @@ interface SEOProps {
   ogDescription?: string;
 }
 
-const SEO: React.FC<SEOProps> = ({
-  title = 'Jose Guadamuz | Desarrollador Web',
-  description = 'Portafolio de Jose David Guadamuz, desarrollador web con experiencia en React, TypeScript, .NET y más tecnologías.',
-  keywords = 'desarrollador web, frontend, backend, React, TypeScript, .NET, Jose Guadamuz, programador',
-  author = 'Jose David Guadamuz',
-  ogType = 'website',
-  ogUrl = 'https://daveliz.me',
-  ogImage = '/assets/JDSnoppyLogo-BD0TpMFU.webp',
-  ogTitle,
-  ogDescription,
-}) => {
+const SEO: React.FC<SEOProps> = (props) => {
+  const { t } = useLanguage();
+  const {
+    title = t.seo.title,
+    description = t.seo.description,
+    keywords = t.seo.keywords,
+    author = 'Jose David Guadamuz',
+    ogType = 'website',
+    ogUrl = 'https://daveliz.me',
+    ogImage = '/assets/JDSnoppyLogo-BD0TpMFU.webp',
+    ogTitle,
+    ogDescription,
+  } = props;
   const metaTitle = title;
   const metaOgTitle = ogTitle || title;
   const metaOgDescription = ogDescription || description;
@@ -51,7 +54,7 @@ const SEO: React.FC<SEOProps> = ({
 
       {/* Additional meta tags for SEO */}
       <meta name="robots" content="index, follow" />
-      <meta name="language" content="Spanish" />
+      <meta name="language" content="en, es" />
       <meta charSet="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="canonical" href={ogUrl} />

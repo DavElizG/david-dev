@@ -1,0 +1,22 @@
+[
+  {
+    "id_experience": 1,
+    "role": "Software Developer",
+    "company": "Independent Developer",
+    "location": "Guanacaste, Costa Rica",
+    "startDate": "January 2024",
+    "endDate": "Present",
+    "description": "Development of custom web applications and systems. Implementation of agile methodologies for project management. Creation of comprehensive solutions with both frontend and backend technologies for various clients.",
+    "technologies": ["React", "Tailwind CSS", "TypeScript", ".NET C#", "Node.js", "SQL Server", "MongoDB", "Scrum"]
+  },
+  {
+    "id_experience": 2,
+    "role": "Technical Training",
+    "company": "INA - Instituto Nacional de Aprendizaje",
+    "location": "Santa Cruz, Guanacaste",
+    "startDate": "May 2023",
+    "endDate": "November 2023",
+    "description": "Business Strategies for Young Entrepreneurs program. 252-hour technical qualification including business plan development, digital marketing and technology project management.",
+    "technologies": ["Entrepreneurship", "Digital Marketing", "Project Management"]
+  }
+]

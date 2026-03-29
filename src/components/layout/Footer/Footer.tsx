@@ -4,24 +4,17 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { usePersonalInfo } from '../../../hooks';
-import { useTheme } from '../../../context';
+import { useTheme, useLanguage } from '../../../context';
 import { FaGithub, FaLinkedin, FaEnvelope, FaArrowUp } from 'react-icons/fa';
 import './Footer.css';
 
 gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin);
 
-const navRows = [
-  { id: 'hero',       label: 'HOME' },
-  { id: 'skills',     label: 'SKILLS' },
-  { id: 'projects',   label: 'PROJECTS' },
-  { id: 'experience', label: 'EXPERIENCE' },
-  { id: 'contact',    label: 'CONTACT' },
-];
-
 type LenisScrollTo = { scrollTo: (target: HTMLElement | number, opts: object) => void };
 
 const Footer = () => {
   const { personalInfo, loading } = usePersonalInfo();
+  const { t } = useLanguage();
   const currentYear = new Date().getFullYear();
   const displayName = loading ? 'David Guadamuz' : personalInfo?.name || 'David Guadamuz';
   const displayEmail = loading ? '' : personalInfo?.email || '';
@@ -183,6 +176,14 @@ const Footer = () => {
 
   const { darkMode } = useTheme();
 
+  const navRows = [
+    { id: 'hero',       label: t.nav.home.toUpperCase() },
+    { id: 'skills',     label: t.nav.skills.toUpperCase() },
+    { id: 'projects',   label: t.nav.projects.toUpperCase() },
+    { id: 'experience', label: t.nav.experience.toUpperCase() },
+    { id: 'contact',    label: t.nav.contact.toUpperCase() },
+  ];
+
   /* ── Row hover handlers ── */
   const handleRowEnter = (rowId: string) => {
     const split = splitsRef.current[rowId];
@@ -315,7 +316,7 @@ const Footer = () => {
         <aside className="footer-info">
           {/* Social block */}
           <div className="footer-info__block">
-            <span className="footer-info__label">Social</span>
+            <span className="footer-info__label">{t.footer.social}</span>
             <div className="footer-info__links">
               <a
                 href={getSocialUrl('github')}
@@ -342,7 +343,7 @@ const Footer = () => {
 
           {/* Contact block */}
           <div className="footer-info__block">
-            <span className="footer-info__label">Contacto</span>
+            <span className="footer-info__label">{t.nav.contact}</span>
             <div className="footer-info__links">
               {displayEmail && (
                 <a
@@ -363,7 +364,7 @@ const Footer = () => {
           {/* Location block */}
           {!loading && personalInfo?.location && (
             <div className="footer-info__block">
-              <span className="footer-info__label">Ubicación</span>
+              <span className="footer-info__label">{t.hero.location}</span>
               <p className="footer-info__detail">{personalInfo.location}</p>
             </div>
           )}
@@ -376,7 +377,7 @@ const Footer = () => {
         <button
           className="footer-bottom__top"
           onClick={scrollToTop}
-          aria-label="Volver arriba"
+          aria-label={t.footer.backToTop}
         >
           <FaArrowUp />
           <span>TOP</span>

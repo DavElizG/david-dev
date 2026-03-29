@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { useLanguage } from '../../../context';
 
 interface LoaderProps {
   onComplete: () => void;
@@ -12,6 +13,7 @@ const DELAY_PER_PATH = 0.22;
 const MORPH_DURATION = 0.95;
 
 const Loader = ({ onComplete }: LoaderProps) => {
+  const { t } = useLanguage();
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const countRef   = useRef<HTMLSpanElement>(null);
@@ -99,7 +101,7 @@ const Loader = ({ onComplete }: LoaderProps) => {
       /* ── Main timeline ───────────────────────────────────── */
       gsap.timeline({
         onComplete: () => {
-          if (statusRef.current) statusRef.current.textContent = 'READY';
+          if (statusRef.current) statusRef.current.textContent = t.loader.ready;
 
           gsap.timeline()
             .to(contentRef.current, { opacity: 0, y: -8, duration: 0.3, ease: 'power2.in' })
@@ -242,7 +244,7 @@ const Loader = ({ onComplete }: LoaderProps) => {
         }}>
           <span style={{ color: 'rgba(255,255,255,0.18)' }}>David Guadamuz</span>
           <div style={{ width: '1px', height: '9px', background: 'rgba(255,255,255,0.15)' }} />
-          <span ref={statusRef} style={{ color: 'rgba(255,255,255,0.1)' }}>LOADING</span>
+          <span ref={statusRef} style={{ color: 'rgba(255,255,255,0.1)' }}>{t.loader.loading}</span>
         </div>
       </div>
 

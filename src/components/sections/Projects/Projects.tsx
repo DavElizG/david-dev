@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { FaGithub, FaExternalLinkAlt, FaServer, FaLock } from 'react-icons/fa';
 import { getTechIcon } from '../../../utils/iconUtils';
 import { useProjects } from '../../../hooks';
+import { useLanguage } from '../../../context';
 import './Projects.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -14,6 +15,7 @@ interface ProjectsProps {
 
 const Projects: React.FC<ProjectsProps> = ({ featured = false }) => {
   const { projects, loading, error } = useProjects();
+  const { t } = useLanguage();
   const sectionRef = useRef<HTMLDivElement>(null);
   const ctxRef = useRef<gsap.Context | null>(null);
 
@@ -130,9 +132,9 @@ const Projects: React.FC<ProjectsProps> = ({ featured = false }) => {
       {/* Section header */}
       <div className="project-slides__header">
         <h2 className="project-slides__heading">
-          {featured ? 'Featured Projects' : 'Projects'}
+          {featured ? t.projects.featuredHeading : t.projects.heading}
         </h2>
-        <p className="project-slides__subheading">Selected work</p>
+        <p className="project-slides__subheading">{t.projects.subheading}</p>
       </div>
 
       {loading ? (
@@ -183,7 +185,7 @@ const Projects: React.FC<ProjectsProps> = ({ featured = false }) => {
                       className="project-slide__link"
                     >
                       <FaGithub />
-                      <span>Repository</span>
+                      <span>{t.projects.repository}</span>
                       <div className="project-slide__link-line" />
                     </a>
 
@@ -195,7 +197,7 @@ const Projects: React.FC<ProjectsProps> = ({ featured = false }) => {
                         className="project-slide__link"
                       >
                         <FaServer />
-                        <span>Backend</span>
+                        <span>{t.projects.backend}</span>
                         <div className="project-slide__link-line" />
                       </a>
                     )}
@@ -203,7 +205,7 @@ const Projects: React.FC<ProjectsProps> = ({ featured = false }) => {
                     {project.isPrivate ? (
                       <span className="project-slide__link project-slide__link--disabled">
                         <FaLock />
-                        <span>Private</span>
+                        <span>{t.projects.private}</span>
                       </span>
                     ) : (
                       <a
@@ -213,7 +215,7 @@ const Projects: React.FC<ProjectsProps> = ({ featured = false }) => {
                         className="project-slide__link"
                       >
                         <FaExternalLinkAlt />
-                        <span>Live Demo</span>
+                        <span>{t.projects.liveDemo}</span>
                         <div className="project-slide__link-line" />
                       </a>
                     )}

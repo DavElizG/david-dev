@@ -1,6 +1,7 @@
 import React from 'react';
 import type { JourneyEntry } from './journey.types';
 import { ACCENT, ACCENT2, TEXT, TEXT_DIM } from './journey.constants';
+import { useLanguage } from '../../../context';
 
 interface EntryPanelProps {
   entry:   JourneyEntry;
@@ -10,6 +11,7 @@ interface EntryPanelProps {
 
 const EntryPanel = React.forwardRef<HTMLDivElement, EntryPanelProps>(
   ({ entry, index, darkMode }, ref) => {
+    const { t } = useLanguage();
     const isEdu       = entry.type === 'education';
     const dotColor    = isEdu ? ACCENT : ACCENT2;
     const cardBg      = darkMode
@@ -72,7 +74,7 @@ const EntryPanel = React.forwardRef<HTMLDivElement, EntryPanelProps>(
               padding:       '4px 14px',
               borderRadius:  '999px',
             }}>
-              {isEdu ? 'Educación' : 'Experiencia'}
+              {isEdu ? t.journey.education : t.journey.experience}
             </span>
             <span style={{
               fontSize:           '0.85rem',
