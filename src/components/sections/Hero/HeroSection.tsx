@@ -36,6 +36,8 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
   useEffect(() => {
     let scramblePlayed = false;
 
+    if (nameRef.current) nameRef.current.textContent = '';
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -48,7 +50,10 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             scrollProgressRef.current = self.progress;
-            if (self.progress < 0.3) scramblePlayed = false;
+            if (self.progress < 0.3) {
+              scramblePlayed = false;
+              if (nameRef.current) nameRef.current.textContent = '';
+            }
             if (self.progress >= 0.52 && !scramblePlayed && nameRef.current) {
               scramblePlayed = true;
               gsap.to(nameRef.current, {

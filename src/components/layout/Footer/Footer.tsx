@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { usePersonalInfo } from '../../../hooks';
+import { useTheme } from '../../../context';
 import { FaGithub, FaLinkedin, FaEnvelope, FaArrowUp } from 'react-icons/fa';
 import './Footer.css';
 
@@ -180,6 +181,8 @@ const Footer = () => {
     };
   }, []);
 
+  const { darkMode } = useTheme();
+
   /* ── Row hover handlers ── */
   const handleRowEnter = (rowId: string) => {
     const split = splitsRef.current[rowId];
@@ -192,9 +195,13 @@ const Footer = () => {
 
     const textEl = footerRef.current?.querySelector<HTMLElement>(`[data-row-id="${rowId}"]`);
     if (textEl) {
+      const hoverColor      = darkMode ? '#fff' : '#111';
+      const hoverShadow      = darkMode
+        ? '0 0 40px rgba(255,255,255,0.12), 0 0 80px rgba(255,255,255,0.04)'
+        : '0 0 30px rgba(0,0,0,0.08), 0 0 60px rgba(0,0,0,0.03)';
       gsap.to(textEl, {
-        color: '#fff',
-        textShadow: '0 0 40px rgba(255,255,255,0.12), 0 0 80px rgba(255,255,255,0.04)',
+        color: hoverColor,
+        textShadow: hoverShadow,
         duration: 0.4,
       });
     }
@@ -203,7 +210,7 @@ const Footer = () => {
     if (indexEl) {
       gsap.to(indexEl, {
         duration: 0.5,
-        color: '#fff',
+        color: darkMode ? '#fff' : '#111',
         scrambleText: {
           text: indexEl.dataset.original || '',
           chars: '▪▫■□▬░▒▓',

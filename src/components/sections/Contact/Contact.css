@@ -386,3 +386,93 @@
     padding-top: 2rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════
+   Light mode overrides
+   ═══════════════════════════════════════════════════ */
+[data-theme="light"] .contact-scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.012) 2px,
+    rgba(0, 0, 0, 0.012) 4px
+  );
+}
+
+[data-theme="light"] .contact-hud__corner {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .contact-hud__line {
+  background: rgba(0, 0, 0, 0.025);
+}
+
+[data-theme="light"] .contact-hud__line--h::after {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 80px,
+    rgba(0, 0, 0, 0.04) 80px,
+    rgba(0, 0, 0, 0.04) 81px
+  );
+}
+
+[data-theme="light"] .contact-hud__line--v::after {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 80px,
+    rgba(0, 0, 0, 0.04) 80px,
+    rgba(0, 0, 0, 0.04) 81px
+  );
+}
+
+[data-theme="light"] .contact-status__label {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="light"] .contact-status__coord {
+  color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .contact-quote {
+  color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .contact-grid-overlay {
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
+
+[data-theme="light"] .contact-datastream__line {
+  color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .contact-datastream__line:nth-child(odd) {
+  color: rgba(0, 0, 0, 0.09);
+}
+
+[data-theme="light"] .contact-panel--form {
+  border-left-color: rgba(0, 0, 0, 0.07);
+}
+
+[data-theme="light"] .contact-panel--form input,
+[data-theme="light"] .contact-panel--form textarea {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .contact-panel--form button[type="submit"] {
+  border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-theme="light"] .contact-panel--form button[type="submit"]:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: var(--space-accent) !important;
+}
+
+@media (max-width: 768px) {
+  [data-theme="light"] .contact-panel--form {
+    border-top-color: rgba(0, 0, 0, 0.07);
+  }
+}

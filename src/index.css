@@ -22,7 +22,7 @@
 }
 
 [data-theme="light"] {
-  --space-bg:         #f0f0f0;
+  --space-bg:         #ffffff;
   --space-surface:    rgba(0, 0, 0, 0.04);
   --space-surface-2:  rgba(0, 0, 0, 0.07);
   --space-border:     rgba(0, 0, 0, 0.12);
@@ -207,4 +207,12 @@ body {
   animation-iteration-count: infinite;
   pointer-events:            none;
   will-change:               transform, opacity;
+}
+
+[data-theme="light"] .shooting-star {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(0,0,0,0.15) 20%,
+    rgba(0,0,0,0.55) 70%,
+    transparent 100%);
 }

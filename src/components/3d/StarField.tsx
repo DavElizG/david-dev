@@ -5,9 +5,11 @@
  * to match the aurora theme. No animation loop — fully static for near-zero CPU cost.
  */
 import { useEffect, useRef } from 'react';
+import { useTheme } from '../../context';
 
 const StarField = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -68,6 +70,7 @@ const StarField = () => {
         height:        '100%',
         pointerEvents: 'none',
         display:       'block',
+        filter:        darkMode ? 'none' : 'invert(1)',
       }}
     />
   );

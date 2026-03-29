@@ -412,3 +412,93 @@
     text-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
   }
 }
+
+/* ═══════════════════════════════════════════════════
+   Light mode overrides
+   ═══════════════════════════════════════════════════ */
+[data-theme="light"] .footer-scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.012) 2px,
+    rgba(0, 0, 0, 0.012) 4px
+  );
+}
+
+[data-theme="light"] .footer-hud__corner {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .footer-hud__line {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .footer-hud__line--h::after {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 60px,
+    rgba(0, 0, 0, 0.05) 60px,
+    rgba(0, 0, 0, 0.05) 61px
+  );
+}
+
+[data-theme="light"] .footer-hud__line--v::after {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 60px,
+    rgba(0, 0, 0, 0.05) 60px,
+    rgba(0, 0, 0, 0.05) 61px
+  );
+}
+
+[data-theme="light"] .footer-row {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .footer-row:first-child {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .footer-row:hover,
+[data-theme="light"] .footer-row:focus-visible,
+[data-theme="light"] .footer-row:active {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="light"] .footer-row__line {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.12) 0%, transparent 100%);
+}
+
+[data-theme="light"] .footer-info__label {
+  border-bottom-color: rgba(0, 0, 0, 0.07);
+}
+
+[data-theme="light"] .footer-bottom__top {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .footer-bottom__top:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Ghost watermark — visible on white background */
+[data-theme="light"] .footer-ghost {
+  color: rgba(0, 0, 0, 0.06);
+  text-shadow: none;
+}
+
+@media (max-width: 768px) {
+  [data-theme="light"] .footer-ghost {
+    color: rgba(0, 0, 0, 0.07);
+  }
+}
+
+@media (max-width: 480px) {
+  [data-theme="light"] .footer-ghost {
+    color: rgba(0, 0, 0, 0.08);
+    text-shadow: none;
+  }
+}

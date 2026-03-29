@@ -14,6 +14,7 @@
  */
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { useTheme } from '../../context';
 import type { MutableRefObject } from 'react';
 
 interface GalaxyProps {
@@ -163,6 +164,7 @@ function createScatter(tex: THREE.Texture): THREE.Points {
 
 const Galaxy = ({ scrollProgressRef }: GalaxyProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -290,6 +292,7 @@ const Galaxy = ({ scrollProgressRef }: GalaxyProps) => {
         height:        '100%',
         pointerEvents: 'none',
         display:       'block',
+        filter:        darkMode ? 'none' : 'invert(1)',
       }}
     />
   );
