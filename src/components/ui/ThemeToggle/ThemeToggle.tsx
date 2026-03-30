@@ -7,7 +7,7 @@ const ThemeToggle = () => {
 
   return (
     <button
-      onClick={toggleDarkMode}
+      onClick={(e) => toggleDarkMode(e)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}

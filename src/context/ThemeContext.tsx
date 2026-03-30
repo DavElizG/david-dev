@@ -1,9 +1,10 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import type { ReactNode } from 'react';
 
 interface ThemeContextType {
   darkMode: boolean;
-  toggleDarkMode: () => void;
+  toggleDarkMode: (e?: React.MouseEvent | MouseEvent) => void;
+  morphKey: number;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -15,20 +16,25 @@ interface ThemeProviderProps {
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     const stored = localStorage.getItem('theme');
-    // Default to dark if no preference stored
     return stored ? stored === 'dark' : true;
   });
 
-  /* Keep <html data-theme> in sync so CSS variables update globally */
+  const morphKeyRef = useRef(0);
+  const [morphKey, setMorphKey] = useState(0);
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
     localStorage.setItem('theme', darkMode ? 'dark' : 'light');
   }, [darkMode]);
 
-  const toggleDarkMode = () => setDarkMode(prev => !prev);
+  const toggleDarkMode = useCallback((_e?: React.MouseEvent | MouseEvent) => {
+    morphKeyRef.current += 1;
+    setMorphKey(morphKeyRef.current);
+    setDarkMode((prev) => !prev);
+  }, []);
 
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
+    <ThemeContext.Provider value={{ darkMode, toggleDarkMode, morphKey }}>
       {children}
     </ThemeContext.Provider>
   );

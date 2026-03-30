@@ -16,6 +16,8 @@ const en = {
     software: 'Software',
     engineer: 'Engineer',
     description: 'Crafting scalable\nweb experiences\nwith precision.',
+    years: 'Years',
+    projects: 'Projects',
     scroll: 'Scroll',
     copyright: `© ${new Date().getFullYear()}`,
     location: 'Costa Rica',

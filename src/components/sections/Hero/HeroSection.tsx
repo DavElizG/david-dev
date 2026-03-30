@@ -183,11 +183,11 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
           <div className="flex gap-6">
             <div className="text-right">
               <p className="text-base font-light leading-none" style={{ color: 'var(--space-accent)' }}>3+</p>
-              <p className="text-[9px] uppercase tracking-[0.25em] mt-1" style={{ color: 'var(--space-text-dim)' }}>Years</p>
+              <p className="text-[9px] uppercase tracking-[0.25em] mt-1" style={{ color: 'var(--space-text-dim)' }}>{t.hero.years}</p>
             </div>
             <div className="text-right">
               <p className="text-base font-light leading-none" style={{ color: 'var(--space-accent)' }}>8+</p>
-              <p className="text-[9px] uppercase tracking-[0.25em] mt-1" style={{ color: 'var(--space-text-dim)' }}>Projects</p>
+              <p className="text-[9px] uppercase tracking-[0.25em] mt-1" style={{ color: 'var(--space-text-dim)' }}>{t.hero.projects}</p>
             </div>
           </div>
         </div>
@@ -210,7 +210,7 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
             border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
           }}
         >
-          Full Stack Developer
+          {t.hero.badge}
         </span>
 
         {/* Name */}
