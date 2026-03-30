@@ -4,23 +4,17 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { usePersonalInfo } from '../../../hooks';
+import { useTheme, useLanguage } from '../../../context';
 import { FaGithub, FaLinkedin, FaEnvelope, FaArrowUp } from 'react-icons/fa';
 import './Footer.css';
 
 gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin);
 
-const navRows = [
-  { id: 'hero',       label: 'HOME' },
-  { id: 'skills',     label: 'SKILLS' },
-  { id: 'projects',   label: 'PROJECTS' },
-  { id: 'experience', label: 'EXPERIENCE' },
-  { id: 'contact',    label: 'CONTACT' },
-];
-
 type LenisScrollTo = { scrollTo: (target: HTMLElement | number, opts: object) => void };
 
 const Footer = () => {
   const { personalInfo, loading } = usePersonalInfo();
+  const { t } = useLanguage();
   const currentYear = new Date().getFullYear();
   const displayName = loading ? 'David Guadamuz' : personalInfo?.name || 'David Guadamuz';
   const displayEmail = loading ? '' : personalInfo?.email || '';
@@ -149,13 +143,13 @@ const Footer = () => {
       });
     }, footer);
 
-    /* Mouse parallax on ghost watermark */
+    /* Parallax on ghost watermark — mouse + touch */
     const ghost = footer.querySelector<HTMLElement>('.footer-ghost');
-    const onMouse = (e: MouseEvent) => {
+    const applyParallax = (clientX: number, clientY: number) => {
       if (!ghost) return;
       const rect = footer.getBoundingClientRect();
-      const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-      const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+      const nx = ((clientX - rect.left) / rect.width - 0.5) * 2;
+      const ny = ((clientY - rect.top) / rect.height - 0.5) * 2;
       gsap.to(ghost, {
         x: nx * 30,
         y: ny * 15,
@@ -164,14 +158,31 @@ const Footer = () => {
         overwrite: 'auto',
       });
     };
+    const onMouse = (e: MouseEvent) => applyParallax(e.clientX, e.clientY);
+    const onTouch = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (t) applyParallax(t.clientX, t.clientY);
+    };
     footer.addEventListener('mousemove', onMouse);
+    footer.addEventListener('touchmove', onTouch, { passive: true });
 
     return () => {
       footer.removeEventListener('mousemove', onMouse);
+      footer.removeEventListener('touchmove', onTouch);
       ctxRef.current?.revert();
       splitsRef.current = {};
     };
   }, []);
+
+  const { darkMode } = useTheme();
+
+  const navRows = [
+    { id: 'hero',       label: t.nav.home.toUpperCase() },
+    { id: 'skills',     label: t.nav.skills.toUpperCase() },
+    { id: 'projects',   label: t.nav.projects.toUpperCase() },
+    { id: 'experience', label: t.nav.experience.toUpperCase() },
+    { id: 'contact',    label: t.nav.contact.toUpperCase() },
+  ];
 
   /* ── Row hover handlers ── */
   const handleRowEnter = (rowId: string) => {
@@ -185,9 +196,13 @@ const Footer = () => {
 
     const textEl = footerRef.current?.querySelector<HTMLElement>(`[data-row-id="${rowId}"]`);
     if (textEl) {
+      const hoverColor      = darkMode ? '#fff' : '#111';
+      const hoverShadow      = darkMode
+        ? '0 0 40px rgba(255,255,255,0.12), 0 0 80px rgba(255,255,255,0.04)'
+        : '0 0 30px rgba(0,0,0,0.08), 0 0 60px rgba(0,0,0,0.03)';
       gsap.to(textEl, {
-        color: '#fff',
-        textShadow: '0 0 40px rgba(255,255,255,0.12), 0 0 80px rgba(255,255,255,0.04)',
+        color: hoverColor,
+        textShadow: hoverShadow,
         duration: 0.4,
       });
     }
@@ -196,7 +211,7 @@ const Footer = () => {
     if (indexEl) {
       gsap.to(indexEl, {
         duration: 0.5,
-        color: '#fff',
+        color: darkMode ? '#fff' : '#111',
         scrambleText: {
           text: indexEl.dataset.original || '',
           chars: '▪▫■□▬░▒▓',
@@ -271,6 +286,8 @@ const Footer = () => {
               className="footer-row"
               onMouseEnter={() => handleRowEnter(row.id)}
               onMouseLeave={() => handleRowLeave(row.id)}
+              onTouchStart={() => handleRowEnter(row.id)}
+              onTouchEnd={() => handleRowLeave(row.id)}
               onClick={() => navigateTo(row.id)}
               onKeyDown={(e) => { if (e.key === 'Enter') navigateTo(row.id); }}
               role="link"
@@ -299,7 +316,7 @@ const Footer = () => {
         <aside className="footer-info">
           {/* Social block */}
           <div className="footer-info__block">
-            <span className="footer-info__label">Social</span>
+            <span className="footer-info__label">{t.footer.social}</span>
             <div className="footer-info__links">
               <a
                 href={getSocialUrl('github')}
@@ -326,7 +343,7 @@ const Footer = () => {
 
           {/* Contact block */}
           <div className="footer-info__block">
-            <span className="footer-info__label">Contacto</span>
+            <span className="footer-info__label">{t.nav.contact}</span>
             <div className="footer-info__links">
               {displayEmail && (
                 <a
@@ -347,7 +364,7 @@ const Footer = () => {
           {/* Location block */}
           {!loading && personalInfo?.location && (
             <div className="footer-info__block">
-              <span className="footer-info__label">Ubicación</span>
+              <span className="footer-info__label">{t.hero.location}</span>
               <p className="footer-info__detail">{personalInfo.location}</p>
             </div>
           )}
@@ -360,7 +377,7 @@ const Footer = () => {
         <button
           className="footer-bottom__top"
           onClick={scrollToTop}
-          aria-label="Volver arriba"
+          aria-label={t.footer.backToTop}
         >
           <FaArrowUp />
           <span>TOP</span>

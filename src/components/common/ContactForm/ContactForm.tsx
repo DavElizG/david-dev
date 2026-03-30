@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { FormData, FormStatus } from '../../../types/contact.types';
 import HoverButton from '../HoverButton';
+import { useLanguage } from '../../../context';
 
 gsap.registerPlugin(ScrambleTextPlugin);
 
@@ -11,6 +12,7 @@ interface ContactFormProps {
 }
 
 const ContactForm = ({ darkMode }: ContactFormProps) => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -58,19 +60,19 @@ const ContactForm = ({ darkMode }: ContactFormProps) => {
     const newErrors: {[key: string]: string} = {};
     
     if (!formData.name.trim()) {
-      newErrors.name = 'El nombre es obligatorio';
+      newErrors.name = t.form.errorNameRequired;
     }
     
     if (!formData.email.trim()) {
-      newErrors.email = 'El correo electrónico es obligatorio';
+      newErrors.email = t.form.errorEmailRequired;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'El formato del correo electrónico no es válido';
+      newErrors.email = t.form.errorEmailInvalid;
     }
     
     if (!formData.message.trim()) {
-      newErrors.message = 'El mensaje es obligatorio';
+      newErrors.message = t.form.errorMessageRequired;
     } else if (formData.message.trim().length < 10) {
-      newErrors.message = 'El mensaje debe tener al menos 10 caracteres';
+      newErrors.message = t.form.errorMessageLength;
     }
     
     setErrors(newErrors);
@@ -84,22 +86,20 @@ const ContactForm = ({ darkMode }: ContactFormProps) => {
     if (!validateForm()) {
       setFormStatus({
         success: false,
-        message: 'Por favor corrige los errores en el formulario.'
+        message: t.form.errorGeneral
       });
       return;
     }
 
-    // Mostrar estado de "enviando"
     setFormStatus({
       success: undefined,
-      message: 'Enviando mensaje...'
+      message: t.form.sendingMessage
     });
 
-    // Simular envío de formulario (aquí implementarías la lógica real)
     setTimeout(() => {
       setFormStatus({
         success: true,
-        message: '¡Mensaje enviado correctamente! Te responderé pronto.'
+        message: t.form.successMessage
       });
       setFormData({ name: '', email: '', message: '' });
     }, 1500);
@@ -108,12 +108,12 @@ const ContactForm = ({ darkMode }: ContactFormProps) => {
   return (
     <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} p-8 rounded-lg shadow-md`}>
       <h3 ref={headingRef} className={`text-2xl font-semibold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-        Envíame un mensaje
+        {t.form.heading}
       </h3>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="name" className={`block mb-2 font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            Nombre
+            {t.form.name}
           </label>
           <input
             type="text"
@@ -126,14 +126,14 @@ const ContactForm = ({ darkMode }: ContactFormProps) => {
                 ? 'bg-gray-700 border-gray-600 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50' 
                 : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50'
             } ${errors.name ? 'border-red-500' : 'border'}`}
-            placeholder="Tu nombre"
+            placeholder={t.form.namePlaceholder}
           />
           {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
         </div>
         
         <div>
           <label htmlFor="email" className={`block mb-2 font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            Correo electrónico
+            {t.form.email}
           </label>
           <input
             type="email"
@@ -146,14 +146,14 @@ const ContactForm = ({ darkMode }: ContactFormProps) => {
                 ? 'bg-gray-700 border-gray-600 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50' 
                 : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50'
             } ${errors.email ? 'border-red-500' : 'border'}`}
-            placeholder="tu@email.com"
+            placeholder={t.form.emailPlaceholder}
           />
           {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
         </div>
         
         <div>
           <label htmlFor="message" className={`block mb-2 font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            Mensaje
+            {t.form.message}
           </label>
           <textarea
             id="message"
@@ -166,24 +166,24 @@ const ContactForm = ({ darkMode }: ContactFormProps) => {
                 ? 'bg-gray-700 border-gray-600 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50' 
                 : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50'
             } ${errors.message ? 'border-red-500' : 'border'}`}
-            placeholder="Escribe tu mensaje aquí..."
+            placeholder={t.form.messagePlaceholder}
           />
           {errors.message && <p className="mt-1 text-sm text-red-500">{errors.message}</p>}
         </div>
         
-        {formStatus?.message === 'Enviando mensaje...' ? (
+        {formStatus?.message === t.form.sendingMessage ? (
           <button
             type="submit"
             disabled
             className="w-full px-6 py-3 text-xs uppercase tracking-widest font-bold rounded-lg"
             style={{ border: '1px solid rgba(255,255,255,0.1)', color: 'var(--space-text-dim)', opacity: 0.5, cursor: 'not-allowed' }}
           >
-            Enviando...
+            {t.form.sending}
           </button>
         ) : (
           <HoverButton
             type="submit"
-            label="Enviar mensaje"
+            label={t.form.send}
             className="w-full"
           />
         )}

@@ -1,17 +1,12 @@
 import { fetchData } from './api';
+import type { Language } from '../context';
 import { Experience } from '../types/experience.types';
 
-/**
- * Obtiene toda la información de experiencia laboral
- */
-export async function getAllExperience(): Promise<Experience[]> {
-  return fetchData<Experience[]>('experience');
+export async function getAllExperience(language?: Language): Promise<Experience[]> {
+  return fetchData<Experience[]>('experience', language);
 }
 
-/**
- * Obtiene una experiencia específica por ID
- */
-export async function getExperienceById(id: number): Promise<Experience | undefined> {
-  const experience = await getAllExperience();
+export async function getExperienceById(id: number, language?: Language): Promise<Experience | undefined> {
+  const experience = await getAllExperience(language);
   return experience.find(item => item.id_experience === id);
 }

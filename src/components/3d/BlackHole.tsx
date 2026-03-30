@@ -15,6 +15,7 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import type { MutableRefObject } from 'react';
+import { useTheme } from '../../context';
 
 /* ──────────────────────────────────────────────────────────────────────────
    VERTEX SHADER — trivial passthrough; clip-space quad fills screen exactly
@@ -41,6 +42,7 @@ const frag = /* glsl */`
   uniform vec3  uCamUp;
   uniform float uFov;
   uniform float uOffset;
+  uniform float uLightMode;  /* 0.0 = dark, 1.0 = light */
 
   const float DISK_IN  = 2.6;
   const float DISK_OUT = 9.0;
@@ -230,8 +232,11 @@ const frag = /* glsl */`
       }
     }
 
-    /* ── Event horizon: pure black ──────────────────────── */
+    /* ── Event horizon: no light escapes ───────────────────────────── */
     if (hitHorizon) {
+      /* Keep accumulated disk light (natural wrap-around).
+         In light mode, invert same as the rest of the image. */
+      color = mix(color, 1.0 - color, uLightMode);
       gl_FragColor = vec4(color, 1.0);
       return;
     }
@@ -251,6 +256,11 @@ const frag = /* glsl */`
     color = color / (1.0 + color * 0.35);
     color = pow(color, vec3(0.94));
 
+    /* ── Light mode: invert the whole image ─────────────
+       Background 0→1 (white), bright disk→dark blue disk,
+       bright stars→dark specks, bright ring→dark ring.    */
+    color = mix(color, 1.0 - color, uLightMode);
+
     gl_FragColor = vec4(color, 1.0);
   }
 `;
@@ -263,7 +273,16 @@ interface BlackHoleProps {
 }
 
 const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const uniformsRef  = useRef<Record<string, THREE.IUniform> | null>(null);
+  const { darkMode } = useTheme();
+
+  /* Update the shader uniform whenever the theme toggles — no WebGL rebuild */
+  useEffect(() => {
+    if (uniformsRef.current) {
+      uniformsRef.current.uLightMode.value = darkMode ? 0.0 : 1.0;
+    }
+  }, [darkMode]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -277,7 +296,12 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
       return; // WebGL unavailable — SceneErrorBoundary will hide the canvas
     }
 
-    const dpr = Math.min(window.devicePixelRatio, 1.0);
+    /* Pixel budget: keep rendered pixels ≤ 1.5M so the GPU stays at 60 fps.
+       On large / high-DPI screens this scales DPR down automatically.       */
+    const computeDpr = (w: number, h: number) =>
+      Math.min(window.devicePixelRatio, Math.max(Math.sqrt(1_500_000 / (w * h)), 0.5));
+
+    let dpr = computeDpr(canvas.clientWidth, canvas.clientHeight);
     renderer.setPixelRatio(dpr);
     renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
 
@@ -295,9 +319,11 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
       uCamPos: { value: new THREE.Vector3(0, 1.8, 10) },
       uCamDir: { value: new THREE.Vector3(0, -1.8, -10).normalize() },
       uCamUp:  { value: new THREE.Vector3(0, 1, 0) },
-      uFov:    { value: 55.0 },
-      uOffset: { value: 0.6 },  // shift black hole left; eases to 0 on scroll
+      uFov:      { value: 55.0 },
+      uOffset:   { value: 0.6 },  // shift black hole left; eases to 0 on scroll
+      uLightMode: { value: document.documentElement.getAttribute('data-theme') === 'light' ? 1.0 : 0.0 },
     };
+    uniformsRef.current = uniforms;
 
     /* ── Fullscreen quad ─────────────────────────────── */
     const material = new THREE.ShaderMaterial({
@@ -314,6 +340,8 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
     const ro = new ResizeObserver(() => {
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
+      dpr = computeDpr(w, h);
+      renderer.setPixelRatio(dpr);
       renderer.setSize(w, h, false);
       uniforms.uResolution.value.set(w * dpr, h * dpr);
     });
@@ -322,12 +350,18 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
     /* ── Animation loop ──────────────────────────────── */
     const camPos = new THREE.Vector3();
     const camDir = new THREE.Vector3();
-    const startMs = Date.now();
+    const startMs = performance.now();
     let animId: number;
+    /* Cap at 60 fps — on 120/144 Hz screens rAF fires at screen rate,
+       which doubles GPU work with no visible benefit.                  */
+    const FRAME_MS = 1000 / 60;
+    let lastFrameTime = 0;
 
-    const animate = () => {
+    const animate = (now: DOMHighResTimeStamp) => {
       animId = requestAnimationFrame(animate);
-      const t = (Date.now() - startMs) / 1000;
+      if (now - lastFrameTime < FRAME_MS - 0.5) return;
+      lastFrameTime = now;
+      const t = (now - startMs) / 1000;
       const p = scrollProgressRef.current;          // 0 → 1
 
       /* Slow orbital rotation + scroll-driven zoom */
@@ -350,7 +384,7 @@ const BlackHole = ({ scrollProgressRef }: BlackHoleProps) => {
 
       renderer.render(scene, dummyCam);
     };
-    animate();
+    animate(performance.now());
 
     return () => {
       cancelAnimationFrame(animId);

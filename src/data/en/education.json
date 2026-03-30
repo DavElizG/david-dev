@@ -1,0 +1,38 @@
+[
+  {
+    "id_education": 1,
+    "degree": "Information Systems Engineering",
+    "institution": "Universidad Nacional de Costa Rica",
+    "location": "Nicoya, Costa Rica",
+    "startDate": "2022",
+    "endDate": "In progress (expected 2025)",
+    "description": "Specialization in software development and enterprise information systems."
+  },
+  {
+    "id_education": 2,
+    "degree": "Diploma in Computer Applications",
+    "institution": "Universidad Nacional de Costa Rica",
+    "location": "Nicoya, Costa Rica",
+    "startDate": "2022",
+    "endDate": "2024",
+    "description": "Specialized training in application development with emphasis on web technologies and relational databases."
+  },
+  {
+    "id_education": 3,
+    "degree": "BUSINESS STRATEGIES FOR YOUNG ENTREPRENEURS",
+    "institution": "Instituto Nacional de Aprendizaje (INA)",
+    "location": "Santa Cruz, Guanacaste",
+    "startDate": "2023",
+    "endDate": "November 2023",
+    "description": "Program with Technician qualification level and 252-hour duration. Training in business strategies for young entrepreneurs."
+  },
+  {
+    "id_education": 4,
+    "degree": "RPA Developer Foundation",
+    "institution": "UiPath Academy",
+    "location": "Online",
+    "startDate": "2023",
+    "endDate": "November 2023",
+    "description": "Certification in robotic process automation (RPA) development, covering fundamentals of enterprise workflow automation."
+  }
+]

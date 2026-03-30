@@ -1,5 +1,6 @@
 import { lazy, Suspense, useRef } from 'react';
 import { SEO } from '../../components/common';
+import { useLanguage } from '../../context';
 import HeroSection from '../../components/sections/Hero/HeroSection';
 
 const JourneySection = lazy(() => import('../../components/sections/Journey/JourneySection'));
@@ -18,13 +19,14 @@ const SectionLoader = () => (
 
 const HomePage = () => {
   const scrollProgressRef = useRef<number>(0);
+  const { t } = useLanguage();
 
   return (
     <>
       <SEO
-        title="Jose Guadamuz | Full Stack Developer"
-        description="Portafolio profesional de Jose Guadamuz, desarrollador web Full Stack especializado en React, TypeScript y .NET."
-        keywords="desarrollador web, full stack, React, TypeScript, .NET, JavaScript, frontend, backend, Jose Guadamuz"
+        title={t.seo.title}
+        description={t.seo.description}
+        keywords={t.seo.keywords}
       />
 
       {/* ── Scrollable content ── */}

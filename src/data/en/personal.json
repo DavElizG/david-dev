@@ -1,0 +1,22 @@
+{
+  "id_personal": 1,
+  "name": "David Guadamuz Elizondo",
+  "title": "Full Stack Developer",
+  "email": "jose.guadamuz.elizondo@est.una.ac.cr",
+  "location": "Nicoya, Costa Rica",
+  "bio": "Full Stack Developer experienced in modern technologies like React, Node.js and .NET C#. Information Systems Engineering student focused on building complete and scalable web solutions, with balanced skills in backend and frontend.",
+  "socialLinks": [
+    {
+      "id_social": 1,
+      "platform": "GitHub",
+      "url": "https://github.com/DavElizG",
+      "icon": "github"
+    },
+    {
+      "id_social": 2,
+      "platform": "LinkedIn",
+      "url": "https://www.linkedin.com/in/jose-guadamuz-elizondo-8288a5354/",
+      "icon": "linkedin"
+    }
+  ]
+}

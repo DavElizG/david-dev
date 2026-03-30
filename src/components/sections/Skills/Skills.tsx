@@ -165,9 +165,23 @@ const Skills = () => {
       }, section);
     };
 
-    const timer = setTimeout(() => {
-      if (!cancelled) setup();
-    }, 150);
+    /* Wait for DOM layout to settle before measuring track widths.
+       On slow mobile devices fonts may not be ready in 150ms, so
+       retry once if no track had a valid scrollWidth.               */
+    let retries = 0;
+    const trySetup = () => {
+      if (cancelled) return;
+      const tracks = sectionRef.current?.querySelectorAll<HTMLElement>('.skills-track');
+      const anyValid = tracks && Array.from(tracks).some(t => t.scrollWidth > 0);
+      if (!anyValid && retries < 2) {
+        retries++;
+        setTimeout(trySetup, 300);
+        return;
+      }
+      setup();
+    };
+
+    const timer = setTimeout(trySetup, 150);
 
     return () => {
       cancelled = true;

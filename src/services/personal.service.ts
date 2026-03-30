@@ -1,9 +1,7 @@
 import { fetchData } from './api';
+import type { Language } from '../context';
 import { PersonalInfo } from '../types/personal.types';
 
-/**
- * Obtiene los datos personales del portafolio
- */
-export async function getPersonalInfo(): Promise<PersonalInfo> {
-  return fetchData<PersonalInfo>('personal');
+export async function getPersonalInfo(language?: Language): Promise<PersonalInfo> {
+  return fetchData<PersonalInfo>('personal', language);
 }

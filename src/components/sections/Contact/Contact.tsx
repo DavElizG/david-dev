@@ -14,25 +14,16 @@ import { usePersonalInfo } from '../../../hooks';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import ContactForm from '../../common/ContactForm';
 import ShootingStars from '../../3d/ShootingStars';
+import { useLanguage } from '../../../context';
 import './Contact.css';
 
 gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin);
 
 const SCRAMBLE_CHARS = 'upperAndLowerCase';
 
-const QUOTES = [
-  'Hagamos algo increíble',
-  'Código con propósito',
-  'Creatividad sin límites',
-  'Ideas en movimiento',
-  'Diseño con intención',
-  'Cada pixel importa',
-  'Innovación constante',
-  'Soluciones elegantes',
-];
-
 const Contact = () => {
   const { personalInfo, loading } = usePersonalInfo();
+  const { t } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
   const ctxRef     = useRef<gsap.Context | null>(null);
   const hasEntered = useRef(false);
@@ -240,7 +231,7 @@ const Contact = () => {
       <div className="contact-status" aria-hidden="true">
         <div className="contact-status__row">
           <span className="contact-status__dot" />
-          <span className="contact-status__label">SIGNAL ACTIVE</span>
+          <span className="contact-status__label">{t.contact.signalActive}</span>
         </div>
         <span className="contact-status__coord">27.0° N — 85.5° W</span>
       </div>
@@ -258,7 +249,7 @@ const Contact = () => {
       <div className="contact-grid-overlay" aria-hidden="true" />
 
       {/* Floating scramble quotes */}
-      {QUOTES.map((q, i) => (
+      {t.contact.quotes.map((q: string, i: number) => (
         <div key={i} className="contact-quote" data-text={q}>
           {q}
         </div>
@@ -267,10 +258,10 @@ const Contact = () => {
       {/* Content grid */}
       <div className="contact-content">
         <div className="contact-panel contact-panel--info">
-          <span className="contact-panel__tag">Hablemos</span>
-          <h2 className="contact-panel__title">Contacto</h2>
+          <span className="contact-panel__tag">{t.contact.tag}</span>
+          <h2 className="contact-panel__title">{t.contact.heading}</h2>
           <p className="contact-panel__sub">
-            Disponible para proyectos freelance y oportunidades laborales.
+            {t.contact.subtitle}
           </p>
           {!loading && personalInfo && (
             <div className="contact-info-list">
