@@ -216,16 +216,10 @@ const HeroSection = ({ scrollProgressRef }: HeroSectionProps) => {
         {/* Name */}
         <h1
           ref={nameRef}
-          className="font-bold leading-none mb-5"
+          className="font-bold leading-none mb-5 hero-name-gradient"
           style={{
             fontSize: 'clamp(3.5rem, 10vw, 9rem)',
             letterSpacing: '-0.02em',
-            background: darkMode
-              ? 'linear-gradient(135deg, #ffffff 0%, #d4d4d4 50%, #8a8a8a 100%)'
-              : 'linear-gradient(135deg, #1a1a1a 0%, #2e2e2e 50%, #555555 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
           }}
         >
           {name}

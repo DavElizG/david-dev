@@ -1,10 +1,9 @@
-import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 
 interface ThemeContextType {
   darkMode: boolean;
   toggleDarkMode: (e?: React.MouseEvent | MouseEvent) => void;
-  morphKey: number;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -19,22 +18,17 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     return stored ? stored === 'dark' : true;
   });
 
-  const morphKeyRef = useRef(0);
-  const [morphKey, setMorphKey] = useState(0);
-
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
     localStorage.setItem('theme', darkMode ? 'dark' : 'light');
   }, [darkMode]);
 
   const toggleDarkMode = useCallback((_e?: React.MouseEvent | MouseEvent) => {
-    morphKeyRef.current += 1;
-    setMorphKey(morphKeyRef.current);
     setDarkMode((prev) => !prev);
   }, []);
 
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleDarkMode, morphKey }}>
+    <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
       {children}
     </ThemeContext.Provider>
   );

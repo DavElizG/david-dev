@@ -216,3 +216,18 @@ body {
     rgba(0,0,0,0.55) 70%,
     transparent 100%);
 }
+
+/* ─── Hero name gradient (CSS-driven, no React re-render conflict) ── */
+.hero-name-gradient {
+  background: linear-gradient(135deg, #ffffff 0%, #d4d4d4 50%, #8a8a8a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .hero-name-gradient {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2e2e2e 50%, #555555 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
